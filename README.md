@@ -19,9 +19,6 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 ---
 ## 🔗 Links Importantes
 * [JIRA](https://cesar-team-xgeehtz9.atlassian.net/jira/software/projects/SCRUM/boards/1)
-* 
-*
-
 
 ---
 
@@ -30,8 +27,8 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 ### Sprint 1
 * [x] Criação da estrutura inicial do projeto (repositório, `README.md`).
 * [x] Histórias bem definidas com cenários de validação usando BDD.
-[DOCS das histórias]([https://cesar-team-xgeehtz9.atlassian.net/jira/software/projects/SCRUM/boards/1](https://docs.google.com/document/d/1Do4L12gQj98wIq89vcKbAmj7p11cPLGHfdSs3oQpDPo/edit?tab=t.0))
 * [ ] Criação de protótipos de Lo-Fi no `figma`
+* [DOCS das histórias](https://docs.google.com/document/d/1Do4L12gQj98wIq89vcKbAmj7p11cPLGHfdSs3oQpDPo/edit?tab=t.0)
 
 ### Sprint 2
 * [ ] Seleção de 3 histórias para implementar.
