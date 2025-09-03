@@ -17,12 +17,20 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 * **Interface Intuitiva**: Um design limpo e fácil de usar para uma experiência de navegação agradável.
 
 ---
+## 🔗 Links Importantes
+* [JIRA](https://cesar-team-xgeehtz9.atlassian.net/jira/software/projects/SCRUM/boards/1)
+* 
+*
+
+
+---
 
 ## 🎯 Entregas do Projeto
 
 ### Sprint 1
 * [x] Criação da estrutura inicial do projeto (repositório, `README.md`).
 * [x] Histórias bem definidas com cenários de validação usando BDD.
+[DOCS das histórias]([https://cesar-team-xgeehtz9.atlassian.net/jira/software/projects/SCRUM/boards/1](https://docs.google.com/document/d/1Do4L12gQj98wIq89vcKbAmj7p11cPLGHfdSs3oQpDPo/edit?tab=t.0))
 * [ ] Criação de protótipos de Lo-Fi no `figma`
 
 ### Sprint 2
