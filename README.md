@@ -19,6 +19,7 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 ---
 ## 🔗 Links Importantes
 * [JIRA](https://cesar-team-xgeehtz9.atlassian.net/jira/software/projects/SCRUM/boards/1)
+* [FIGMA](https://www.figma.com/team_invite/redeem/uNprfevO6ROzst63JGn8dA)
 
 ---
 
