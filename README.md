@@ -31,7 +31,14 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <li>Histórias bem definidas com cenários de validação usando BDD.</li>
 <li>Criação de protótipos de Lo-Fi no FIGMA.</li>
 <li>Adicionar screencast no Youtube apresentando protótipo de baixa fidelidade.</li>
+<li><a href="https://docs.google.com/document/d/1Do4L12gQj98wIq89vcKbAmj7p11cPLGHfdSs3oQpDPo/edit?tab=t.0">DOCS das histórias</a></li> 
 </ul>
+<p align="center">
+  <img src="images/sprint01.png" alt="Sprint 01 do FIGMA" width="1500"/>
+</p>
+<p align="center">
+  <img src="images/backlog.png" alt="Backlog do JIRA" width="1500"/>
+</p>
 </details>
 
 <details><summary><h3><b>Sprint 2</b></h3></summary>
