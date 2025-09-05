@@ -79,3 +79,12 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <li>Quadro da Sprint 04 atualizado refletindo a entrega.</li>
 </ul>
 </details>
+
+---
+## 🖥️ Equipe de Desenvolvimento 
+* **Eros Amâncio Nascimento** - [ean@cesar.school](mailto:ean@cesar.school)
+* **Lucas Coutinho de Almeida Bayma** - [lcab@cesar.school](mailto:lcab@cesar.school)
+* **Luiz Felipe Siqueira** - [lfsg@cesar.school](mailto:lfsg@cesar.school)
+* **Mateus Lins Farias** - [mlf2@cesar.school](mailto:mlf2@cesar.school)
+* **Pedro David Oliveira Baia** - [pdob@cesar.school](mailto:pdob@cesar.school)
+* **Pedro Moreira** - [psblm@cesar.school](mailto:psblm@cesar.school)
