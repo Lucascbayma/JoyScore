@@ -25,51 +25,50 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 
 ## 🎯 Entregas do Projeto
 
-### Sprint 1
-* [x] Criação da estrutura inicial do projeto (repositório, `README.md`).
-* [x] Histórias bem definidas com cenários de validação usando BDD.
-* [ ] Criação de protótipos de Lo-Fi no `figma`
-* [DOCS das histórias](https://docs.google.com/document/d/1Do4L12gQj98wIq89vcKbAmj7p11cPLGHfdSs3oQpDPo/edit?tab=t.0)
+<details><summary><h3><b>Sprint 1</b></h3></summary>
+<ul>
+<li>Criação da estrutura inicial do projeto (repositório README.md).</li>
+<li>Histórias bem definidas com cenários de validação usando BDD.</li>
+<li>Criação de protótipos de Lo-Fi no FIGMA.</li>
+<li>Adicionar screencast no Youtube apresentando protótipo de baixa fidelidade.</li>
+</ul>
+</details>
 
-### Sprint 2
-* [ ] Seleção de 3 histórias para implementar.
-* [ ] Ambiente de versionamento atuante.
-* [ ] Issue/bug tracker atualizado.
-* [ ] Deployment das histórias em produção.
-* [ ] Programação em Par experimentada.
-* [ ] Quadro da `Sprint 02` atualizado refletindo a entrega.
+<details><summary><h3><b>Sprint 2</b></h3></summary>
+<ul>
+<li>Seleção de 3 histórias para implementar.</li>
+<li>Ambiente de versionamento atuante.</li>
+<li>Issue/bug tracker atualizado.</li>
+<li>Deployment das histórias em produção.</li>
+<li>Adicionar screencast no Youtube do uso do sistema.</li>
+<li>Programação em Par experimentada.</li>
+<li>Quadro da Sprint 02 atualizado refletindo a entrega.</li>
+</ul>
+</details>
 
-### Sprint 3
-* [ ] Seleção de mais histórias para implementar.
-* [ ] Ambiente de versionamento atuante.
-* [ ] Deployment das novas histórias.
-* [ ] Issue/bug tracker atualizado.
-* [ ] CI/CD com build e deployment automatizado.
-* [ ] Testes de Sistema `E2E` Automatizados.
-* [ ] Atualização sobre o uso da programação em pares.
-* [ ] Quadro da `Sprint 03` atualizado refletindo a entrega.
+<details><summary><h3><b>Sprint 3</b></h3></summary>
+<ul>
+<li>Seleção de mais histórias para implementar.</li>
+<li>Ambiente de versionamento atuante.</li>
+<li>Deployment das novas histórias.</li>
+<li>Adicionar novo screencast com ênfase nas novas histórias</li>
+<li>Issue/bug tracker atualizado.</li>
+<li>CI/CD com build e deployment automatizado.</li>
+<li>Testes de Sistema E2E Automatizados.</li>
+<li>Atualização sobre o uso da programação em pares.</li>
+<li>Quadro da Sprint 03 atualizado refletindo a entrega.</li>
+</ul>
+</details>
 
-### Sprint 4
-* [ ] Implementação das histórias restantes.
-* [ ] Ambiente de versionamento atuante.
-* [ ] Deployment das novas histórias.
-* [ ] Uso do Issue/bug tracker.
-* [ ] Testes de Sistema `E2E` automatizados.
-* [ ] CI/CD com build e deployment automatizado.
-* [ ] Atualização sobre o uso da programação em pares.
-* [ ] Quadro da `Sprint 04` atualizado refletindo a entrega.
-
----
-
-## 📅 Backlog e Quadros das Sprints
-
-* **Backlog do Projeto (Jira)**:
-    ![Captura de tela do Backlog do Jira](images/backlog.jpeg)
-
-* **Quadro da Sprint 1 (Jira)**:
-    ![Captura de tela do Quadro da Sprint 1 do Jira](images/sprint01.png)
-
-* **Quadro da Sprint 2 (Jira)**:
-    ![Captura de tela do Quadro da Sprint 2 do Jira](URL_DA_IMAGEM_DO_QUADRO_DA_SPRINT_2)
-
----
+<details><summary><h3><b>Sprint 4</b></h3></summary>
+<ul>
+<li>Implementação das histórias restantes.</li>
+<li>Ambiente de versionamento atuante.</li>
+<li>Deployment das novas histórias.</li>
+<li>Uso do Issue/bug tracker.</li>
+<li>Testes de Sistema E2E automatizados.</li>
+<li>CI/CD com build e deployment automatizado.</li>
+<li>Atualização sobre o uso da programação em pares.</li>
+<li>Quadro da Sprint 04 atualizado refletindo a entrega.</li>
+</ul>
+</details>
