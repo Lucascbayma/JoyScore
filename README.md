@@ -67,7 +67,7 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
     ![Captura de tela do Backlog do Jira](images/backlog.jpeg)
 
 * **Quadro da Sprint 1 (Jira)**:
-    ![Captura de tela do Quadro da Sprint 1 do Jira](URL_DA_IMAGEM_DO_QUADRO_DA_SPRINT_1)
+    ![Captura de tela do Quadro da Sprint 1 do Jira](images/sprint01.png)
 
 * **Quadro da Sprint 2 (Jira)**:
     ![Captura de tela do Quadro da Sprint 2 do Jira](URL_DA_IMAGEM_DO_QUADRO_DA_SPRINT_2)
