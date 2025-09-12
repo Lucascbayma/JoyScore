@@ -36,10 +36,10 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <li><a href="https://youtu.be/yQzH5eD5fhk">Vídeo do protótipo de Lo-fi</a></li>
 </ul>
 <p align="center">
-  <img src="images/sprint01.png" alt="Sprint 01 do FIGMA" width="1500"/>
+  <img src="images/NewSprint01.png" alt="Sprint 01 do FIGMA" width="1500"/>
 </p>
 <p align="center">
-  <img src="images/backlog.png" alt="Backlog do JIRA" width="1500"/>
+  <img src="images/NewBacklog.png" alt="Backlog do JIRA" width="1500"/>
 </p>
 </details>
 
