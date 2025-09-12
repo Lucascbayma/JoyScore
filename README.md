@@ -33,7 +33,7 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <li>Adicionar screencast no Youtube apresentando protótipo de baixa fidelidade.</li>
 <li><a href="https://docs.google.com/document/d/1Do4L12gQj98wIq89vcKbAmj7p11cPLGHfdSs3oQpDPo/edit?tab=t.0">DOCS das histórias</a></li>
 <li><a href="https://www.figma.com/design/MzaHIchF8uLwNGaZ5YyXol/Prot%C3%B3tipo-de-Lo-fi?node-id=7-4&p=f&t=9L0frUt6vO77NQqT-0">FIGMA das histórias</a></li>
-<li><a href="https://youtu.be/yQzH5eD5fhk">Vídeo do protótipo de Lo-fi</a></li>
+<li><a href="https://youtu.be/oIIDpBLJsUc">Vídeo do protótipo de Lo-fi</a></li>
 </ul>
 <p align="center">
   <img src="images/NewSprint01.png" alt="Sprint 01 do FIGMA" width="1500"/>
