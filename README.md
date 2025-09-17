@@ -53,6 +53,9 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <li>Programação em Par experimentada.</li>
 <li>Quadro da Sprint 02 atualizado refletindo a entrega.</li>
 </ul>
+  <p align="center">
+  <img src="images/Sprint02.png" alt="Sprint02 do jira" width="1500"/>
+</p>
 </details>
 
 <details><summary><h3><b>Sprint 3</b></h3></summary>
