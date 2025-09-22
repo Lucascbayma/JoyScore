@@ -1,15 +1,39 @@
-from django.shortcuts import render
-from .models import Jogo
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from .models import Jogo, Add_Biblioteca
 
-# Create your views here.
-
+@login_required #verifica se o usuario esta logado.
 def buscar_jogos(request):
     pesquisa = request.GET.get('q')
     jogos = Jogo.objects.all()
 
     if pesquisa:
         jogos = jogos.filter(Q(titulo__icontains=pesquisa) | Q(desenvolvedor__icontains=pesquisa) | Q(genero__icontains=pesquisa)).distinct() # Esse distinct é pra que não tenha resultados duplicados
+    
     context = {'jogos': jogos, 'pesquisa': pesquisa,}
 
     return render(request, 'buscar_jogos.hmtl', context)
+
+@login_required
+def adicionar_biblioteca(request, jogo_id):
+    #Busca o jogo ou retorna erro se não existir.
+    jogo = get_object_or_404(Jogo, pk=jogo_id)
+    
+    # Cria biblioteca caso não exista.
+    Add_Biblioteca.objects.get_or_create(usuario=request.user, jogo=jogo)
+    
+    return redirect('minha_biblioteca')
+
+
+@login_required
+def minha_biblioteca(request):
+    # Busca os jogos da biblioteca.
+    itens_biblioteca = Add_Biblioteca.objects.filter(
+        usuario=request.user
+    ).order_by('-data_adicionado')  #Ordena por data.
+    
+    context = {
+        'itens_biblioteca': itens_biblioteca
+    }
+    return render(request, 'minha_biblioteca.html', context)
