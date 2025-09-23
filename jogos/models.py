@@ -17,7 +17,7 @@ class Avaliar(models.Model):
     Buscar = models.ForeignKey(Jogo, on_delete=models.CASCADE, related_name="avaliacoes")
     usuario = models.ForeignKey(User, on_delete=models.CASCADE) # Isso é pra vincular a avaliação ao usuário!
     nota = models.IntegerField(
-        validacao = [MinValueValidator(1),MaxValueValidator(5)] # 5 estrelas
+        validators= [MinValueValidator(1),MaxValueValidator(5)] # 5 estrelas
     ) 
     comentario = models.CharField(max_length=1000, blank=True)
 
