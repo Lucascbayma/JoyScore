@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from .models import Jogo, Add_Biblioteca
+from .models import Jogo, Avaliacao
+from .forms import AvaliacaoForm #precisamos criar esse formulário
 
 @login_required #verifica se o usuario esta logado.
 def buscar_jogos(request):
@@ -37,3 +39,25 @@ def minha_biblioteca(request):
         'itens_biblioteca': itens_biblioteca
     }
     return render(request, 'minha_biblioteca.html', context)
+
+
+@login_required
+def avaliar(request,jogo_id):
+    jogo = get_object_or_404(jogo,pk = jogo_id)
+
+    if request.method== 'POST':
+        form = AvaliacaoForm(request.POST)
+        if form.is_valid():
+            avaliacao= form.save(commit=False)
+            avaliacao.jogo = jogo
+            avaliacao.usuario = request.user
+            avaliacao.save()
+            return redirect('página_do_jogo',jogo_id = jogo.id)
+    else:
+        form= AvaliacaoForm()
+
+    context= {
+        'jogo': jogo,
+        'form': form,
+    }
+    return render(request,'avaliar_jogo.html',context)
