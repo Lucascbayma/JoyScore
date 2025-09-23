@@ -16,8 +16,8 @@ from dotenv import load_dotenv
 
 load_dotenv() # Serve pra carregar as variáveis do arquivo .env
 
-SECRET_KEY = os.environ.get('xlzm(w)5t$w7dxov_7_q$*w=8_rlsv4%01zaoh6bi53gwj###i')
-API_KEY = os.environ.get('2d6f7a2d7bca4536b96d4277f0152903')
+SECRET_KEY = os.environ.get('SECRET_KEY')
+API_KEY = os.environ.get('API_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
