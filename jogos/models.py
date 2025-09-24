@@ -14,7 +14,7 @@ class Jogo(models.Model):
         return self.titulo
     
 class Avaliar(models.Model):
-    Buscar = models.ForeignKey(Jogo, on_delete=models.CASCADE, related_name="avaliacoes")
+    Jogo = models.ForeignKey(Jogo, on_delete=models.CASCADE, related_name="avaliacoes")
     usuario = models.ForeignKey(User, on_delete=models.CASCADE) # Isso é pra vincular a avaliação ao usuário!
     nota = models.IntegerField(
         validators= [MinValueValidator(1),MaxValueValidator(5)] # 5 estrelas
