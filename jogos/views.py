@@ -15,7 +15,7 @@ def buscar_jogos(request):
     
     context = {'jogos': jogos, 'pesquisa': pesquisa,}
 
-    return render(request, 'buscar_jogos.hmtl', context)
+    return render(request, 'buscar_jogos.html', context)
 
 @login_required
 def adicionar_biblioteca(request, jogo_id):
