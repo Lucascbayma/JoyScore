@@ -5,6 +5,8 @@ from .models import Jogo, Add_Biblioteca
 from .models import Jogo, Avaliar
 from .forms import AvaliacaoForm #precisamos criar esse formulário
 from django.http import HttpResponse
+import requests 
+from django.conf import settings
 
 @login_required #verifica se o usuario esta logado.
 def buscar_jogos(request):
@@ -63,4 +65,26 @@ def avaliar(request,jogo_id):
     return render(request,'avaliar_jogo.html',context)
 
 def home(request):
-    return render(request, 'home.html')
+    api_key = settings.API_KEY 
+    url = f"https://api.rawg.io/api/games?key={api_key}&page_size=20"
+    
+    dados_jogos = None # Inicializa como None para tratar erros
+    
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        # O campo 'results' geralmente contém a lista de jogos na resposta
+        dados_jogos = data.get('results', []) 
+        
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao conectar com a API RAWG: {e}")
+        # Se houver erro, dados_jogos continua como None ou lista vazia
+
+    context = {
+        'jogos_rawg': dados_jogos 
+    }
+    
+    return render(request, 'home.html', context)
