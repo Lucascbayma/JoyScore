@@ -69,11 +69,11 @@ footer{
 
 .btn-register {
     background-color: #6a1b9a; 
-    border: 1px solid #6a1b9a;
+    border: 1px solid #552f6d;
 }
 .btn-register:hover {
-    background-color: #9575a9;
-    border-color: #9575a9;
+    background-color: #8e24aa;
+    border-color: #8e24aa;
     transform: scale(1.05);
     transition: all 0.2s ease;
 }
