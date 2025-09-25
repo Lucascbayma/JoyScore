@@ -6,10 +6,7 @@ body {
     padding: 0;
     overflow-x: hidden;
 }
-footer{
-  background-color: #1a1a1a;
-  color: #f0f0f0;
-}
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -166,4 +163,11 @@ footer{
 .card-subtitle {
     font-size: 12px;
     color: #aaa;
+}
+footer {
+  background-color: #1a1a1a;
+  padding: 10px;
+  text-align: center;
+  color: white;
+  height: 40px;
 }
