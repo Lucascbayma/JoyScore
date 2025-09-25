@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from .models import Jogo, Add_Biblioteca
-from .models import Jogo, Avaliacao
+from .models import Jogo, Avaliar
 from .forms import AvaliacaoForm #precisamos criar esse formulário
 
 @login_required #verifica se o usuario esta logado.
