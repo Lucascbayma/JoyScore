@@ -4,12 +4,12 @@ from django.contrib.auth.decorators import login_required
 from .models import Jogo, Add_Biblioteca
 from .models import Jogo, Avaliar
 from .forms import AvaliacaoForm #precisamos criar esse formulário
+from django.http import HttpResponse
 
 @login_required #verifica se o usuario esta logado.
 def buscar_jogos(request):
     pesquisa = request.GET.get('q')
     jogos = Jogo.objects.all()
-
     if pesquisa:
         jogos = jogos.filter(Q(titulo__icontains=pesquisa) | Q(desenvolvedor__icontains=pesquisa) | Q(genero__icontains=pesquisa)).distinct() # Esse distinct é pra que não tenha resultados duplicados
     
@@ -61,3 +61,6 @@ def avaliar(request,jogo_id):
         'form': form,
     }
     return render(request,'avaliar_jogo.html',context)
+
+def home(request):
+    return render(request, 'home.html')

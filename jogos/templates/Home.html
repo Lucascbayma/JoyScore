@@ -1,5 +1,35 @@
-{%{% extends "/base.html" %}%}
+{% extends 'base.html' %}
 
-{%block content%}
-<h1>JOGOS</h1>
-{%endblock%}
+{% block title %}Início - JoyScore{% endblock %}
+
+{% block content %}
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">Jogos</h2>
+        </div>
+
+        <div class="card-container">
+            <div class="card">
+                <img src="" alt="Jogo">
+                <div class="card-info">
+                    <div class="card-title">Jogo 1</div>
+                    <div class="card-subtitle">Nome da empresa</div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="" alt="Jogo">
+                <div class="card-info">
+                    <div class="card-title">Jogo 2</div>
+                    <div class="card-subtitle">Nome da empresa</div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="" alt="Jogo">
+                <div class="card-info">
+                    <div class="card-title">Jogo 3</div>
+                    <div class="card-subtitle">Nome da empresa</div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

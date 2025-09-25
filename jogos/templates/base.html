@@ -1,27 +1,32 @@
-{% load static %}
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>{% block title %}JoyScore{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
 </head>
 <body>
-    <header>
+
+    <header class="header">
         <div class="logo">JoyScore</div>
-        <div class="search">
-            <input type="text" placeholder="Buscar...">
-            <button>🔍</button>
+        <nav class="nav">
+            <a href="#" class="nav-link">Início</a>
+            <a href="#" class="nav-link">Biblioteca</a>
+        </nav>
+        <div class="search-bar">
+            <input type="text" placeholder="Pesquisar">
+            <span class="search-icon">🔍</span>
         </div>
-        <div class="right-side">
-            <div class="menu-item">Biblioteca</div>
-            <div class="menu-item">Entrar</div>
+        <div class="auth-links">
+            <a href="#" class="btn-register">Entrar</a>
         </div>
     </header>
 
-    <main>
-        {% block content %}{% endblock %}
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
     </main>
     <footer>
         <p> &copy; 2025 - JoyScore</p>
