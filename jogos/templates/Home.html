@@ -1,56 +1,26 @@
-{% extends 'base.html' %}
+{%extends 'base.html'%}
 
-{% block title %}Início - JoyScore{% endblock %}
+{%block title%}Início - JoyScore{%endblock%}
 
-{% block content %}
+{%block content%}
     <section class="content-section">
         <div class="section-header">
-            <h2 class="section-title">Jogos</h2>
+            <h2 class="section-title">Jogos Populares</h2>
         </div>
 
         <div class="card-container">
-            <div class="card">
-                <img src="" alt="Jogo">
-                <div class="card-info">
-                    <div class="card-title">Jogo 1</div>
-                    <div class="card-subtitle">Nome da empresa</div>
+            {%for jogo in jogos_rawg%}
+                <div class="card">
+                    <img src="{{jogo.background_image}}" alt="{{jogo.name}}">
+                    <div class="card-info">
+                        <div class="card-title">{{jogo.name}}</div>
+                        <div class="card-subtitle">Data de Lançamento: {{jogo.released}}</div>
+                    </div>
                 </div>
-            </div>
-            <div class="card">
-                <img src="" alt="Jogo">
-                <div class="card-info">
-                    <div class="card-title">Jogo 2</div>
-                    <div class="card-subtitle">Nome da empresa</div>
-                </div>
-            </div>
-            <div class="card">
-                <img src="" alt="Jogo">
-                <div class="card-info">
-                    <div class="card-title">Jogo 3</div>
-                    <div class="card-subtitle">Nome da empresa</div>
-                </div>
-            </div>
-            <div class="card">
-                <img src="" alt="Jogo">
-                <div class="card-info">
-                    <div class="card-title">Jogo 4</div>
-                    <div class="card-subtitle">Nome da empresa</div>
-                </div>
-            </div>
-            <div class="card">
-                <img src="" alt="Jogo">
-                <div class="card-info">
-                    <div class="card-title">Jogo 5</div>
-                    <div class="card-subtitle">Nome da empresa</div>
-                </div>
-            </div>
-            <div class="card">
-                <img src="" alt="Jogo">
-                <div class="card-info">
-                    <div class="card-title">Jogo 6</div>
-                    <div class="card-subtitle">Nome da empresa</div>
-                </div>
-            </div>
+            {%empty%}
+                <p>Nenhum jogo popular encontrado no momento.</p>
+            {%endfor%}
+            
         </div>
     </section>
-{% endblock %}
+{%endblock%}
