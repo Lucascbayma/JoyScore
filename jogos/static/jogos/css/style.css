@@ -33,7 +33,7 @@ body {
 }
 
 .search-bar {
-    position: center;
+    position: relative;
     display: flex;
     align-items: center;
     background-color: #333;
