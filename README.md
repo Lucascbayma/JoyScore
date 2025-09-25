@@ -27,10 +27,10 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 
 <details><summary><h3><b>Sprint 1</b></h3></summary>
 <ul>
-<li>Criação da estrutura inicial do projeto (repositório README.md).</li>
-<li>Histórias bem definidas com cenários de validação usando BDD.</li>
-<li>Criação de protótipos de Lo-Fi no FIGMA.</li>
-<li>Adicionar screencast no Youtube apresentando protótipo de baixa fidelidade.</li>
+<li>Criação da estrutura inicial do projeto (repositório README.md).✅</li>
+<li>Histórias bem definidas com cenários de validação usando BDD.✅</li>
+<li>Criação de protótipos de Lo-Fi no FIGMA.✅</li>
+<li>Adicionar screencast no Youtube apresentando protótipo de baixa fidelidade.✅</li>
 <li><a href="https://docs.google.com/document/d/1Do4L12gQj98wIq89vcKbAmj7p11cPLGHfdSs3oQpDPo/edit?tab=t.0">DOCS das histórias</a></li>
 <li><a href="https://www.figma.com/design/MzaHIchF8uLwNGaZ5YyXol/Prot%C3%B3tipo-de-Lo-fi?node-id=7-4&p=f&t=9L0frUt6vO77NQqT-0">FIGMA das histórias</a></li>
 <li><a href="https://youtu.be/UO0U4fJKBno">Vídeo do protótipo de Lo-fi</a></li>
@@ -45,13 +45,14 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 
 <details><summary><h3><b>Sprint 2</b></h3></summary>
 <ul>
-<li>Seleção de 3 histórias para implementar.</li>
-<li>Ambiente de versionamento atuante.</li>
-<li>Issue/bug tracker atualizado.</li>
+<li>Seleção de 3 histórias para implementar.✅</li>
+<li>Ambiente de versionamento atuante.✅</li>
+<li>Issue/bug tracker atualizado.✅</li>
 <li>Deployment das histórias em produção.</li>
 <li>Adicionar screencast no Youtube do uso do sistema.</li>
-<li>Programação em Par experimentada.</li>
-<li>Quadro da Sprint 02 atualizado refletindo a entrega.</li>
+<li>Programação em Par experimentada✅</li>
+<li>Quadro da Sprint 02 atualizado refletindo a entrega.✅</li>
+<li><a href="https://docs.google.com/document/d/1cLlLR55E9F2QSTH3upHOF6-ahyTImWCMaRnRvmUL4mg/edit?tab=t.0">Relatório de programação em par </a></li>
 </ul>
   <p align="center">
   <img src="images/Sprint02.png" alt="Sprint02 do jira" width="1500"/>
