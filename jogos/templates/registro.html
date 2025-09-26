@@ -16,7 +16,7 @@
 
     <div class="container">
         <div class="header">
-            <a href="site.html" class="back-button">
+            <a href="{% url 'jogos:login' %}" class="back-button">
                 <i class="fas fa-arrow-left"></i> Voltar
             </a>
         </div>
@@ -62,9 +62,6 @@
             <button type="submit">Inscrever-se</button>
         </form>
 
-        <p class="login-text">
-            Já tem conta? <a href="#">Login</a>
-        </p>
     </div>
 
     <script>
