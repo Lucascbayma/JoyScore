@@ -4,28 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}JoyScore{% endblock %}</title>
+    <title>{% block title %}JoyScore{% endblock %}</title> 
     <link rel="stylesheet" href="{% static 'jogos/css/style.css' %}">
 </head>
 <body>
 
     <header class="header">
-        <div class="logo">JoyScore</div>
-        <div class="search-bar">
-            <input type="text" placeholder="Pesquisar">
-            <span class="search-icon">🔍</span>
-        </div>
-        <div class="auth-links">
-            <a href="#" class="btn-register">Entrar</a>
-        </div>
-    </header>
+        </header>
 
     <main class="main-content">
         {% block content %}
         {% endblock %}
     </main>
+
     <footer>
-        <p> &copy; 2025 - JoyScore</p>
-    </footer>
+      </footer>
+
+    {% block extra_scripts %}
+    {% endblock %}
+
 </body>
 </html>

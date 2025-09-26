@@ -1,8 +1,13 @@
-{%extends 'base.html'%}
+{% extends 'base.html' %}
+{% load static %} 
+{% block title %}Início - JoyScore{% endblock %}
 
-{%block title%}Início - JoyScore{%endblock%}
+{% block content %}
+    <section class="search-section">
+        <input type="text" id="game-search-input" placeholder="Pesquisar jogo">
+        <div id="autocomplete-results"></div>
+    </section>
 
-{%block content%}
     <section class="content-section">
         <div class="section-header">
             <h2 class="section-title">Jogos Populares</h2>
@@ -23,4 +28,8 @@
             
         </div>
     </section>
-{%endblock%}
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'jogos/js/autocomplete.js' %}"></script>
+{% endblock %}
