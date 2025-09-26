@@ -5,45 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Joyscore | Login</title>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
     <link rel="stylesheet" href="{% static 'jogos/css/login.css' %}"> 
 </head>
 <body>
 
     <div class="container">
-        <div class="header">
-        </div>
+        <h1>Bem-vindo de volta!</h1>
 
-        <h1>Bem-vindo de volta!</h1> <form>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p class="error-message" style="color: red; text-align: center;">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'jogos:login' %}">
+            {% csrf_token %}
             <div class="form-group">
-                <label for="email" class="required">Email</label>
-                <input type="email" id="email" placeholder="Insira seu e-mail" required>
+                <label for="username" class="required">Apelido</label>
+                <input type="text" id="username" name="username" placeholder="Insira seu apelido" required>
             </div>
 
             <div class="form-group">
                 <label for="senha" class="required">Senha</label>
                 <div class="input-wrapper">
-                    <input type="password" id="senha" placeholder="Insira sua senha" required>
+                    <input type="password" id="senha" name="password" placeholder="Insira sua senha" required>
                     <span class="toggle-password" onclick="togglePasswordVisibility('senha', this)">
                         <i class="fas fa-eye-slash"></i>
                     </span>
                 </div>
             </div>
 
-            <div class="checkbox-group">
-                <input type="checkbox" id="continuar-conectado">
-                <label for="continuar-conectado">Manter conectado</label>
-            </div>
+            <button type="submit">Entrar</button>
+        </form>
 
-            <form method="post" action="{% url 'jogos:home' %}">
-                {% csrf_token %}
-                <button type="submit">Entrar</button>
-            </form>
-        <p class="login-text">
-            <a href="#"></a>
-        </p>
         <p class="login-text">
             Não tem uma conta? <a href="{% url 'jogos:registro' %}">Criar conta</a>
         </p>
@@ -53,7 +50,6 @@
         function togglePasswordVisibility(id, iconElement) {
             const input = document.getElementById(id);
             const icon = iconElement.querySelector('i');
-
             if (input.type === "password") {
                 input.type = "text";
                 icon.classList.remove('fa-eye-slash');

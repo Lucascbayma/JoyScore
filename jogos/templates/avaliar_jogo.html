@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Joyscore | Avaliação de Jogo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* Estilos básicos para o formulário de avaliação */
+    .rating-form textarea {
+        width: 100%;
+        min-height: 80px;
+        margin-top: 1rem;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+    .rating { display: inline-block; border: none; }
+    .rating > input { display: none; }
+    .rating > label { color: #ddd; float: right; cursor: pointer; font-size: 2rem; }
+    .rating > input:checked ~ label,
+    .rating:not(:checked) > label:hover,
+    .rating:not(:checked) > label:hover ~ label { color: #f7d106; }
+  </style>
+</head>
+<body>
+
+  <header>
+      </header>
+
+  <main>
+    <section class="game-container">
+      <h1>Avaliando: {{ jogo.titulo }}</h1>
+    </section>
+
+    <section class="rating-section">
+      <h2>Sua avaliação</h2>
+      
+      {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <p style="color: green; text-align: center;">{{ message }}</p>
+            {% endfor %}
+        </div>
+      {% endif %}
+
+      <form class="rating-form" method="POST">
+        {% csrf_token %}
+        <fieldset class="rating">
+          <legend class="sr-only">Avaliação de estrelas: 1 a 5</legend>
+
+          <input type="radio" id="star5" name="nota" value="5" {% if avaliacao_existente.nota == 5 %}checked{% endif %}>
+          <label for="star5" class="star">★</label>
+          
+          <input type="radio" id="star4" name="nota" value="4" {% if avaliacao_existente.nota == 4 %}checked{% endif %}>
+          <label for="star4" class="star">★</label>
+          
+          <input type="radio" id="star3" name="nota" value="3" {% if avaliacao_existente.nota == 3 %}checked{% endif %}>
+          <label for="star3" class="star">★</label>
+          
+          <input type="radio" id="star2" name="nota" value="2" {% if avaliacao_existente.nota == 2 %}checked{% endif %}>
+          <label for="star2" class="star">★</label>
+          
+          <input type="radio" id="star1" name="nota" value="1" {% if avaliacao_existente.nota == 1 %}checked{% endif %}>
+          <label for="star1" class="star">★</label>
+        </fieldset>
+
+        <div>
+            <label for="comentario">Comentário (opcional):</label>
+            <br>
+            <textarea id="comentario" name="comentario" rows="4">{{ avaliacao_existente.comentario|default:'' }}</textarea>
+        </div>
+
+        <button type="submit" class="submit-rating">Salvar Avaliação</button>
+      </form>
+
+    </section>
+
+  </main>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-body {
+Body {
     background-color: #1a1a1a;
     color: #f0f0f0;
     font-family: 'Roboto', sans-serif;
@@ -283,4 +283,19 @@ footer {
 .autocomplete-item.error {
     color: #ff5555;
     font-weight: bold;
+}
+
+/* ===== CÓDIGO ADICIONADO PARA OS LINKS DOS CARDS ===== */
+
+.card-link {
+    text-decoration: none; /* Remove o sublinhado do link */
+    color: inherit;      /* Faz o texto do link usar a cor normal */
+    display: block;      /* Garante que o link ocupe todo o espaço do card */
+}
+
+.card-link:hover .card {
+    /* Efeito opcional para quando o mouse passa por cima */
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    transition: all 0.2s ease-out;
 }
