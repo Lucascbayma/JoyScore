@@ -13,7 +13,7 @@
         <img src="{% static 'jogos/imagens/logo.png' %}" alt="logo_JoyScore" class="logo">
         <div class="right-section">
             <div class="auth-links">
-                <a href="login.html" class="btn-register">Entrar</a>
+                <a href="{% url 'login' %}}" class="btn-register">Entrar</a>
             </div>
             <input type="checkbox" id="menu-toggle" hidden>
             <label for="menu-toggle" class="hamburger">
@@ -23,7 +23,7 @@
             </label>
             <nav class="menu">
                 <ul>
-                    <li><a href="site.html" target="_blank">Início</a></li>
+                    <li><a href="" target="_blank">Início</a></li>
                     <li><a href="remove-game.html" target="_blank">Biblioteca</a></li>
                 </ul>
             </nav>
