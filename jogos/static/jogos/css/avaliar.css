@@ -1,0 +1,260 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+
+:root {
+  --cor-fundo-principal: #1a1a1a;
+  --cor-fundo-header: #212121;
+  --cor-fundo-bloco: #333333; 
+  --cor-borda-header: #333;
+  --cor-texto-principal: #e4e4e4;
+  --cor-texto-forte: #ffffff; 
+  --cor-destaque-dourado: #db9731; 
+  --cor-destaque-roxo: #6a1b9a;
+  --cor-destaque-roxo-hover: #9575a9;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--cor-fundo-principal);
+  color: var(--cor-texto-principal);
+  font-family: 'Roboto', sans-serif;
+}
+
+
+header {
+  width: 100%;
+  background: var(--cor-fundo-header);
+  padding: 20px 50px;
+  border-bottom: 2px solid var(--cor-borda-header);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-logo-link { 
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.header-logo {
+  height: 80px; 
+  width: auto;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--cor-destaque-dourado);
+  margin-left: 15px; 
+}
+
+
+main {
+  width: 90%; 
+  max-width: 1200px; 
+  margin: 40px auto;
+}
+
+.game-container {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.cover img {
+  width: 300px;
+  height: 430px;
+  object-fit: cover;
+  background: var(--cor-fundo-bloco);
+  border-radius: 12px;
+  box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.05);
+}
+
+.game-info {
+  flex: 1;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title-section h1 {
+  font-size: 2.5rem;
+  color: var(--cor-texto-forte);
+}
+
+.add-btn {
+  background: var(--cor-destaque-roxo);
+  color: #fff;
+  font-size: 1.5rem; 
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.add-btn:hover {
+  background: var(--cor-destaque-roxo-hover);
+}
+
+
+.details {
+  margin: 20px 0;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  display: grid;
+  grid-template-columns: auto 1fr; 
+  gap: 0 10px;
+}
+
+.details dt { 
+  color: var(--cor-texto-forte);
+  font-weight: bold;
+}
+.details dd { 
+  margin-left: 0;
+}
+
+
+.description h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: var(--cor-texto-forte);
+}
+
+.description p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  background: var(--cor-fundo-bloco);
+  padding: 20px;
+  border-radius: 10px;
+  min-height: 120px;
+  border: 1px solid #2c2c3e;
+}
+
+
+.rating-section {
+  margin-top: 60px;
+  text-align: center;
+}
+
+.rating-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: var(--cor-texto-forte);
+}
+
+.rating-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rating {
+
+  display: flex;
+  justify-content: center;
+  flex-direction: row-reverse; 
+  gap: 10px;
+  margin-bottom: 30px;
+  border: none;
+  padding: 0;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.rating input[type="radio"] {
+
+  display: none;
+}
+
+.rating .star {
+
+  font-size: 2.5rem; 
+  color: #777;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+  line-height: 1; 
+}
+
+
+.rating .star:hover,
+.rating input[type="radio"]:hover ~ .star,
+.rating input[type="radio"]:checked ~ .star {
+  color: var(--cor-destaque-dourado); 
+  transform: scale(1.1);
+}
+
+
+
+.submit-rating {
+  background: var(--cor-destaque-roxo);
+  color: white;
+  border: none;
+  padding: 12px 40px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background 0.3s;
+}
+
+.submit-rating:hover {
+  background: var(--cor-destaque-roxo-hover);
+}
+
+
+@media (max-width: 850px) {
+  .game-container {
+    flex-direction: column; 
+    align-items: center;
+  }
+  
+  .cover img {
+    width: 90%;
+    max-width: 400px; 
+    height: auto;
+  }
+
+  .game-info {
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  .title-section {
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 500px) {
+    header {
+        padding: 15px 20px; 
+    }
+
+    h1 {
+        font-size: 2rem !important;
+    }
+}
