@@ -69,18 +69,26 @@ def avaliar(request, jogo_id):
 
 
 def home(request):
-    url = f"https://api.rawg.io/api/games?key={RAWG_API_KEY}&page_size=20"
+    titulos_selecionados = [
+        "The Witcher 3: Wild Hunt",
+        "Red Dead Redemption 2",
+        "Grand Theft Auto V",
+        "The Elder Scrolls V: Skyrim",
+        "Portal 2",
+        "Minecraft",
+        "God of War",
+        "Elden Ring",
+        "Fortnite",
+        "The Legend of Zelda: Breath of the Wild",
+    ]
 
-    dados_jogos = []
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        data = response.json()
-        dados_jogos = data.get('results', [])
-    except requests.exceptions.RequestException as e:
-        print(f"Erro ao conectar com a API RAWG: {e}")
-
-    context = {'jogos_rawg': dados_jogos}
+    jogos_populares = Jogo.objects.filter(
+        titulo__in=titulos_selecionados
+    ).order_by('titulo')
+    
+    context = {
+        'jogos_populares': jogos_populares, 
+    }
     return render(request, 'home.html', context)
 
 @require_GET
