@@ -7,12 +7,20 @@ from datetime import datetime
 class Command(BaseCommand):
     help = 'Importa jogos populares da API RAWG para o banco de dados local usando paginação.'
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--total',
+            type=int,
+            default=100, # Valor padrão: 100 jogos
+            help='Número total de jogos que você deseja tentar importar.'
+        )
+
     def handle(self, *args, **kwargs):
         api_key = settings.API_KEY
         
         current_url = f"https://api.rawg.io/api/games?key={api_key}&page_size=40" 
         
-        total_a_importar = 100
+        total_a_importar = 400
         jogos_importados = 0
         total_processado = 0
         
@@ -46,6 +54,7 @@ class Command(BaseCommand):
                             'ano_lancamento': ano_lancamento,
                             'desenvolvedor': 'RAWG API', 
                             'genero': genero,
+                            'background_image': game_data.get('background_image'),
                         }
                     )
 
