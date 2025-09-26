@@ -6,6 +6,7 @@ app_name = 'jogos'
 urlpatterns = [
     path('', views.home, name='home'),
     path('login/', views.login, name='login'),  
+    path('registro/', views.registro, name='registro'),
     # PATH para história 1
     path('buscar/', views.buscar_jogos, name='buscar_jogos'),
 

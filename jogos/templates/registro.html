@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Junte-se a nós!</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="stylesheet" href="{% static 'jogos/css/registro.css' %}"> 
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <a href="site.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+        <h1>Junte-se a nós!</h1>
+
+        <form>
+            <div class="form-group">
+                <label for="email" class="required">Email</label>
+                <input type="email" id="email" placeholder="Insira seu e-mail" required>
+            </div>
+
+            <div class="form-group">
+                <label for="senha" class="required">Senha</label>
+                <div class="input-wrapper">
+                    <input type="password" id="senha" placeholder="Insira sua senha" required>
+                    <span class="toggle-password" onclick="togglePasswordVisibility('senha', this)">
+                        <i class="fas fa-eye-slash"></i>
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmar-senha" class="required">Confirme sua senha</label>
+                <div class="input-wrapper">
+                    <input type="password" id="confirmar-senha" placeholder="Insira sua senha" required>
+                    <span class="toggle-password" onclick="togglePasswordVisibility('confirmar-senha', this)">
+                        <i class="fas fa-eye-slash"></i>
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="apelido" class="required">Apelido</label>
+                <input type="text" id="apelido" placeholder="Insira seu nome de usuário" required>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="continuar-conectado">
+                <label for="continuar-conectado">Continuar conectado</label>
+            </div>
+
+            <button type="submit">Inscrever-se</button>
+        </form>
+
+        <p class="login-text">
+            Já tem conta? <a href="#">Login</a>
+        </p>
+    </div>
+
+    <script>
+        function togglePasswordVisibility(id, iconElement) {
+            const input = document.getElementById(id);
+            const icon = iconElement.querySelector('i');
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        }
+    </script>
+</body>
+</html>

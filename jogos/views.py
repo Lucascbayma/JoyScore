@@ -110,4 +110,6 @@ def autocomplete_search(request):
         return JsonResponse({'error': 'Erro de comunicação com a API.'}, status=500)
 def login(request):
     return render(request, 'login.html')
+def registro(request):
+    return render(request, 'registro.html')
     
