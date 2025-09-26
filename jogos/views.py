@@ -98,24 +98,20 @@ def autocomplete_search(request):
     if not query:
         return JsonResponse({'results': []})
 
-    params = {
-        'key': settings.API_KEY,
-        'search': query,
-        'search_precise': 'true', 
-        'page_size': 3,
-    }
+    jogos_encontrados = Jogo.objects.filter(
+        titulo__icontains=query
+    ).order_by('titulo')[:4]
+    results_list = []
+    for jogo in jogos_encontrados:
+        results_list.append({
+            "id": jogo.id,
+            "name": jogo.titulo,
+            "released": jogo.ano_lancamento.isoformat() if jogo.ano_lancamento else None,
+            "background_image": jogo.background_image, 
+        })
+        
+    return JsonResponse({'results': results_list})
     
-    search_url = f'{RAWG_BASE_URL}/games'
-    
-    try:
-        response = requests.get(search_url, params=params)
-        response.raise_for_status()
-        data = response.json()
-        return JsonResponse(data)
-
-    except requests.RequestException as e:
-        print(f"Erro ao conectar com a API: {e}")
-        return JsonResponse({'error': 'Erro de comunicação com a API.'}, status=500)
 def login(request):
     return render(request, 'login.html')
 def registro(request):

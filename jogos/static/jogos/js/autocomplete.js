@@ -17,7 +17,7 @@ const fetchGames = async (query) =>{
         return;
     }
 
-    const url = `/api/search/?q=${encodeURIComponent(query)}`;
+    const url = `/autocomplete/?q=${encodeURIComponent(query)}`;
 
     try{
         resultsContainer.innerHTML = '<div class="autocomplete-loading">Buscando...</div>';
@@ -47,7 +47,7 @@ const displayResults = (games) =>{
     games.forEach(game =>{
         const item = document.createElement('a');
         item.classList.add('autocomplete-item');
-        item.href = `/game/${game.slug}/`;
+        item.href = `/jogo/${game.id}/`;
         
         item.innerHTML = `
             <img src="${game.background_image || '/static/img/default.jpg'}" alt="${game.name}" class="autocomplete-img">
