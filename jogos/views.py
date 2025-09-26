@@ -1,11 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from django import forms
 from .models import Jogo, Add_Biblioteca, Avaliar
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import requests
 from django.conf import settings
+from django.views.decorators.http import require_GET
+
+RAWG_API_KEY = settings.API_KEY
+RAWG_BASE_URL = "https://api.rawg.io/api"
 
 
 @login_required
@@ -66,8 +69,7 @@ def avaliar(request, jogo_id):
 
 
 def home(request):
-    api_key = settings.API_KEY
-    url = f"https://api.rawg.io/api/games?key={api_key}&page_size=20"
+    url = f"https://api.rawg.io/api/games?key={RAWG_API_KEY}&page_size=20"
 
     dados_jogos = []
     try:
@@ -80,3 +82,29 @@ def home(request):
 
     context = {'jogos_rawg': dados_jogos}
     return render(request, 'home.html', context)
+
+@require_GET
+def autocomplete_search(request):
+    query = request.GET.get('q')
+    
+    if not query:
+        return JsonResponse({'results': []})
+
+    params = {
+        'key': settings.API_KEY,
+        'search': query,
+        'search_precise': 'true', 
+        'page_size': 3,
+    }
+    
+    search_url = f'{RAWG_BASE_URL}/games'
+    
+    try:
+        response = requests.get(search_url, params=params)
+        response.raise_for_status()
+        data = response.json()
+        return JsonResponse(data)
+
+    except requests.RequestException as e:
+        print(f"Erro ao conectar com a API: {e}")
+        return JsonResponse({'error': 'Erro de comunicação com a API.'}, status=500)
