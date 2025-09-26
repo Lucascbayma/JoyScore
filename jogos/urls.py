@@ -17,4 +17,7 @@ urlpatterns = [
 
     # História 3: Avaliar um Jogo
     path('avaliar/<int:jogo_id>/', views.avaliar, name='avaliar'),
+
+    # Função de Busca inteligente
+    path('api/search/', views.autocomplete_search, name='api_autocomplete'),
 ]
