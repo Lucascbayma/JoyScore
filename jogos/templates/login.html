@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joyscore | Login</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="stylesheet" href="{% static 'jogos/css/login.css' %}"> 
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <a href="index.html"> <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+        <h1>Bem-vindo de volta!</h1> <form>
+            <div class="form-group">
+                <label for="email" class="required">Email</label>
+                <input type="email" id="email" placeholder="Insira seu e-mail" required>
+            </div>
+
+            <div class="form-group">
+                <label for="senha" class="required">Senha</label>
+                <div class="input-wrapper">
+                    <input type="password" id="senha" placeholder="Insira sua senha" required>
+                    <span class="toggle-password" onclick="togglePasswordVisibility('senha', this)">
+                        <i class="fas fa-eye-slash"></i>
+                    </span>
+                </div>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="continuar-conectado">
+                <label for="continuar-conectado">Manter conectado</label>
+            </div>
+
+            <button type="submit">Entrar</button> </form>
+
+        <p class="login-text">
+            <a href="#"></a>
+        </p>
+        <p class="login-text">
+            Não tem uma conta? <a href="index.html">Criar conta</a>
+        </p>
+    </div>
+
+    <script>
+        function togglePasswordVisibility(id, iconElement) {
+            const input = document.getElementById(id);
+            const icon = iconElement.querySelector('i');
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        }
+    </script>
+</body>
+</html>

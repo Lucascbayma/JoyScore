@@ -108,4 +108,6 @@ def autocomplete_search(request):
     except requests.RequestException as e:
         print(f"Erro ao conectar com a API: {e}")
         return JsonResponse({'error': 'Erro de comunicação com a API.'}, status=500)
+def login(request):
+    return render(request, 'login.html')
     
