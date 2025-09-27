@@ -27,8 +27,8 @@
                 {% csrf_token %}
                 
                 <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="Insira seu Email" required>
+                    <label for="apelido">Apelido</label>
+                    <input type="text" id="apelido" name="username" placeholder="Insira seu Apelido" required>
                 </div>
 
                 <div class="form-group">
@@ -58,7 +58,9 @@
             <img src="{% static 'jogos/imagens/logo.png' %}" alt="Joyscore Logo" class="project-logo">
         </div>
 
-    </div> <script>
+    </div> 
+    
+    <script>
         function togglePasswordVisibility(id, iconElement) {
             const input = document.getElementById(id);
             const icon = iconElement.querySelector('i');
