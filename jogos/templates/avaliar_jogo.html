@@ -24,35 +24,35 @@
     <section class="game-container">
 
       <div class="cover">
-        <img src="{{ jogo.capa_url }}" alt="Capa do Jogo" id="game-cover">
+        <img src="{{jogo.background_image}}" alt="Capa do Jogo" id="game-cover">
       </div>
 
       <div class="game-info">
         <div class="title-section">
-          <h1 id="game-title">{{ jogo.titulo }}</h1>
-          <button class="add-btn" title="Adicionar à biblioteca" aria-label="Adicionar {{ jogo.titulo }} à biblioteca">
+          <h1 id="game-title">{{jogo.titulo}}</h1>
+          <button class="add-btn" title="Adicionar à biblioteca" aria-label="Adicionar {{jogo.titulo}} à biblioteca">
             <i class="fas fa-plus"></i>
           </button>
         </div>
 
         <dl class="details">
           <dt>Gênero:</dt>
-          <dd id="game-genre">{{ jogo.genero }}</dd>
+          <dd id="game-genre">{{jogo.genero}}</dd>
 
-          <dt>Plataformas:</dt>
-          <dd id="game-platforms">{{ jogo.plataformas }}</dd>
+          <dt>Desenvolvedor:</dt>
+          <dd id="game-platforms">{{jogo.desenvolvedor}}</dd>
         </dl>
 
         <div class="description">
-          <h2>Sinopse</h2>
+          <h2>Descrição</h2>
           <p id="game-description">
-            {{ jogo.sinopse }}
+            {{jogo.descricao}}
           </p>
         </div>
       </div>
     </section>
 
-    <section class="rating-section">
+      <section class="rating-section">
       {% if messages %}
         <div class="messages">
             {% for message in messages %}
@@ -65,8 +65,6 @@
       
       <form class="rating-form" method="POST">
         {% csrf_token %}
-        
-        <input type="hidden" name="comentario" value="">
         
         <fieldset class="rating">
           <legend class="sr-only">Avaliação de estrelas: 1 a 5</legend>
@@ -85,13 +83,23 @@
           
           <input type="radio" id="star1" name="nota" value="1" aria-label="1 Estrela" {% if avaliacao_existente.nota == 1 %}checked{% endif %}>
           <label for="star1" class="star">★</label>
-
         </fieldset>
+
+        <div class="comment-field"> 
+          <label for="comment-text">Seu Comentário:</label> 
+          <textarea 
+            id="comment-text" 
+            name="comentario" 
+            rows="4" 
+            placeholder="Escreva sua avaliação sobre o jogo aqui!"
+          >{{avaliacao_existente.comentario|default:''}}</textarea>
+        </div>
         
         <button type="submit" name="acao" value="salvar" class="submit-rating">Salvar Avaliação</button>
-      </form>
 
+      </form>
     </section>
+    
 
   </main>
 
