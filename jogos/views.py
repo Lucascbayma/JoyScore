@@ -15,6 +15,7 @@ from django.contrib import messages
 RAWG_API_KEY = settings.API_KEY
 RAWG_BASE_URL = "https://api.rawg.io/api"
 
+
 def registro(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -68,6 +69,11 @@ def avaliar(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
     
 
+    esta_na_biblioteca = Add_Biblioteca.objects.filter(
+        usuario=request.user, 
+        jogo=jogo
+    ).exists()
+
     avaliacao_existente = Avaliar.objects.filter(usuario=request.user, Jogo=jogo).first()
 
     if request.method == 'POST':
@@ -87,7 +93,11 @@ def avaliar(request, jogo_id):
         messages.success(request, 'Sua avaliação foi salva com sucesso!')
         return redirect('jogos:avaliar', jogo_id=jogo.id)
 
-    context = {'jogo': jogo, 'avaliacao_existente': avaliacao_existente}
+    context = {
+        'jogo': jogo, 
+        'avaliacao_existente': avaliacao_existente,
+        'esta_na_biblioteca': esta_na_biblioteca 
+    }
     return render(request, 'avaliar_jogo.html', context)
 
 @login_required
@@ -105,15 +115,24 @@ def buscar_jogos(request):
     return render(request, 'buscar_jogos.html', context)
 
 
+
 @login_required
 def adicionar_biblioteca(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
-
-    Add_Biblioteca.objects.get_or_create(usuario=request.user, jogo=jogo)
     
+    registro_biblioteca = Add_Biblioteca.objects.filter(
+        usuario=request.user, 
+        jogo=jogo
+    ).first()
 
-    messages.success(request, f'O jogo "{jogo.titulo}" foi adicionado à sua biblioteca!')
+    if registro_biblioteca:
 
+        registro_biblioteca.delete()
+        messages.success(request, f'O jogo "{jogo.titulo}" foi removido da sua biblioteca.')
+    else:
+
+        Add_Biblioteca.objects.create(usuario=request.user, jogo=jogo)
+        messages.success(request, f'O jogo "{jogo.titulo}" foi adicionado à sua biblioteca!')
 
     return redirect('jogos:avaliar', jogo_id=jogo.id)
 

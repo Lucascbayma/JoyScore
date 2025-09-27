@@ -33,10 +33,11 @@
             <h1 id="game-title">{{jogo.titulo}}</h1>
             
             <a href="{% url 'jogos:adicionar_biblioteca' jogo.id %}" 
-               class="add-btn" 
-               title="Adicionar à biblioteca" 
-               aria-label="Adicionar {{jogo.titulo}} à biblioteca">
-                <i class="fas fa-plus"></i>
+               class="add-btn {% if esta_na_biblioteca %} added {% endif %}" 
+               title="{% if esta_na_biblioteca %}Remover da biblioteca{% else %}Adicionar à biblioteca{% endif %}"
+               aria-label="{% if esta_na_biblioteca %}Remover {{jogo.titulo}}{% else %}Adicionar {{jogo.titulo}}{% endif %}">
+                
+                <i class="fas {% if esta_na_biblioteca %}fa-check{% else %}fa-plus{% endif %}"></i>
             </a>
 
             </div>
@@ -60,12 +61,17 @@
             {% if messages %}
             <div class="messages">
                 {% for message in messages %}
-                    <p style="color: green; text-align: center;">{{ message }}</p>
+                    {% if 'removido' in message|lower or 'adicionado' in message|lower or 'sucesso' in message|lower %}
+                        <p style="color: green; text-align: center;">{{ message }}</p>
+                    {% else %}
+                        <p style="color: red; text-align: center;">{{ message }}</p>
+                    {% endif %}
                 {% endfor %}
             </div>
             {% endif %}
 
             <h2>Avalie este jogo</h2>
+            
             
             <form class="rating-form" method="POST">
                 {% csrf_token %}
