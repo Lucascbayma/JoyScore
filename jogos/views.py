@@ -115,36 +115,30 @@ def buscar_jogos(request):
     return render(request, 'buscar_jogos.html', context)
 
 
-
 @login_required
 def adicionar_biblioteca(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
     
+
     registro_biblioteca = Add_Biblioteca.objects.filter(
         usuario=request.user, 
         jogo=jogo
     ).first()
 
     if registro_biblioteca:
-
         registro_biblioteca.delete()
         messages.success(request, f'O jogo "{jogo.titulo}" foi removido da sua biblioteca.')
     else:
-
         Add_Biblioteca.objects.create(usuario=request.user, jogo=jogo)
-        messages.success(request, f'O jogo "{jogo.titulo}" foi adicionado à sua biblioteca!')
+        messages.success(request, f'O jogo "{jogo.titulo}" foi adicionado à sua biblioteca.')
 
     return redirect('jogos:avaliar', jogo_id=jogo.id)
 
 
 @login_required
 def minha_biblioteca(request):
-    itens_biblioteca = Add_Biblioteca.objects.filter(
-        usuario=request.user
-    ).order_by('-data_adicionado')
 
-    context = {'itens_biblioteca': itens_biblioteca}
-    return render(request, 'minha_biblioteca.html', context)
+    return redirect('jogos:home')
 
 
 def home(request):
