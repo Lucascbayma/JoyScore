@@ -15,7 +15,7 @@
         <div class="header-content">
           <a href="/" class="header-logo-link">
             <img src="{% static 'jogos/imagens/logo.png' %}" alt="Joyscore Logo" class="header-logo">
-            <span class="logo">Joyscore</span>
+            <span class="logo"></span>
           </a>
         </div>
     </header>
@@ -106,3 +106,37 @@
 
 </body>
 </html>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+      const addButton = document.querySelector('.add-btn');
+      const addIcon = addButton.querySelector('i');
+
+
+      function toggleAddedState() {
+
+          const isAdded = addButton.classList.contains('added');
+
+          if (isAdded) {
+
+              addButton.classList.remove('added');
+              addIcon.classList.remove('fa-check');
+              addIcon.classList.add('fa-plus');
+
+              addButton.setAttribute('title', 'Adicionar à biblioteca'); 
+              addButton.setAttribute('aria-label', 'Adicionar jogo à biblioteca');
+
+          } else {
+
+              addButton.classList.add('added');
+              addIcon.classList.remove('fa-plus');
+              addIcon.classList.add('fa-check');
+
+              addButton.setAttribute('title', 'Na biblioteca');
+              addButton.setAttribute('aria-label', 'Jogo já está na biblioteca');
+          }
+      }
+
+
+      addButton.addEventListener('click', toggleAddedState);
+  });
+</script>

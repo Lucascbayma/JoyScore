@@ -70,7 +70,6 @@ main {
   align-items: flex-start;
 }
 
-/* ESTILOS DA COLUNA ESQUERDA (IMAGEM) */
 .cover {
     width: 300px; 
     height: 430px; 
@@ -141,7 +140,7 @@ main {
 }
 
 
-/* CORREÇÃO PARA ALINHAR E SEPARAR GENERO/DESENVOLVEDOR */
+
 .details {
   margin: 20px 0;
   font-size: 1.1rem;
@@ -168,7 +167,7 @@ main {
 .game-summary-box .details {
     margin: 0;
 }
-/* FIM DA CORREÇÃO */
+
 
 
 .description h2 {
@@ -342,4 +341,22 @@ main {
     h1 {
         font-size: 2rem !important;
     }
+}
+
+.add-btn.added {
+
+  background: #4CAF50; 
+  transition: none; 
+}
+
+
+.add-btn.added:hover {
+
+  background: #45a049; 
+}
+
+
+.add-btn i.fa-check {
+
+  font-size: 1.5rem; 
 }
