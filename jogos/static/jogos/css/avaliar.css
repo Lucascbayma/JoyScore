@@ -154,7 +154,9 @@ main {
   margin-right: 5px;
 }
 
+
 .details dd { 
+  color: var(--cor-destaque-roxo); 
   margin-left: 0;
   display: inline;
 }
