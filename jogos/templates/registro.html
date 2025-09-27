@@ -10,65 +10,69 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <link rel="stylesheet" href="{% static 'jogos/css/registro.css' %}"> 
+    <link rel="stylesheet" href="{% static 'jogos/css/login.css' %}">
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
-            <a href="{% url 'jogos:login' %}" class="back-button">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </a>
+    <div class="login-wrapper">
+
+        <div class="container">
+            <h1>Junte-se a nós!</h1>
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <p class="error-message" style="color: red; text-align: center;">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'jogos:registro' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="apelido">Apelido</label>
+                    <input type="text" id="apelido" name="username" placeholder="Insira seu nome de usuário" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Insira seu e-mail" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="senha" name="password" placeholder="Insira sua senha" required>
+                        <span class="toggle-password" onclick="togglePasswordVisibility('senha', this)">
+                            <i class="fas fa-eye-slash"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmar-senha">Confirme sua senha</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="confirmar-senha" name="password2" placeholder="Insira sua senha novamente" required>
+                        <span class="toggle-password" onclick="togglePasswordVisibility('confirmar-senha', this)">
+                            <i class="fas fa-eye-slash"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <button type="submit">Inscrever-se</button>
+            </form>
+
+            <p class="login-text">
+                Já tem uma conta? <a href="{% url 'jogos:login' %}">Login</a>
+            </p>
+
         </div>
 
-        <h1>Junte-se a nós!</h1>
+        <div class="logo-container">
+            <img src="{% static 'jogos/imagens/logo.png' %}" alt="Logo do Projeto" class="project-logo">
+        </div>
 
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <p class="error-message" style="color: red; text-align: center;">{{ message }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <form method="POST" action="{% url 'jogos:registro' %}">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="apelido" class="required">Apelido</label>
-                <input type="text" id="apelido" name="username" placeholder="Insira seu nome de usuário" required>
-            </div>
-
-            <div class="form-group">
-                <label for="email" class="required">Email</label>
-                <input type="email" id="email" name="email" placeholder="Insira seu e-mail" required>
-            </div>
-
-            <div class="form-group">
-                <label for="senha" class="required">Senha</label>
-                <div class="input-wrapper">
-                    <input type="password" id="senha" name="password" placeholder="Insira sua senha" required>
-                    <span class="toggle-password" onclick="togglePasswordVisibility('senha', this)">
-                        <i class="fas fa-eye-slash"></i>
-                    </span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="confirmar-senha" class="required">Confirme sua senha</label>
-                <div class="input-wrapper">
-                    <input type="password" id="confirmar-senha" name="password2" placeholder="Insira sua senha novamente" required>
-                    <span class="toggle-password" onclick="togglePasswordVisibility('confirmar-senha', this)">
-                        <i class="fas fa-eye-slash"></i>
-                    </span>
-                </div>
-            </div>
-
-            <button type="submit">Inscrever-se</button>
-        </form>
-
-    </div>
-
-    <script>
+    </div> <script>
         function togglePasswordVisibility(id, iconElement) {
             const input = document.getElementById(id);
             const icon = iconElement.querySelector('i');

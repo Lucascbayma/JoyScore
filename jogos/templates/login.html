@@ -10,43 +10,55 @@
 </head>
 <body>
 
-    <div class="container">
-        <h1>Bem-vindo de volta!</h1>
+    <div class="login-wrapper">
 
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <p class="error-message" style="color: red; text-align: center;">{{ message }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
+        <div class="container">
+            <h1>Bem-vindo de volta!</h1>
 
-        <form method="POST" action="{% url 'jogos:login' %}">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="username" class="required">Apelido</label>
-                <input type="text" id="username" name="username" placeholder="Insira seu apelido" required>
-            </div>
-
-            <div class="form-group">
-                <label for="senha" class="required">Senha</label>
-                <div class="input-wrapper">
-                    <input type="password" id="senha" name="password" placeholder="Insira sua senha" required>
-                    <span class="toggle-password" onclick="togglePasswordVisibility('senha', this)">
-                        <i class="fas fa-eye-slash"></i>
-                    </span>
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <p class="error-message" style="color: red; text-align: center;">{{ message }}</p>
+                    {% endfor %}
                 </div>
-            </div>
+            {% endif %}
 
-            <button type="submit">Entrar</button>
-        </form>
+            <form method="POST" action="{% url 'jogos:login' %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Insira seu Email" required>
+                </div>
 
-        <p class="login-text">
-            Não tem uma conta? <a href="{% url 'jogos:registro' %}">Criar conta</a>
-        </p>
-    </div>
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="senha" name="password" placeholder="Insira sua senha" required>
+                        <span class="toggle-password" onclick="togglePasswordVisibility('senha', this)">
+                            <i class="fas fa-eye-slash"></i>
+                        </span>
+                    </div>
+                </div>
 
-    <script>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="manter_conectado" name="manter_conectado">
+                    <label for="manter_conectado" style="margin-bottom: 0;">Continuar conectado</label>
+                </div>
+
+                <button type="submit">Login</button>
+            </form>
+
+            <p class="login-text">
+                Não tem conta? <a href="{% url 'jogos:registro' %}">Registre-se</a>
+            </p>
+        </div>
+
+        <div class="logo-container">
+            <img src="{% static 'jogos/imagens/logo.png' %}" alt="Joyscore Logo" class="project-logo">
+        </div>
+
+    </div> <script>
         function togglePasswordVisibility(id, iconElement) {
             const input = document.getElementById(id);
             const icon = iconElement.querySelector('i');
