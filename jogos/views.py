@@ -15,17 +15,13 @@ from django.contrib import messages
 RAWG_API_KEY = settings.API_KEY
 RAWG_BASE_URL = "https://api.rawg.io/api"
 
-# --- NOVAS FUNÇÕES DE AUTENTICAÇÃO ---
-
 def registro(request):
     if request.method == 'POST':
-        # Pegando os dados do formulário pelo atributo 'name'
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
         password2 = request.POST.get('password2')
 
-        # Validações
         if password != password2:
             messages.error(request, 'As senhas não coincidem!')
             return redirect('jogos:registro')
@@ -36,11 +32,9 @@ def registro(request):
             messages.error(request, f'O e-mail "{email}" já foi cadastrado!')
             return redirect('jogos:registro')
         
-        # Criando o usuário
         user = User.objects.create_user(username=username, email=email, password=password)
         user.save()
         
-        # Logando o usuário recém-criado
         auth_login(request, user)
         messages.success(request, f'Conta criada com sucesso! Bem-vindo, {username}.')
         return redirect('jogos:home')
@@ -69,13 +63,10 @@ def logout_view(request):
     return redirect('jogos:login')
 
 
-# --- FUNÇÃO AVALIAR REFEITA SEM FORMS ---
-
 @login_required
 def avaliar(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
     
-    # Busca se o usuário já fez uma avaliação para este jogo
     avaliacao_existente = Avaliar.objects.filter(usuario=request.user, Jogo=jogo).first()
 
     if request.method == 'POST':
@@ -86,7 +77,6 @@ def avaliar(request, jogo_id):
             messages.error(request, 'Você precisa selecionar pelo menos uma estrela para avaliar.')
             return redirect('jogos:avaliar', jogo_id=jogo.id)
 
-        # Usando update_or_create para criar uma nova avaliação ou atualizar uma existente
         Avaliar.objects.update_or_create(
             usuario=request.user,
             Jogo=jogo,
@@ -94,14 +84,10 @@ def avaliar(request, jogo_id):
         )
         
         messages.success(request, 'Sua avaliação foi salva com sucesso!')
-        # Idealmente, você redirecionaria para a página de detalhes do jogo
-        return redirect('jogos:home') # Altere para a página de detalhes do jogo se tiver uma
+        return redirect('jogos:avaliar', jogo_id=jogo.id)
 
     context = {'jogo': jogo, 'avaliacao_existente': avaliacao_existente}
     return render(request, 'avaliar_jogo.html', context)
-
-
-# --- SUAS OUTRAS VIEWS (mantidas como estavam) ---
 
 @login_required
 def buscar_jogos(request):
