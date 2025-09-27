@@ -122,7 +122,12 @@ main {
   color: var(--cor-texto-forte);
 }
 
+
 .add-btn {
+
+  display: block; 
+  position: relative;
+  
   background: var(--cor-destaque-roxo);
   color: #fff;
   font-size: 1.5rem; 
@@ -139,6 +144,15 @@ main {
   background: var(--cor-destaque-roxo-hover);
 }
 
+
+.add-btn i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    line-height: 1; 
+    display: block; 
+}
 
 
 .details {

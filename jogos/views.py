@@ -67,6 +67,7 @@ def logout_view(request):
 def avaliar(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
     
+
     avaliacao_existente = Avaliar.objects.filter(usuario=request.user, Jogo=jogo).first()
 
     if request.method == 'POST':
@@ -107,8 +108,14 @@ def buscar_jogos(request):
 @login_required
 def adicionar_biblioteca(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
+
     Add_Biblioteca.objects.get_or_create(usuario=request.user, jogo=jogo)
-    return redirect('minha_biblioteca')
+    
+
+    messages.success(request, f'O jogo "{jogo.titulo}" foi adicionado à sua biblioteca!')
+
+
+    return redirect('jogos:avaliar', jogo_id=jogo.id)
 
 
 @login_required
@@ -122,6 +129,7 @@ def minha_biblioteca(request):
 
 
 def home(request):
+
     titulos_selecionados = [
         "The Witcher 3: Wild Hunt",
         "Red Dead Redemption 2",
@@ -139,8 +147,21 @@ def home(request):
         titulo__in=titulos_selecionados
     ).order_by('titulo')
     
+
+    jogos_biblioteca = None 
+    
+    if request.user.is_authenticated:
+        itens_biblioteca = Add_Biblioteca.objects.filter(
+            usuario=request.user
+        ).order_by('-data_adicionado')
+        
+
+        jogos_biblioteca = [item.jogo for item in itens_biblioteca]
+
     context = {
         'jogos_populares': jogos_populares, 
+
+        'jogos': jogos_biblioteca, 
     }
     return render(request, 'home.html', context)
 

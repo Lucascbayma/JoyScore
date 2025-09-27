@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% load static %} 
+
 {% block title %}Início - JoyScore{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'jogos/css/biblioteca.css' %}"> 
+{% endblock %}
+
 
 {% block content %}
     <section class="search-section">
@@ -29,6 +35,9 @@
             {% endfor %}
         </div>
     </section>
+    
+    {% include 'biblioteca.html' %} 
+    
 {% endblock %}
 
 {% block extra_scripts %}

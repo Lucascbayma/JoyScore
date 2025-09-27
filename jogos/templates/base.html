@@ -5,27 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}JoyScore{% endblock %}</title> 
+    
     <link rel="stylesheet" href="{% static 'jogos/css/style.css' %}">
+    
+    {% block extra_css %}
+    {% endblock %}
+    
 </head>
 <body>
-
     <header class="header">
-        <img src="{% static 'jogos/imagens/logo.png' %}" alt="logo_JoyScore" class="logo">
-        <div class="right-section">
-            <input type="checkbox" id="menu-toggle" hidden>
-            <label for="menu-toggle" class="hamburger">
-                <div></div>
-                <div></div>
-                <div></div>
-            </label>
-            <nav class="menu">
-                <ul>
-                    <li><a href="" target="_blank">Início</a></li>
-                    <li><a href="remove-game.html" target="_blank">Biblioteca</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+        </header>
 
     <main class="main-content">
         {% block content %}

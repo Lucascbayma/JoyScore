@@ -25,17 +25,21 @@
 
       <div class="cover">
         <img src="{{jogo.background_image}}" alt="Capa do Jogo" id="game-cover">
-        
       </div>
 
       <div class="game-info">
         
         <div class="title-section">
             <h1 id="game-title">{{jogo.titulo}}</h1>
-            <button class="add-btn" title="Adicionar à biblioteca" aria-label="Adicionar {{jogo.titulo}} à biblioteca">
+            
+            <a href="{% url 'jogos:adicionar_biblioteca' jogo.id %}" 
+               class="add-btn" 
+               title="Adicionar à biblioteca" 
+               aria-label="Adicionar {{jogo.titulo}} à biblioteca">
                 <i class="fas fa-plus"></i>
-            </button>
-        </div>
+            </a>
+
+            </div>
 
         <dl class="details">
             <dt>Gênero:</dt>
@@ -105,30 +109,6 @@
     </main>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-      const addButton = document.querySelector('.add-btn');
-      const addIcon = addButton.querySelector('i');
-
-      function toggleAddedState() {
-          const isAdded = addButton.classList.contains('added');
-
-          if (isAdded) {
-              addButton.classList.remove('added');
-              addIcon.classList.remove('fa-check');
-              addIcon.classList.add('fa-plus');
-              addButton.setAttribute('title', 'Adicionar à biblioteca'); 
-              addButton.setAttribute('aria-label', 'Adicionar jogo à biblioteca');
-          } else {
-              addButton.classList.add('added');
-              addIcon.classList.remove('fa-plus');
-              addIcon.classList.add('fa-check');
-              addButton.setAttribute('title', 'Na biblioteca');
-              addButton.setAttribute('aria-label', 'Jogo já está na biblioteca');
-          }
-      }
-
-      addButton.addEventListener('click', toggleAddedState);
-  });
 </script>
 
 </body>
