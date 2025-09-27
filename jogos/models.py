@@ -10,6 +10,7 @@ class Jogo(models.Model):
     ano_lancamento = models.DateField(blank=True,null=True)
     genero = models.CharField(max_length=50, blank=True)
     background_image = models.URLField(max_length=500, blank=True, null=True)
+    descricao = models.TextField(blank=True, null=True) 
 
     def __str__(self):
         return self.titulo

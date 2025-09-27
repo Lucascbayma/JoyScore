@@ -11,7 +11,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--total',
             type=int,
-            default=100, # Valor padrão: 100 jogos
+            default=400,
             help='Número total de jogos que você deseja tentar importar.'
         )
 
@@ -20,7 +20,7 @@ class Command(BaseCommand):
         
         current_url = f"https://api.rawg.io/api/games?key={api_key}&page_size=40" 
         
-        total_a_importar = 400
+        total_a_importar = kwargs['total']
         jogos_importados = 0
         total_processado = 0
         
@@ -34,27 +34,38 @@ class Command(BaseCommand):
                 response.raise_for_status()
                 data = response.json()
                 
-                for game_data in data.get('results', []):
+                for game_list_data in data.get('results', []):
                     if total_processado >= total_a_importar:
                         break 
+                        
+                    game_id = game_list_data['id']
+                    details_url = f"https://api.rawg.io/api/games/{game_id}?key={api_key}"
                     
-                    data_lancamento_str = game_data.get('released')
+                    details_response = requests.get(details_url)
+                    details_response.raise_for_status()
+                    game_details = details_response.json()
+                    
+                    data_lancamento_str = game_details.get('released')
                     ano_lancamento = None
                     if data_lancamento_str:
                         try:
                             ano_lancamento = datetime.strptime(data_lancamento_str, '%Y-%m-%d').date()
                         except ValueError:
                             pass 
-
-                    genero = ', '.join([g['name'] for g in game_data.get('genres', [])])
+                    
+                    genero = ', '.join([g['name'] for g in game_list_data.get('genres', [])])                    
+                    descricao = game_details.get('description_raw', '')
+                    desenvolvedores_list = game_details.get('developers', [])
+                    desenvolvedor = ', '.join([d['name'] for d in desenvolvedores_list])
                     
                     jogo_obj, created = Jogo.objects.update_or_create(
-                        titulo=game_data['name'],
+                        titulo=game_details['name'],
                         defaults={
                             'ano_lancamento': ano_lancamento,
-                            'desenvolvedor': 'RAWG API', 
                             'genero': genero,
-                            'background_image': game_data.get('background_image'),
+                            'background_image': game_details.get('background_image'),
+                            'desenvolvedor': desenvolvedor,
+                            'descricao': descricao,
                         }
                     )
 
