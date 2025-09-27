@@ -55,7 +55,7 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <li><a href="https://docs.google.com/document/d/1cLlLR55E9F2QSTH3upHOF6-ahyTImWCMaRnRvmUL4mg/edit?tab=t.0">Relatório de programação em par </a></li>
 </ul>
   <p align="center">
-  <img src="images/Sprint02_att.png." alt="Sprint02_att.png" width="1500"/>
+  <img src="images/Sprint02_att.png" alt="Sprint02_att.png" width="1500"/>
 </p>
 </details>
 
