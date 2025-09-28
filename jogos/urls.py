@@ -5,7 +5,7 @@ app_name = 'jogos'
 
 urlpatterns = [
     path('home/', views.home, name='home'),
-    path('', views.home, name='temp_home'), # Alterado de views.login, mudança temporaria
+    path('', views.login_view, name='login'), # Alterado de views.login
     path('registro/', views.registro, name='registro'),
     path('logout/', views.logout_view, name='logout'), # URL para sair
     path('biblioteca/', views.minha_biblioteca, name='biblioteca'),
