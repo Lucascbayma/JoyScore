@@ -48,11 +48,13 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <li>Seleção de 3 histórias para implementar.✅</li>
 <li>Ambiente de versionamento atuante.✅</li>
 <li>Issue/bug tracker atualizado.✅</li>
-<li>Deployment das histórias em produção.</li>
-<li>Adicionar screencast no Youtube do uso do sistema.</li>
+<li>Deployment das histórias em produção.✅</li>
+<li>Adicionar screencast no Youtube do uso do sistema.✅</li>
 <li>Programação em Par experimentada✅</li>
 <li>Quadro da Sprint 02 atualizado refletindo a entrega.✅</li>
 <li><a href="https://docs.google.com/document/d/1cLlLR55E9F2QSTH3upHOF6-ahyTImWCMaRnRvmUL4mg/edit?tab=t.0">Relatório de programação em par </a></li>
+<li><a href="https://youtu.be/MG5x-7HTrK4">Vídeo de teste das primeiras histórias implementadas</a></li>
+<li><a href="https://lcsbayma.pythonanywhere.com/">Link do site JoyScore</a></li>
 </ul>
   <p align="center">
   <img src="images/Sprint02_att.png" alt="Sprint02_att.png" width="1500"/>
