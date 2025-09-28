@@ -18,7 +18,7 @@ from decouple import config
 load_dotenv() # Serve pra carregar as variáveis do arquivo .env
 
 
-API_KEY = os.environ.get('API_KEY')
+API_KEY = "2d6f7a2d7bca4536b96d4277f0152903"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
