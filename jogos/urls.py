@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.login_view, name='login'), # Alterado de views.login
     path('registro/', views.registro, name='registro'),
     path('logout/', views.logout_view, name='logout'), # URL para sair
+    path('biblioteca/', views.biblioteca, name='biblioteca'),
 
     path('buscar/', views.buscar_jogos, name='buscar_jogos'),
     path('minha-biblioteca/', views.minha_biblioteca, name='minha_biblioteca'),

@@ -8,17 +8,16 @@ Body {
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
-    background-color: #212121;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background-color: #212121;
 }
 
-.logo {
-    width: auto; 
-    height: 70px; 
-    margin: 0; 
+.logo-img {
+    max-width: 150px; 
+    height: auto;     
 }
 
 .nav {

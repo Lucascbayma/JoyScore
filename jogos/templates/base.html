@@ -14,7 +14,28 @@
 </head>
 <body>
     <header class="header">
-        </header>
+        <div class="logo-container">
+            <img src="{% static 'jogos/imagens/logo.png' %}"
+                alt="JoyScore"
+                class="logo-img"
+                style="display:block; max-width:220px; max-height:72px; width:auto; height:auto;">
+        </div>
+
+        <div class="right-section">
+            <input type="checkbox" id="menu-toggle" hidden>
+            <label for="menu-toggle" class="hamburger">
+                <div></div>
+                <div></div>
+                <div></div>
+            </label>
+            <nav class="menu">
+                <ul>
+                    <li><a href="{% url 'jogos:home' %}" target="_blank">Início</a></li>
+                    <li><a href="{% url 'jogos:minha_biblioteca' %}" target="_blank">Biblioteca</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
     <main class="main-content">
         {% block content %}
