@@ -86,11 +86,14 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 </ul>
 </details>
 
----
-## 🖥️ Equipe de Desenvolvimento 
-* **Eros Amâncio Nascimento** - [ean@cesar.school](mailto:ean@cesar.school)
-* **Lucas Coutinho de Almeida Bayma** - [lcab@cesar.school](mailto:lcab@cesar.school)
-* **Luiz Felipe Siqueira** - [lfsg@cesar.school](mailto:lfsg@cesar.school)
-* **Mateus Lins Farias** - [mlf2@cesar.school](mailto:mlf2@cesar.school)
-* **Pedro David Oliveira Baia** - [pdob@cesar.school](mailto:pdob@cesar.school)
-* **Pedro Moreira** - [psblm@cesar.school](mailto:psblm@cesar.school)
+## 👥 Equipe de Desenvolvimento 
+
+Agradecimentos especiais a todas as pessoas que contribuíram com este projeto 💜
+
+* **Eros Amâncio Nascimento** - [@erosamancio](https://github.com/erosamancio)
+* **Lucas Coutinho de Almeida Bayma** - [@lucascbaymma](https://github.com/lucascbaymma)
+* **Luiz Felipe Siqueira** - [@LuizNoCode](https://github.com/LuizNoCode)
+* **Mateus Lins Farias** - [@mateuslinsf](https://github.com/mateuslinsf)
+* **Pedro David Oliveira Baia** - [@Pedrodavidob](https://github.com/Pedrodavidob)
+* **Pedro Moreira** - [@PedroMoreira18](https://github.com/PedroMoreira18)
+  
