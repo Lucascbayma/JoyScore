@@ -2,35 +2,20 @@
 {% load static %} 
 
 {% block title %}avaliar - JoyScore{% endblock %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <title>Joyscore | Avaliação de Jogo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  
-  <link rel="stylesheet" href="{% static 'jogos/css/avaliar.css' %}"> 
-</head>
-<body>
 
-    <header>
-        <div class="header-content">
-          <a href="{% url 'jogos:minha_biblioteca' %}" class="header-logo-link">
-            <img src="{% static 'jogos/imagens/logo.png' %}" alt="Joyscore Logo" class="header-logo">
-            <span class="logo"></span>
-          </a>
-        </div>
-    </header>
+{% block extra_css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'jogos/css/avaliar.css' %}"> 
+{% endblock %}
 
-  <main>
-    <section class="game-container">
-
-      <div class="cover">
+{% block content %}
+<section class="game-container">
+    
+    <div class="cover">
         <img src="{{jogo.background_image}}" alt="Capa do Jogo" id="game-cover">
-      </div>
+    </div>
 
-      <div class="game-info">
+    <div class="game-info">
         
         <div class="title-section">
             <h1 id="game-title">{{jogo.titulo}}</h1>
@@ -115,10 +100,8 @@
         
       </div>
     </section>
-    </main>
 
-<script>
-</script>
+{% endblock content %}
 
-</body>
-</html>
+{% block extra_scripts %}
+    {% endblock %}
