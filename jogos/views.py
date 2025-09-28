@@ -40,7 +40,7 @@ def registro(request):
         messages.success(request, f'Conta criada com sucesso! Bem-vindo, {username}.')
         return redirect('jogos:home')
 
-    return render(request, 'registro.html')
+    return render(request, 'jogos/registro.html')
 
 
 def login_view(request):
@@ -57,7 +57,7 @@ def login_view(request):
             messages.error(request, 'Apelido ou senha inválidos.')
             return redirect('jogos:login')
             
-    return render(request, 'login.html')
+    return render(request, 'jogos/login.html')
 
 def logout_view(request):
     auth_logout(request)
@@ -98,7 +98,7 @@ def avaliar(request, jogo_id):
         'avaliacao_existente': avaliacao_existente,
         'esta_na_biblioteca': esta_na_biblioteca 
     }
-    return render(request, 'avaliar_jogo.html', context)
+    return render(request, 'jogos/avaliar_jogo.html', context)
 
 @login_required
 def buscar_jogos(request):
@@ -112,7 +112,7 @@ def buscar_jogos(request):
         ).distinct()
 
     context = {'jogos': jogos, 'pesquisa': pesquisa}
-    return render(request, 'buscar_jogos.html', context)
+    return render(request, 'jogos/buscar_jogos.html', context)
 
 
 @login_required
@@ -176,7 +176,7 @@ def home(request):
 
         'jogos': jogos_biblioteca, 
     }
-    return render(request, 'home.html', context)
+    return render(request, 'jogos/home.html', context)
 
 @require_GET
 def autocomplete_search(request):
