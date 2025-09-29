@@ -93,7 +93,7 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 Agradecimentos especiais a todas as pessoas que contribuíram com este projeto 💜
 
 * **Eros Amâncio Nascimento** - [@erosamancio](https://github.com/erosamancio)
-* **Lucas Coutinho de Almeida Bayma** - [@lucascbaymma](https://github.com/lucascbaymma)
+* **Lucas Coutinho de Almeida Bayma** - [@lucascbaymma](https://github.com/lucascbayma)
 * **Luiz Felipe Siqueira** - [@LuizNoCode](https://github.com/LuizNoCode)
 * **Mateus Lins Farias** - [@mateuslinsf](https://github.com/mateuslinsf)
 * **Pedro David Oliveira Baia** - [@Pedrodavidob](https://github.com/Pedrodavidob)
