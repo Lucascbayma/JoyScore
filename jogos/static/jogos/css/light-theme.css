@@ -1,0 +1,167 @@
+
+:root[data-theme="light"] {
+    --bg-primary: #ffffff;         
+    --bg-secondary: #f0f0f0;       
+    --text-primary: #1a1a1a;       
+    --text-secondary: #4a4a4a;     
+    --border-color: #cccccc;      
+    --accent-primary: #6a1b9a;     
+    --accent-secondary: #8e24aa;   
+}
+
+
+
+body[data-theme="light"] {
+    background-color: #ffffff; 
+    color: #1a1a1a;            
+}
+
+
+body[data-theme="light"] .header,
+body[data-theme="light"] footer {
+    background-color: #f0f0f0; 
+}
+
+
+body[data-theme="light"] .nav-link,
+body[data-theme="light"] .menu ul li a {
+    color: #1a1a1a; 
+}
+
+body[data-theme="light"] .hamburger div {
+  background: #1a1a1a; 
+}
+
+
+body[data-theme="light"] .menu {
+  background: #ffffff; 
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+body[data-theme="light"] #theme-toggle {
+    color: #1a1a1a;
+}
+
+
+
+body[data-theme="light"] #game-search-input {
+    color: #1a1a1a;      
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;   
+}
+
+body[data-theme="light"] #game-search-input:focus {
+    border-color: #8e24aa; 
+}
+
+body[data-theme="light"] #autocomplete-results {
+    background: #ffffff;   
+    border: 1px solid #ccc; 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="light"] .autocomplete-item {
+    color: #1a1a1a; 
+}
+
+body[data-theme="light"] .autocomplete-item:hover, 
+body[data-theme="light"] .autocomplete-item:focus {
+    background-color: #eeeeee; 
+    color: #8e24aa; 
+}
+
+body[data-theme="light"] .autocomplete-loading, 
+body[data-theme="light"] .autocomplete-item.error,
+body[data-theme="light"] .autocomplete-item:not(a) {
+    color: #777; 
+}
+
+
+body[data-theme="light"] .card-container {
+    scrollbar-color: #999 #eee; 
+}
+
+body[data-theme="light"] .card-container::-webkit-scrollbar-thumb {
+    background-color: #999;
+}
+body[data-theme="light"] .card-container::-webkit-scrollbar-track {
+    background-color: #eee; 
+}
+
+
+body[data-theme="light"] .card-info {
+
+    background: rgba(0, 0, 0, 0.7); 
+}
+
+body[data-theme="light"] .card-subtitle {
+    color: #ccc;
+}
+
+
+
+body[data-theme="light"] {
+
+    --cor-fundo-principal: #f5f5f5;      
+    --cor-texto: #1a1a1a;               
+    --cor-destaque-primaria: #6a1b9a;   
+    --cor-destaque-secundaria: #8e24aa;  
+    --cor-cinza-claro: #555555;          
+    --cor-fundo-transicao: #e0e0e0;      
+}
+
+
+body[data-theme="light"] {
+    background-color: var(--cor-fundo-principal);
+    color: var(--cor-texto);
+}
+
+
+body[data-theme="light"] .game-item:hover {
+
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15), 0 0 0 3px var(--cor-destaque-secundaria);
+}
+
+
+
+body[data-theme="light"] {
+
+    --cor-fundo-principal: #ffffff;      /* De #1a1a1a para Branco Puro */
+    --cor-fundo-header: #f0f0f0;         /* De #212121 para Cinza Claro */
+    --cor-fundo-bloco: #f8f8f8;          /* De #333333 para Cinza Super Claro */
+    --cor-borda-header: #cccccc;         /* De #333 para Cinza Claro/Borda */
+    --cor-texto-principal: #1a1a1a;      /* De #e4e4e4 para Preto */
+    --cor-texto-forte: #333333;          /* De #ffffff para Cinza Escuro (Títulos) */
+    --cor-destaque-dourado: #db9731;     /* Mantido o Dourado */
+    --cor-destaque-roxo: #6a1b9a;        /* Mantido o Roxo */
+    --cor-destaque-roxo-hover: #9575a9;  /* Mantido o Roxo Claro */
+}
+
+/* Header */
+body[data-theme="light"] header {
+    border-bottom: 2px solid var(--cor-borda-header);
+    background: var(--cor-fundo-header);
+}
+
+/* Capa do Jogo (Ajuste da Sombra) */
+body[data-theme="light"] .cover img {
+    /* Ajusta a cor de fundo e a sombra para fundos claros */
+    background: #eeeeee;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Bloco de Avaliação (rating-section) */
+body[data-theme="light"] .rating-section {
+    background-color: #eeeeee; /* De rgb(52, 50, 50) para Cinza Claro */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Área de Comentários (textarea) */
+body[data-theme="light"] .comment-field textarea {
+    /* Inverte as cores da textarea para o modo claro, se ela não usar as variáveis do arquivo */
+    background-color: #ffffff; 
+    color: #333; 
+    border: 1px solid #ccc;
+}

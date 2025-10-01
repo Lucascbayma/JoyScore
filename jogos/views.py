@@ -147,12 +147,12 @@ def home(request):
         "The Witcher 3: Wild Hunt",
         "Red Dead Redemption 2",
         "Grand Theft Auto V",
-        "The Elder Scrolls V: Skyrim",
+        "Hollow Knight",
         "Portal 2",
         "Minecraft",
         "God of War",
         "Elden Ring",
-        "Fortnite",
+        "Fortnite Battle Royale",
         "The Legend of Zelda: Breath of the Wild",
     ]
 

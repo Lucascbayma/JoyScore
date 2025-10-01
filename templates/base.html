@@ -8,11 +8,13 @@
     
     <link rel="stylesheet" href="{% static 'jogos/css/style.css' %}">
     
+    <link rel="stylesheet" href="{% static 'jogos/css/light-theme.css' %}" disabled id="light-theme-style">
+    
     {% block extra_css %}
     {% endblock %}
     
 </head>
-<body>
+<body data-theme="dark">
     <header class="header">
         <div class="logo-container">
             <img src="{% static 'jogos/imagens/logo.png' %}"
@@ -32,6 +34,13 @@
                 <ul>
                     <li><a href="{% url 'jogos:home' %}" target="_blank">Início</a></li>
                     <li><a href="{% url 'jogos:minha_biblioteca' %}" target="_blank">Biblioteca</a></li>
+                    
+                    <li>
+                        <button id="theme-toggle" style="background: none; border: none; color: inherit; font: inherit; cursor: pointer; padding: 0; text-align: left; width: 100%; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-moon" id="theme-icon"></i> 
+                            <span id="theme-text">Modo Branco</span>
+                        </button>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -45,6 +54,42 @@
     <footer>
         <p>&copy; 2025-JoyScore</p>
     </footer>
+
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const lightThemeStyle = document.getElementById('light-theme-style');
+        const body = document.body;
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                body.setAttribute('data-theme', 'light');
+                lightThemeStyle.disabled = false;
+                if (themeIcon) themeIcon.className = 'fas fa-sun'; 
+                if (themeText) themeText.textContent = 'Modo Escuro'; 
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                lightThemeStyle.disabled = true;
+                if (themeIcon) themeIcon.className = 'fas fa-moon'; 
+                if (themeText) themeText.textContent = 'Modo Branco'; 
+            }
+            localStorage.setItem('theme', theme);
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark'; 
+            applyTheme(savedTheme);
+        });
+
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+        });
+    </script>
 
     {% block extra_scripts %}
     {% endblock %}
