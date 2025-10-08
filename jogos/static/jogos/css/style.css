@@ -1,10 +1,18 @@
-Body {
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+html,Body {
     background-color: #1a1a1a;
     color: #f0f0f0;
     font-family: 'Roboto', sans-serif;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important; 
 }
 
 .header {
@@ -13,6 +21,7 @@ Body {
   justify-content: space-between;
   padding: 0 16px;
   background-color: #212121;
+  width: 100%;
 }
 
 .logo-img {
@@ -84,8 +93,9 @@ Body {
 }
 .main-content {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 20px auto;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 .content-section {
