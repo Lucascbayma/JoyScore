@@ -219,22 +219,27 @@ footer {
   border-radius: 2px;
 }
 
-.search-section{
-    position: relative;
-    max-width: 700px;
-    margin: 40px auto;
+.header-search {
+    position: relative; 
+    flex-grow: 1;       
+    margin: 0 30px;     
+    max-width: 600px;   
 }
 
 #game-search-input{
     width: 100%;
-    padding: 18px 25px; 
-    font-size: 1.2em;
+    padding: 10px 15px; 
+    font-size: 1rem;
     color: #f0f0f0;
     background-color: #2c2c2c; 
     border: 1px solid #444; 
-    border-radius: 10px;
+    border-radius: 8px;
     box-sizing: border-box;
     transition: border-color 0.3s ease;
+}
+
+#autocomplete-results:empty {
+    display: none;
 }
 
 #game-search-input:focus{
