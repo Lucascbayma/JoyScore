@@ -149,6 +149,7 @@ def minha_biblioteca(request):
 
 
 def home(request):
+    # 1. SEÇÃO DE JOGOS POPULARES (Curadoria Manual)
     titulos_selecionados = [
         "The Witcher 3: Wild Hunt",
         "Red Dead Redemption 2",
@@ -161,13 +162,22 @@ def home(request):
         "Fortnite Battle Royale",
         "The Legend of Zelda: Breath of the Wild",
     ]
-
     jogos_populares = Jogo.objects.filter(
         titulo__in=titulos_selecionados
     ).order_by('titulo')
     
+    # 2. SEÇÕES POR GÊNERO (Filtro automático)
+    jogos_acao = Jogo.objects.filter(genero__icontains='Action').order_by('-ano_lancamento')[:10]
+    jogos_indie = Jogo.objects.filter(genero__icontains='Indie').order_by('-ano_lancamento')[:10]
+    jogos_rpg = Jogo.objects.filter(genero__icontains='RPG').order_by('-ano_lancamento')[:10]
+    jogos_shooter = Jogo.objects.filter(genero__icontains='Shooter').order_by('-ano_lancamento')[:10]
+    
     context = {
-        'jogos_populares': jogos_populares, 
+        'jogos_populares': jogos_populares,
+        'jogos_acao': jogos_acao,
+        'jogos_indie': jogos_indie,
+        'jogos_rpg': jogos_rpg,
+        'jogos_shooter': jogos_shooter,
     }
     return render(request, 'jogos/home.html', context)
 
