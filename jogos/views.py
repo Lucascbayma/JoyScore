@@ -68,7 +68,6 @@ def logout_view(request):
 def avaliar(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
     
-
     esta_na_biblioteca = Add_Biblioteca.objects.filter(
         usuario=request.user, 
         jogo=jogo
@@ -119,7 +118,6 @@ def buscar_jogos(request):
 def adicionar_biblioteca(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
     
-
     registro_biblioteca = Add_Biblioteca.objects.filter(
         usuario=request.user, 
         jogo=jogo
@@ -137,12 +135,20 @@ def adicionar_biblioteca(request, jogo_id):
 
 @login_required
 def minha_biblioteca(request):
+    itens_biblioteca = Add_Biblioteca.objects.filter(
+        usuario=request.user
+    ).order_by('-data_adicionado')
+    
+    jogos_na_biblioteca = [item.jogo for item in itens_biblioteca]
 
-    return redirect('jogos:home')
+    context = {
+        'jogos': jogos_na_biblioteca, 
+    }
+    
+    return render(request, 'jogos/biblioteca.html', context)
 
 
 def home(request):
-
     titulos_selecionados = [
         "The Witcher 3: Wild Hunt",
         "Red Dead Redemption 2",
@@ -160,21 +166,8 @@ def home(request):
         titulo__in=titulos_selecionados
     ).order_by('titulo')
     
-
-    jogos_biblioteca = None 
-    
-    if request.user.is_authenticated:
-        itens_biblioteca = Add_Biblioteca.objects.filter(
-            usuario=request.user
-        ).order_by('-data_adicionado')
-        
-
-        jogos_biblioteca = [item.jogo for item in itens_biblioteca]
-
     context = {
         'jogos_populares': jogos_populares, 
-
-        'jogos': jogos_biblioteca, 
     }
     return render(request, 'jogos/home.html', context)
 

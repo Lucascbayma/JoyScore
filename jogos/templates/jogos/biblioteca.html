@@ -1,38 +1,47 @@
-{% load static %}
+{% extends 'base.html' %}
+{% load static %} 
 
-{% if user.is_authenticated and jogos %} 
-    <section class="content-section"> 
-        <h2 class="section-title">MINHA BIBLIOTECA DE JOGOS:</h2>
-        
-        <ul class="game-list">
-            {% for jogo in jogos %}
+{% block title %}Minha Biblioteca - JoyScore{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'jogos/css/biblioteca.css' %}"> 
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+
+    {% if user.is_authenticated and jogos %} 
+        <section class="content-section"> 
+            <h2 class="section-title">MINHA BIBLIOTECA DE JOGOS:</h2>
             
-            <a href="{% url 'jogos:avaliar' jogo.id %}" class="game-item-link">
-                <li class="game-item">
-                    <img src="{{ jogo.background_image }}" 
-                         alt="Capa do Jogo {{ jogo.titulo }}" 
-                         class="game-cover-img">
-                         
-                    <span class="game-title">{{ jogo.titulo }}</span>
-                </li>
-            </a>
-            
-            {% empty %}
+            <ul class="game-list">
+                {% for jogo in jogos %}
+                <a href="{% url 'jogos:avaliar' jogo.id %}" class="game-item-link">
+                    <li class="game-item">
+                        <img src="{{ jogo.background_image }}" 
+                             alt="Capa do Jogo {{ jogo.titulo }}" 
+                             class="game-cover-img">
+                        <span class="game-title">{{ jogo.titulo }}</span>
+                    </li>
+                </a>
+                {% empty %}
+                <p>Sua biblioteca está vazia. Adicione jogos!</p>
+                {% endfor %}
+            </ul>
+        </section>
+
+    {% elif user.is_authenticated %}
+        <section class="content-section">
+            <h2 class="section-title">MINHA BIBLIOTECA DE JOGOS:</h2>
             <p>Sua biblioteca está vazia. Adicione jogos!</p>
-            {% endfor %}
-        </ul>
+        </section>
         
-    </section>
+    {% else %}
+        <section class="content-section">
+            <h2 class="section-title">BIBLIOTECA DE JOGOS:</h2>
+            <p>Faça <a href="{% url 'jogos:login' %}">login</a> para visualizar e gerenciar sua biblioteca pessoal.</p>
+        </section>
+    {% endif %}
 
-{% elif user.is_authenticated %}
-    <section class="content-section">
-        <h2 class="section-title">MINHA BIBLIOTECA DE JOGOS:</h2>
-        <p>Sua biblioteca está vazia. Adicione jogos!</p>
-    </section>
-    
-{% else %}
-    <section class="content-section">
-        <h2 class="section-title">BIBLIOTECA DE JOGOS:</h2>
-        <p>Faça <a href="{% url 'jogos:login' %}">login</a> para visualizar e gerenciar sua biblioteca pessoal.</p>
-    </section>
-{% endif %}
+</main>
+{% endblock %}
