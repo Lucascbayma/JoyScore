@@ -5,28 +5,28 @@ from jogos.models import Jogo
 from datetime import datetime
 
 class Command(BaseCommand):
-    help = 'Importa jogos populares da API RAWG para o banco de dados local usando paginação.'
+    help = 'Importa jogos populares da API RAWG para o banco de dados local usando paginação, focando em adicionar jogos novos até o total especificado.'
 
     def add_arguments(self, parser):
         parser.add_argument(
             '--total',
             type=int,
             default=400,
-            help='Número total de jogos que você deseja tentar importar.'
+            help='Número total de JOGOS NOVOS/ATUALIZADOS que você deseja tentar importar.'
         )
 
     def handle(self, *args, **kwargs):
         api_key = settings.API_KEY
         
-        current_url = f"https://api.rawg.io/api/games?key={api_key}&page_size=40" 
-        
         total_a_importar = kwargs['total']
         jogos_importados = 0
-        total_processado = 0
+        total_processado_rawg = 0 
         
-        self.stdout.write(self.style.NOTICE(f'Iniciando importação de até {total_a_importar} jogos da RAWG...'))
+        current_url = f"https://api.rawg.io/api/games?key={api_key}&page_size=40" 
+        
+        self.stdout.write(self.style.NOTICE(f'Iniciando importação de até {total_a_importar} jogos NOVOS/ATUALIZADOS da RAWG...'))
 
-        while current_url and total_processado < total_a_importar:
+        while current_url and jogos_importados < total_a_importar:
             self.stdout.write(f'Buscando página: {current_url}')
             
             try:
@@ -35,12 +35,21 @@ class Command(BaseCommand):
                 data = response.json()
                 
                 for game_list_data in data.get('results', []):
-                    if total_processado >= total_a_importar:
+                    if jogos_importados >= total_a_importar:
                         break 
+                        
+                    game_titulo = game_list_data['name']
+                    total_processado_rawg += 1
+                    
+                    if Jogo.objects.filter(titulo=game_titulo).exists():
+                        self.stdout.write(self.style.NOTICE(f'PULANDO: "{game_titulo}" já existe no DB.'))
+                        continue
                         
                     game_id = game_list_data['id']
                     details_url = f"https://api.rawg.io/api/games/{game_id}?key={api_key}"
                     
+                    self.stdout.write(f'  -> Importando detalhes para: {game_titulo}')
+
                     details_response = requests.get(details_url)
                     details_response.raise_for_status()
                     game_details = details_response.json()
@@ -68,11 +77,9 @@ class Command(BaseCommand):
                             'descricao': descricao,
                         }
                     )
-
-                    if created:
-                        jogos_importados += 1
                     
-                    total_processado += 1
+                    jogos_importados += 1 
+                    self.stdout.write(self.style.SUCCESS(f'  -> Jogo processado: {jogo_obj.titulo} (Total: {jogos_importados}/{total_a_importar})'))
 
                 current_url = data.get('next') 
                 
@@ -83,4 +90,4 @@ class Command(BaseCommand):
                 self.stderr.write(self.style.ERROR(f'Ocorreu um erro no processamento: {e}'))
                 break 
 
-        self.stdout.write(self.style.SUCCESS(f'Importação concluída. Total de jogos processados: {total_processado}. {jogos_importados} novos jogos adicionados/atualizados.'))
+        self.stdout.write(self.style.SUCCESS(f'Importação concluída. Total de jogos da RAWG examinados: {total_processado_rawg}. {jogos_importados} novos jogos adicionados/atualizados.'))
