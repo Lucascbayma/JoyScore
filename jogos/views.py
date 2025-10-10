@@ -150,7 +150,7 @@ def minha_biblioteca(request):
 
 def home(request):
     # 1. SEÇÃO DE JOGOS POPULARES (Curadoria Manual)
-    titulos_selecionados = [
+    titulos_populares = [
         "The Witcher 3: Wild Hunt",
         "Red Dead Redemption 2",
         "Grand Theft Auto V",
@@ -163,14 +163,66 @@ def home(request):
         "The Legend of Zelda: Breath of the Wild",
     ]
     jogos_populares = Jogo.objects.filter(
-        titulo__in=titulos_selecionados
+        titulo__in=titulos_populares
     ).order_by('titulo')
     
-    # 2. SEÇÕES POR GÊNERO (Filtro automático)
-    jogos_acao = Jogo.objects.filter(genero__icontains='Action').order_by('-ano_lancamento')[:10]
-    jogos_indie = Jogo.objects.filter(genero__icontains='Indie').order_by('-ano_lancamento')[:10]
-    jogos_rpg = Jogo.objects.filter(genero__icontains='RPG').order_by('-ano_lancamento')[:10]
-    jogos_shooter = Jogo.objects.filter(genero__icontains='Shooter').order_by('-ano_lancamento')[:10]
+    # 2. SEÇÃO DE JOGOS DE AÇÃO (Curadoria Manual)
+    titulos_acao = [
+        "Sekiro: Shadows Die Twice",
+        "Devil May Cry 5",
+        "Doom Eternal",
+        "Marvel Rivals",
+        "Marvel's Spider-Man",
+        "Assassin's Creed Valhalla",
+        "Alan Wake 2",
+        "Batman: Arkham Knight",
+        "God of War: Ragnarök",
+    ]
+    jogos_acao = Jogo.objects.filter(
+        titulo__in=titulos_acao
+    ).order_by('titulo')
+    
+    # 3. SEÇÃO DE JOGOS INDIE (Curadoria Manual)
+    titulos_indie = [
+        "Hades",
+        "Cuphead",
+        "Celeste",
+        "Stardew Valley",
+        "Ori and the Will of the Wisps",
+        "Disco Elysium",
+    ]
+    jogos_indie = Jogo.objects.filter(
+        titulo__in=titulos_indie
+    ).order_by('titulo')
+
+    # 4. SEÇÃO DE JOGOS DE RPG (Curadoria Manual)
+    titulos_rpg = [
+        "Final Fantasy VII Remake",
+        "Persona 5 Royal",
+        "Dragon Age: Inquisition",
+        "Mass Effect Legendary Edition",
+        "Fallout: New Vegas",
+        "FINAL FANTASY XV",
+        "World of Warcraft",
+    ]
+    jogos_rpg = Jogo.objects.filter(
+        titulo__in=titulos_rpg
+    ).order_by('titulo')
+
+    # 5. SEÇÃO DE JOGOS DE TIRO (SHOOTER) (Curadoria Manual)
+    titulos_shooter = [
+        "Call of Duty: Modern Warfare",
+        "Apex Legends",
+        "Overwatch 2",
+        "Destiny 2",
+        "Counter-Strike: Global Offensive",
+        "Battlefield 4",
+        "Halo 3",
+        "S.T.A.L.K.E.R.: Clear Sky",
+    ]
+    jogos_shooter = Jogo.objects.filter(
+        titulo__in=titulos_shooter
+    ).order_by('titulo')
     
     context = {
         'jogos_populares': jogos_populares,
