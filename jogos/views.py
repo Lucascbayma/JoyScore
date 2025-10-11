@@ -17,7 +17,6 @@ RAWG_API_KEY = settings.API_KEY
 RAWG_BASE_URL = "https://api.rawg.io/api"
 
 
-
 def _get_all_genres(request):
     """Função auxiliar para buscar a lista de gêneros da API RAWG."""
     genres_url = f"{RAWG_BASE_URL}/genres?key={RAWG_API_KEY}"
@@ -28,7 +27,6 @@ def _get_all_genres(request):
     except requests.RequestException:
         messages.error(request, "Não foi possível buscar a lista de gêneros da API.")
         return []
-
 
 
 def registro(request):
@@ -154,6 +152,17 @@ def home(request):
 
 
 
+@login_required
+def configuracoes_conta(request):
+    """
+    Renderiza a página de configurações da conta.
+    O nome de usuário (request.user.username) é acessível automaticamente no template.
+    """
+    context = {}
+    return render(request, 'jogos/configuracoes.html', context)
+
+
+
 @require_GET
 def autocomplete_search(request):
     query = request.GET.get('q')
@@ -164,7 +173,6 @@ def autocomplete_search(request):
     for jogo in jogos_encontrados:
         results_list.append({ "id": jogo.id, "name": jogo.titulo, "released": jogo.ano_lancamento.isoformat() if jogo.ano_lancamento else None, "background_image": jogo.background_image, })
     return JsonResponse({'results': results_list})
-
 
 
 @login_required

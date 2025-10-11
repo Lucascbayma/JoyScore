@@ -15,11 +15,9 @@ html,Body {
     overflow-x: hidden !important; 
 }
 
-
 .header {
   display: flex;
   align-items: center;
-
   padding: 0 16px;
   background-color: #212121;
   width: 100%;
@@ -200,11 +198,15 @@ footer {
     margin-top: 20px;
 }
 
+
 .right-section {
     display: flex;
     align-items: center;
     gap: 20px;
+    margin-left: auto; 
 }
+
+
 .hamburger {
   cursor: pointer;
   width: 30px;
@@ -219,7 +221,6 @@ footer {
   height: 4px;
   border-radius: 2px;
 }
-
 
 .search-filter-container {
     display: flex;
@@ -313,14 +314,11 @@ footer {
     font-weight: bold;
 }
 
-
 .header-filter-link {
-
     display: inline-block;
 }
 
 .filter-toggle-button {
-
     background-color: #6a1b9a; 
     color: white;
     padding: 10px 15px;
@@ -340,12 +338,9 @@ footer {
     transform: scale(1.03);
 }
 
-
 .genre-filter-dropdown, .filter-dropdown-wrapper {
     display: none; 
 }
-
-
 
 .card-link {
     text-decoration: none; 

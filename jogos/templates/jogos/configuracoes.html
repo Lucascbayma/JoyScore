@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurações de Conta - JoyScore{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'jogos/css/configuracoes.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">Configurações de Conta</h2>
+        </div>
+
+        <div class="config-card profile-info">
+            <h3 class="card-title">Informações do Usuário</h3>
+            <p class="user-display">
+                Bem-vindo, <span class="username-highlight">{{ user.username }}</span>.
+            </p>
+            <p class="info-text">Gerencie suas preferências e o visual do site.</p>
+        </div>
+
+        <div class="config-card genre-preferences-card">
+            <h3 class="card-title">Gêneros Favoritos</h3>
+            <p class="preference-instructions">Selecione os gêneros que você mais gosta (em desenvolvimento).</p>
+            
+            <div class="genre-container-config">
+                
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-acao" value="Action">
+                    <label for="pref-acao">Action</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-indie" value="Indie">
+                    <label for="pref-indie">Indie</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-adventure" value="Adventure">
+                    <label for="pref-adventure">Adventure</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-rpg" value="RPG">
+                    <label for="pref-rpg">RPG</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-strategy" value="Strategy">
+                    <label for="pref-strategy">Strategy</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-shooter" value="Shooter">
+                    <label for="pref-shooter">Shooter</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-casual" value="Casual">
+                    <label for="pref-casual">Casual</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-simulation" value="Simulation">
+                    <label for="pref-simulation">Simulation</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-puzzle" value="Puzzle">
+                    <label for="pref-puzzle">Puzzle</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-arcade" value="Arcade">
+                    <label for="pref-arcade">Arcade</label>
+                </div>
+                
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-platformer" value="Platformer">
+                    <label for="pref-platformer">Platformer</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-multiplayer" value="Massively Multiplayer">
+                    <label for="pref-multiplayer">Massively Multiplayer</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-racing" value="Racing">
+                    <label for="pref-racing">Racing</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-sports" value="Sports">
+                    <label for="pref-sports">Sports</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-fighting" value="Fighting">
+                    <label for="pref-fighting">Fighting</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-family" value="Family">
+                    <label for="pref-family">Family</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-board" value="Board Games">
+                    <label for="pref-board">Board Games</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-card" value="Card">
+                    <label for="pref-card">Card</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-educational" value="Educational">
+                    <label for="pref-educational">Educational</label>
+                </div>
+                <div class="genre-item-config">
+                    <input type="checkbox" id="pref-visual" value="Visual Novel">
+                    <label for="pref-visual">Visual Novel</label>
+                </div>
+                
+            </div>
+            <button class="save-button" disabled>Salvar Preferências (Apenas Layout)</button>
+        </div>
+
+        <div class="config-card theme-settings-card">
+            <h3 class="card-title">Configuração de Tema</h3>
+            <p class="info-text">Alterne entre o tema escuro e o tema claro para uma melhor experiência visual.</p>
+            
+            <a href="#" id="theme-toggle" class="theme-toggle-button">
+                <i class="fas fa-moon" id="theme-icon"></i><span id="theme-text">Modo Branco</span>
+            </a>
+            
+        </div>
+        
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+    {% endblock %}

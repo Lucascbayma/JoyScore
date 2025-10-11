@@ -7,14 +7,12 @@ app_name = 'jogos'
 
 urlpatterns = [
     path('home/', views.home, name='home'),
-    path('', views.login_view, name='login'), # Alterado de views.login
+    path('', views.login_view, name='login'),
     path('registro/', views.registro, name='registro'),
-    path('logout/', views.logout_view, name='logout'), # URL para sair
+    path('logout/', views.logout_view, name='logout'), 
     path('biblioteca/', views.minha_biblioteca, name='biblioteca'),
-
-    # >>> NOVA ROTA ADICIONADA AQUI <<<
     path('filtrar/', views.filtrar_por_genero, name='filtrar_por_genero'),
-
+    path('configuracoes/', views.configuracoes_conta, name='configuracoes_conta'),
     path('buscar/', views.buscar_jogos, name='buscar_jogos'),
     path('minha-biblioteca/', views.minha_biblioteca, name='minha_biblioteca'),
     path('adicionar/<int:jogo_id>/', views.adicionar_biblioteca, name='adicionar_biblioteca'),
