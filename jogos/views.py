@@ -8,15 +8,27 @@ from django.http import HttpResponse, JsonResponse
 import requests
 from django.conf import settings
 from django.views.decorators.http import require_GET
-import math # <<<< GARANTA QUE ESTA LINHA ESTEJA AQUI
-
-# Imports para autenticação
+import math 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
 
 RAWG_API_KEY = settings.API_KEY
 RAWG_BASE_URL = "https://api.rawg.io/api"
+
+
+
+def _get_all_genres(request):
+    """Função auxiliar para buscar a lista de gêneros da API RAWG."""
+    genres_url = f"{RAWG_BASE_URL}/genres?key={RAWG_API_KEY}"
+    try:
+        all_genres_response = requests.get(genres_url)
+        all_genres_response.raise_for_status()
+        return all_genres_response.json().get('results', [])
+    except requests.RequestException:
+        messages.error(request, "Não foi possível buscar a lista de gêneros da API.")
+        return []
+
 
 
 def registro(request):
@@ -126,8 +138,21 @@ def home(request):
     jogos_rpg = Jogo.objects.filter( titulo__in=titulos_rpg ).order_by('titulo')
     titulos_shooter = [ "Call of Duty: Modern Warfare", "Apex Legends", "Overwatch 2", "Destiny 2", "Counter-Strike: Global Offensive", "Battlefield 4", "Halo 3", "S.T.A.L.K.E.R.: Clear Sky", ]
     jogos_shooter = Jogo.objects.filter( titulo__in=titulos_shooter ).order_by('titulo')
-    context = { 'jogos_populares': jogos_populares, 'jogos_acao': jogos_acao, 'jogos_indie': jogos_indie, 'jogos_rpg': jogos_rpg, 'jogos_shooter': jogos_shooter, }
+    
+    
+    all_genres = _get_all_genres(request)
+    
+    context = { 
+        'jogos_populares': jogos_populares, 
+        'jogos_acao': jogos_acao, 
+        'jogos_indie': jogos_indie, 
+        'jogos_rpg': jogos_rpg, 
+        'jogos_shooter': jogos_shooter,
+        'all_genres': all_genres, 
+    }
     return render(request, 'jogos/home.html', context)
+
+
 
 @require_GET
 def autocomplete_search(request):
@@ -141,17 +166,12 @@ def autocomplete_search(request):
     return JsonResponse({'results': results_list})
 
 
+
 @login_required
 def filtrar_por_genero(request):
-    genres_url = f"{RAWG_BASE_URL}/genres?key={RAWG_API_KEY}"
-    try:
-        all_genres_response = requests.get(genres_url)
-        all_genres_response.raise_for_status()
-        all_genres = all_genres_response.json().get('results', [])
-    except requests.RequestException:
-        all_genres = []
-        messages.error(request, "Não foi possível buscar a lista de gêneros da API.")
 
+    all_genres = _get_all_genres(request)
+    
     selected_genres_ids_str = request.GET.getlist('genres')
     selected_genres_ids = [int(gid) for gid in selected_genres_ids_str if gid.isdigit()]
     

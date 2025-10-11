@@ -128,39 +128,39 @@ body[data-theme="light"] .game-item:hover {
 
 body[data-theme="light"] {
 
-    --cor-fundo-principal: #ffffff;      /* De #1a1a1a para Branco Puro */
-    --cor-fundo-header: #f0f0f0;         /* De #212121 para Cinza Claro */
-    --cor-fundo-bloco: #f8f8f8;          /* De #333333 para Cinza Super Claro */
-    --cor-borda-header: #cccccc;         /* De #333 para Cinza Claro/Borda */
-    --cor-texto-principal: #1a1a1a;      /* De #e4e4e4 para Preto */
-    --cor-texto-forte: #333333;          /* De #ffffff para Cinza Escuro (Títulos) */
-    --cor-destaque-dourado: #db9731;     /* Mantido o Dourado */
-    --cor-destaque-roxo: #6a1b9a;        /* Mantido o Roxo */
-    --cor-destaque-roxo-hover: #9575a9;  /* Mantido o Roxo Claro */
+    --cor-fundo-principal: #ffffff;      
+    --cor-fundo-header: #f0f0f0;         
+    --cor-fundo-bloco: #f8f8f8;          
+    --cor-borda-header: #cccccc;         
+    --cor-texto-principal: #1a1a1a;     
+    --cor-texto-forte: #333333;          
+    --cor-destaque-dourado: #db9731;     
+    --cor-destaque-roxo: #6a1b9a;        
+    --cor-destaque-roxo-hover: #9575a9;  
 }
 
-/* Header */
+
 body[data-theme="light"] header {
     border-bottom: 2px solid var(--cor-borda-header);
     background: var(--cor-fundo-header);
 }
 
-/* Capa do Jogo (Ajuste da Sombra) */
+
 body[data-theme="light"] .cover img {
-    /* Ajusta a cor de fundo e a sombra para fundos claros */
+
     background: #eeeeee;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Bloco de Avaliação (rating-section) */
+
 body[data-theme="light"] .rating-section {
-    background-color: #eeeeee; /* De rgb(52, 50, 50) para Cinza Claro */
+    background-color: #eeeeee; 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Área de Comentários (textarea) */
+
 body[data-theme="light"] .comment-field textarea {
-    /* Inverte as cores da textarea para o modo claro, se ela não usar as variáveis do arquivo */
+
     background-color: #ffffff; 
     color: #333; 
     border: 1px solid #ccc;

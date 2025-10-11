@@ -15,13 +15,15 @@ html,Body {
     overflow-x: hidden !important; 
 }
 
+
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+
   padding: 0 16px;
   background-color: #212121;
   width: 100%;
+  gap: 30px; 
 }
 
 .logo-img {
@@ -199,7 +201,6 @@ footer {
 }
 
 .right-section {
-    justify-self: end;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -219,11 +220,24 @@ footer {
   border-radius: 2px;
 }
 
+
+.search-filter-container {
+    display: flex;
+    align-items: center;
+    gap: 15px; 
+    
+    margin-left: auto; 
+    margin-right: auto; 
+    
+    flex-grow: 1; 
+    max-width: 600px; 
+}
+
 .header-search {
     position: relative; 
-    flex-grow: 1;       
-    margin: 0 30px;     
-    max-width: 600px;   
+    flex-grow: 1;      
+    margin: 0; 
+    min-width: 250px; 
 }
 
 #game-search-input{
@@ -299,16 +313,47 @@ footer {
     font-weight: bold;
 }
 
-/* ===== CÓDIGO ADICIONADO PARA OS LINKS DOS CARDS ===== */
+
+.header-filter-link {
+
+    display: inline-block;
+}
+
+.filter-toggle-button {
+
+    background-color: #6a1b9a; 
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s, transform 0.2s;
+    text-decoration: none; 
+}
+
+.filter-toggle-button:hover {
+    background-color: #8e24aa;
+    transform: scale(1.03);
+}
+
+
+.genre-filter-dropdown, .filter-dropdown-wrapper {
+    display: none; 
+}
+
+
 
 .card-link {
-    text-decoration: none; /* Remove o sublinhado do link */
-    color: inherit;      /* Faz o texto do link usar a cor normal */
-    display: block;      /* Garante que o link ocupe todo o espaço do card */
+    text-decoration: none; 
+    color: inherit;     
+    display: block;      
 }
 
 .card-link:hover .card {
-    /* Efeito opcional para quando o mouse passa por cima */
     transform: translateY(-5px);
     box-shadow: 0 6px 20px rgba(0,0,0,0.15);
     transition: all 0.2s ease-out;

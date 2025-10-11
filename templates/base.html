@@ -7,8 +7,9 @@
     <title>{% block title %}JoyScore{% endblock %}</title> 
     
     <link rel="stylesheet" href="{% static 'jogos/css/style.css' %}">
-    
     <link rel="stylesheet" href="{% static 'jogos/css/light-theme.css' %}" disabled id="light-theme-style">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
     {% block extra_css %}
     {% endblock %}
@@ -23,13 +24,21 @@
                  style="display:block; max-width:220px; max-height:72px; width:auto; height:auto;">
         </div>
 
-        {% if request.resolver_match.url_name == 'home' %}
-        <div class="header-search">
-            <input type="text" id="game-search-input" placeholder="Pesquisar jogo...">
-            <div id="autocomplete-results"></div>
-        </div>
-        {% endif %}
+        <div class="search-filter-container">
 
+            {% if request.resolver_match.url_name == 'home' %}
+            <div class="header-search">
+                <input type="text" id="game-search-input" placeholder="Pesquisar jogo...">
+                <div id="autocomplete-results"></div>
+            </div>
+            {% endif %}
+            
+            <div class="header-filter-link">
+                <a href="{% url 'jogos:filtrar_por_genero' %}" class="filter-toggle-button">
+                    <i class="fas fa-filter"></i> Filtrar Gêneros
+                </a>
+            </div>
+            </div>
         <div class="right-section">
             <input type="checkbox" id="menu-toggle" hidden>
             <label for="menu-toggle" class="hamburger">
@@ -40,7 +49,6 @@
             <nav class="menu">
                 <ul>
                     <li><a href="{% url 'jogos:home' %}">Início</a></li>
-                    <li><a href="{% url 'jogos:filtrar_por_genero' %}">Filtrar Jogos</a></li>
                     <li><a href="{% url 'jogos:minha_biblioteca' %}">Biblioteca</a></li>
                     <li>
                         <a href="#" id="theme-toggle" style="text-decoration: none; color: inherit;">
@@ -98,7 +106,6 @@
             applyTheme(savedTheme);
         });
     </script>
-
     {% block extra_scripts %}
     {% endblock %}
 

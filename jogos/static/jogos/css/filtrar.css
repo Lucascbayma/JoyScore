@@ -1,5 +1,3 @@
-/* jogos/static/jogos/css/filtrar.css */
-
 .filter-instructions {
     text-align: center;
     margin-bottom: 25px;
@@ -100,6 +98,7 @@ body[data-theme="light"] .genre-item label {
     transform: scale(1.05);
 }
 
+
 .results-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -120,8 +119,6 @@ body[data-theme="light"] .genre-item label {
     color: #aaa;
     font-size: 1.1rem;
     padding: 40px 0;
-    /* >>>>> CÓDIGO ATUALIZADO: A LINHA ABAIXO FOI REMOVIDA PARA SUBIR A MENSAGEM <<<<< */
-    /* align-self: center; */
 }
 
 .pagination-controls {
@@ -160,4 +157,79 @@ body[data-theme="light"] .page-number {
     background-color: #e9ecef;
     color: #121212;
     border-color: #ccc;
+}
+
+.filter-instructions-header {
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: #aaa;
+    text-align: left;
+    padding: 0 5px;
+}
+
+.genre-container-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; 
+    justify-content: flex-start;
+    margin-bottom: 15px;
+}
+
+.genre-item-header {
+    position: relative;
+}
+
+.genre-item-header input[type="checkbox"] {
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.genre-item-header label {
+    display: block;
+    padding: 6px 10px; 
+    font-size: 0.85rem; 
+    background-color: #2c2c2c;
+    color: #f0f0f0;
+    border: 1px solid #444;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    text-align: center;
+    font-weight: 500;
+    white-space: nowrap; 
+}
+
+body[data-theme="light"] .genre-item-header label {
+    background-color: #f0f0f0;
+    color: #121212;
+    border: 1px solid #ccc;
+}
+
+.genre-item-header label:hover {
+    border-color: #8e24aa;
+}
+
+.genre-item-header input[type="checkbox"]:checked + label {
+    background-color: #6a1b9a;
+    border-color: #8e24aa;
+    color: #fff;
+    font-weight: 700;
+}
+
+.form-actions-header {
+    text-align: right;
+    display: flex;
+    justify-content: flex-end; 
+    gap: 10px; 
+    align-items: center;
+}
+
+
+.form-actions-header .filter-button, 
+.form-actions-header .reset-button {
+    padding: 8px 15px; 
+    font-size: 0.9rem;
 }
