@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Filtrar Jogos - JoyScore{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'jogos/css/filtrar.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">Filtrar Jogos por Gênero</h2>
+        </div>
+
+        <form method="GET" action="{% url 'jogos:filtrar_por_genero' %}" id="genre-filter-form">
+            <p class="filter-instructions">Selecione até 2 gêneros para encontrar jogos.</p>
+            
+            <div class="genre-container">
+                {% for genre in all_genres %}
+                    <div class="genre-item">
+                        <input type="checkbox" name="genres" value="{{ genre.id }}" id="genre-{{ genre.id }}"
+                               {% if genre.id in selected_genres_ids %}checked{% endif %}>
+                        <label for="genre-{{ genre.id }}">{{ genre.name }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="filter-button">Filtrar Jogos</button>
+                <a href="{% url 'jogos:filtrar_por_genero' %}" class="reset-button">Resetar Filtros</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">Resultados do Filtro</h2>
+        </div>
+        
+        <div class="results-grid">
+            {% for game in games_page.results %}
+                <div class="card-link">
+                    <div class="card">
+                        <img src="{{ game.background_image }}" alt="{{ game.name }}">
+                        <div class="card-info">
+                            <div class="card-title">{{ game.name }}</div>
+                            <div class="card-subtitle">Lançamento: {{ game.released|date:"d/m/Y" }}</div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if search_error %}
+            <p class="filter-message">{{ search_error }}</p>
+
+        {% elif not games_page.results and form_submitted %}
+            <p class="filter-message">Nenhum jogo encontrado para os gêneros selecionados.</p>
+        {% endif %}
+
+
+        {% if games_page.results and games_page.has_previous or games_page.has_next %}
+            <div class="pagination-controls">
+                {% if games_page.has_previous %}
+                    <a href="?{{ genres_query_string }}&page={{ games_page.previous_page_number }}" class="page-arrow" title="Página Anterior">&laquo;</a>
+                {% endif %}
+                
+                <span class="page-number">Página {{ games_page.number }}</span>
+                
+                {% if games_page.has_next %}
+                    <a href="?{{ genres_query_string }}&page={{ games_page.next_page_number }}" class="page-arrow" title="Próxima Página">&raquo;</a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('input[name="genres"]');
+    const maxChecked = 2;
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            let checkedCount = document.querySelectorAll('input[name="genres"]:checked').length;
+            
+            if (checkedCount > maxChecked) {
+                checkbox.checked = false;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

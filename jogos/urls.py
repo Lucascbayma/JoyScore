@@ -1,3 +1,5 @@
+# jogos/urls.py
+
 from django.urls import path
 from . import views
 
@@ -9,6 +11,9 @@ urlpatterns = [
     path('registro/', views.registro, name='registro'),
     path('logout/', views.logout_view, name='logout'), # URL para sair
     path('biblioteca/', views.minha_biblioteca, name='biblioteca'),
+
+    # >>> NOVA ROTA ADICIONADA AQUI <<<
+    path('filtrar/', views.filtrar_por_genero, name='filtrar_por_genero'),
 
     path('buscar/', views.buscar_jogos, name='buscar_jogos'),
     path('minha-biblioteca/', views.minha_biblioteca, name='minha_biblioteca'),

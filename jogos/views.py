@@ -1,3 +1,5 @@
+# jogos/views.py
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
@@ -6,6 +8,7 @@ from django.http import HttpResponse, JsonResponse
 import requests
 from django.conf import settings
 from django.views.decorators.http import require_GET
+import math # <<<< GARANTA QUE ESTA LINHA ESTEJA AQUI
 
 # Imports para autenticação
 from django.contrib.auth.models import User
@@ -67,36 +70,18 @@ def logout_view(request):
 @login_required
 def avaliar(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
-    
-    esta_na_biblioteca = Add_Biblioteca.objects.filter(
-        usuario=request.user, 
-        jogo=jogo
-    ).exists()
-
+    esta_na_biblioteca = Add_Biblioteca.objects.filter(usuario=request.user, jogo=jogo).exists()
     avaliacao_existente = Avaliar.objects.filter(usuario=request.user, Jogo=jogo).first()
-
     if request.method == 'POST':
         nota = request.POST.get('nota')
         comentario = request.POST.get('comentario')
-
         if not nota:
             messages.error(request, 'Você precisa selecionar pelo menos uma estrela para avaliar.')
             return redirect('jogos:avaliar', jogo_id=jogo.id)
-
-        Avaliar.objects.update_or_create(
-            usuario=request.user,
-            Jogo=jogo,
-            defaults={'nota': nota, 'comentario': comentario}
-        )
-        
+        Avaliar.objects.update_or_create(usuario=request.user, Jogo=jogo, defaults={'nota': nota, 'comentario': comentario})
         messages.success(request, 'Sua avaliação foi salva com sucesso!')
         return redirect('jogos:avaliar', jogo_id=jogo.id)
-
-    context = {
-        'jogo': jogo, 
-        'avaliacao_existente': avaliacao_existente,
-        'esta_na_biblioteca': esta_na_biblioteca 
-    }
+    context = {'jogo': jogo, 'avaliacao_existente': avaliacao_existente, 'esta_na_biblioteca': esta_na_biblioteca }
     return render(request, 'jogos/avaliar_jogo.html', context)
 
 @login_required
@@ -104,12 +89,7 @@ def buscar_jogos(request):
     pesquisa = request.GET.get('q')
     jogos = Jogo.objects.all()
     if pesquisa:
-        jogos = jogos.filter(
-            Q(titulo__icontains=pesquisa) |
-            Q(desenvolvedor__icontains=pesquisa) |
-            Q(genero__icontains=pesquisa)
-        ).distinct()
-
+        jogos = jogos.filter(Q(titulo__icontains=pesquisa) | Q(desenvolvedor__icontains=pesquisa) | Q(genero__icontains=pesquisa)).distinct()
     context = {'jogos': jogos, 'pesquisa': pesquisa}
     return render(request, 'jogos/buscar_jogos.html', context)
 
@@ -117,139 +97,117 @@ def buscar_jogos(request):
 @login_required
 def adicionar_biblioteca(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
-    
-    registro_biblioteca = Add_Biblioteca.objects.filter(
-        usuario=request.user, 
-        jogo=jogo
-    ).first()
-
+    registro_biblioteca = Add_Biblioteca.objects.filter(usuario=request.user, jogo=jogo).first()
     if registro_biblioteca:
         registro_biblioteca.delete()
         messages.success(request, f'O jogo "{jogo.titulo}" foi removido da sua biblioteca.')
     else:
         Add_Biblioteca.objects.create(usuario=request.user, jogo=jogo)
         messages.success(request, f'O jogo "{jogo.titulo}" foi adicionado à sua biblioteca.')
-
     return redirect('jogos:avaliar', jogo_id=jogo.id)
 
 
 @login_required
 def minha_biblioteca(request):
-    itens_biblioteca = Add_Biblioteca.objects.filter(
-        usuario=request.user
-    ).order_by('-data_adicionado')
-    
+    itens_biblioteca = Add_Biblioteca.objects.filter(usuario=request.user).order_by('-data_adicionado')
     jogos_na_biblioteca = [item.jogo for item in itens_biblioteca]
-
-    context = {
-        'jogos': jogos_na_biblioteca, 
-    }
-    
+    context = {'jogos': jogos_na_biblioteca, }
     return render(request, 'jogos/biblioteca.html', context)
 
 
 def home(request):
-    # 1. SEÇÃO DE JOGOS POPULARES (Curadoria Manual)
-    titulos_populares = [
-        "The Witcher 3: Wild Hunt",
-        "Red Dead Redemption 2",
-        "Grand Theft Auto V",
-        "Hollow Knight",
-        "Portal 2",
-        "Minecraft",
-        "God of War",
-        "Elden Ring",
-        "Fortnite Battle Royale",
-        "The Legend of Zelda: Breath of the Wild",
-    ]
-    jogos_populares = Jogo.objects.filter(
-        titulo__in=titulos_populares
-    ).order_by('titulo')
-    
-    # 2. SEÇÃO DE JOGOS DE AÇÃO (Curadoria Manual)
-    titulos_acao = [
-        "Sekiro: Shadows Die Twice",
-        "Devil May Cry 5",
-        "Doom Eternal",
-        "Marvel Rivals",
-        "Marvel's Spider-Man",
-        "Assassin's Creed Valhalla",
-        "Alan Wake 2",
-        "Batman: Arkham Knight",
-        "God of War: Ragnarök",
-    ]
-    jogos_acao = Jogo.objects.filter(
-        titulo__in=titulos_acao
-    ).order_by('titulo')
-    
-    # 3. SEÇÃO DE JOGOS INDIE (Curadoria Manual)
-    titulos_indie = [
-        "Hades",
-        "Cuphead",
-        "Celeste",
-        "Stardew Valley",
-        "Ori and the Will of the Wisps",
-        "Disco Elysium",
-    ]
-    jogos_indie = Jogo.objects.filter(
-        titulo__in=titulos_indie
-    ).order_by('titulo')
-
-    # 4. SEÇÃO DE JOGOS DE RPG (Curadoria Manual)
-    titulos_rpg = [
-        "Final Fantasy VII Remake",
-        "Persona 5 Royal",
-        "Dragon Age: Inquisition",
-        "Mass Effect Legendary Edition",
-        "Fallout: New Vegas",
-        "FINAL FANTASY XV",
-        "World of Warcraft",
-    ]
-    jogos_rpg = Jogo.objects.filter(
-        titulo__in=titulos_rpg
-    ).order_by('titulo')
-
-    # 5. SEÇÃO DE JOGOS DE TIRO (SHOOTER) (Curadoria Manual)
-    titulos_shooter = [
-        "Call of Duty: Modern Warfare",
-        "Apex Legends",
-        "Overwatch 2",
-        "Destiny 2",
-        "Counter-Strike: Global Offensive",
-        "Battlefield 4",
-        "Halo 3",
-        "S.T.A.L.K.E.R.: Clear Sky",
-    ]
-    jogos_shooter = Jogo.objects.filter(
-        titulo__in=titulos_shooter
-    ).order_by('titulo')
-    
-    context = {
-        'jogos_populares': jogos_populares,
-        'jogos_acao': jogos_acao,
-        'jogos_indie': jogos_indie,
-        'jogos_rpg': jogos_rpg,
-        'jogos_shooter': jogos_shooter,
-    }
+    titulos_populares = [ "The Witcher 3: Wild Hunt", "Red Dead Redemption 2", "Grand Theft Auto V", "Hollow Knight", "Portal 2", "Minecraft", "God of War", "Elden Ring", "Fortnite Battle Royale", "The Legend of Zelda: Breath of the Wild", ]
+    jogos_populares = Jogo.objects.filter( titulo__in=titulos_populares ).order_by('titulo')
+    titulos_acao = [ "Sekiro: Shadows Die Twice", "Devil May Cry 5", "Doom Eternal", "Marvel Rivals", "Marvel's Spider-Man", "Assassin's Creed Valhalla", "Alan Wake 2", "Batman: Arkham Knight", "God of War: Ragnarök", ]
+    jogos_acao = Jogo.objects.filter( titulo__in=titulos_acao ).order_by('titulo')
+    titulos_indie = [ "Hades", "Cuphead", "Celeste", "Stardew Valley", "Hollow Knight", "Ori and the Will of the Wisps", "Disco Elysium", ]
+    jogos_indie = Jogo.objects.filter( titulo__in=titulos_indie ).order_by('titulo')
+    titulos_rpg = [ "Final Fantasy VII Remake", "Persona 5 Royal", "Dragon Age: Inquisition", "Mass Effect Legendary Edition", "Fallout: New Vegas", "FINAL FANTASY XV", "World of Warcraft", ]
+    jogos_rpg = Jogo.objects.filter( titulo__in=titulos_rpg ).order_by('titulo')
+    titulos_shooter = [ "Call of Duty: Modern Warfare", "Apex Legends", "Overwatch 2", "Destiny 2", "Counter-Strike: Global Offensive", "Battlefield 4", "Halo 3", "S.T.A.L.K.E.R.: Clear Sky", ]
+    jogos_shooter = Jogo.objects.filter( titulo__in=titulos_shooter ).order_by('titulo')
+    context = { 'jogos_populares': jogos_populares, 'jogos_acao': jogos_acao, 'jogos_indie': jogos_indie, 'jogos_rpg': jogos_rpg, 'jogos_shooter': jogos_shooter, }
     return render(request, 'jogos/home.html', context)
 
 @require_GET
 def autocomplete_search(request):
     query = request.GET.get('q')
-    
     if not query:
         return JsonResponse({'results': []})
-
-    jogos_encontrados = Jogo.objects.filter(
-        titulo__icontains=query
-    ).order_by('titulo')[:4]
+    jogos_encontrados = Jogo.objects.filter(titulo__icontains=query).order_by('titulo')[:4]
     results_list = []
     for jogo in jogos_encontrados:
-        results_list.append({
-            "id": jogo.id,
-            "name": jogo.titulo,
-            "released": jogo.ano_lancamento.isoformat() if jogo.ano_lancamento else None,
-            "background_image": jogo.background_image, 
-        })
-        
+        results_list.append({ "id": jogo.id, "name": jogo.titulo, "released": jogo.ano_lancamento.isoformat() if jogo.ano_lancamento else None, "background_image": jogo.background_image, })
     return JsonResponse({'results': results_list})
+
+
+@login_required
+def filtrar_por_genero(request):
+    genres_url = f"{RAWG_BASE_URL}/genres?key={RAWG_API_KEY}"
+    try:
+        all_genres_response = requests.get(genres_url)
+        all_genres_response.raise_for_status()
+        all_genres = all_genres_response.json().get('results', [])
+    except requests.RequestException:
+        all_genres = []
+        messages.error(request, "Não foi possível buscar a lista de gêneros da API.")
+
+    selected_genres_ids_str = request.GET.getlist('genres')
+    selected_genres_ids = [int(gid) for gid in selected_genres_ids_str if gid.isdigit()]
+    
+    page_number = request.GET.get('page', 1)
+    games_page = {
+        'results': [],
+        'has_previous': False,
+        'previous_page_number': 1,
+        'number': 1,
+        'has_next': False,
+        'next_page_number': 1
+    }
+    
+    search_error = None
+    form_submitted = 'genres' in request.GET
+
+    if form_submitted:
+        if not selected_genres_ids:
+            search_error = "Por favor, selecione pelo menos um gênero para filtrar."
+        else:
+            genres_param = ",".join(selected_genres_ids_str)
+            page_size = 15
+            games_url = f"{RAWG_BASE_URL}/games?key={RAWG_API_KEY}&genres={genres_param}&ordering=name&page_size={page_size}&page={page_number}"
+            
+            try:
+                response = requests.get(games_url)
+                response.raise_for_status()
+                data = response.json()
+                
+                total_games = data.get('count', 0)
+                total_pages = math.ceil(total_games / page_size)
+                current_page_num = int(page_number)
+
+                games_page['results'] = data.get('results', [])
+                games_page['number'] = current_page_num
+                
+                if current_page_num > 1:
+                    games_page['has_previous'] = True
+                    games_page['previous_page_number'] = current_page_num - 1
+                
+                if current_page_num < total_pages:
+                    games_page['has_next'] = True
+                    games_page['next_page_number'] = current_page_num + 1
+
+            except requests.RequestException:
+                search_error = "Ocorreu um erro ao buscar os jogos. Tente novamente."
+
+    genres_query_string = "&".join([f"genres={gid}" for gid in selected_genres_ids_str])
+
+    context = {
+        'all_genres': all_genres,
+        'games_page': games_page,
+        'selected_genres_ids': selected_genres_ids,
+        'search_error': search_error,
+        'form_submitted': form_submitted,
+        'genres_query_string': genres_query_string,
+    }
+    
+    return render(request, 'jogos/filtrar.html', context)
