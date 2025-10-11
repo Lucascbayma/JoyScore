@@ -22,10 +22,14 @@
                  class="logo-img"
                  style="display:block; max-width:220px; max-height:72px; width:auto; height:auto;">
         </div>
+
+        {% if request.resolver_match.url_name == 'home' %}
         <div class="header-search">
             <input type="text" id="game-search-input" placeholder="Pesquisar jogo...">
             <div id="autocomplete-results"></div>
         </div>
+        {% endif %}
+
         <div class="right-section">
             <input type="checkbox" id="menu-toggle" hidden>
             <label for="menu-toggle" class="hamburger">
@@ -36,14 +40,11 @@
             <nav class="menu">
                 <ul>
                     <li><a href="{% url 'jogos:home' %}">Início</a></li>
-                    
                     <li><a href="{% url 'jogos:filtrar_por_genero' %}">Filtrar Jogos</a></li>
                     <li><a href="{% url 'jogos:minha_biblioteca' %}">Biblioteca</a></li>
-                    
                     <li>
-                        <a href="#" id="theme-toggle" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <i class="fas fa-moon" id="theme-icon"></i> 
-                            <span id="theme-text">Modo Branco</span>
+                        <a href="#" id="theme-toggle" style="text-decoration: none; color: inherit;">
+                            <i class="fas fa-moon" id="theme-icon" style="margin-right: 8px; vertical-align: middle;"></i><span id="theme-text">Modo Branco</span>
                         </a>
                     </li>
                 </ul>
@@ -61,17 +62,16 @@
     </footer>
 
     <script>
-        // A lógica do JavaScript para o tema continua funcionando perfeitamente,
-        // pois o ID 'theme-toggle' foi mantido.
         const themeToggleBtn = document.getElementById('theme-toggle');
 
-        // Adiciona um preventDefault para que o link não mude a URL
-        themeToggleBtn.addEventListener('click', (event) => {
-            event.preventDefault(); 
-            const currentTheme = document.body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            applyTheme(newTheme);
-        });
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', (event) => {
+                event.preventDefault(); 
+                const currentTheme = document.body.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                applyTheme(newTheme);
+            });
+        }
 
         const lightThemeStyle = document.getElementById('light-theme-style');
         const body = document.body;
