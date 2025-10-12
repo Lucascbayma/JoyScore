@@ -3,7 +3,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from .models import Jogo, Add_Biblioteca, Avaliar
+# Adicione Profile aos imports
+from .models import Jogo, Add_Biblioteca, Avaliar, Profile
 from django.http import HttpResponse, JsonResponse
 import requests
 from django.conf import settings
@@ -28,14 +29,13 @@ def _get_all_genres(request):
         messages.error(request, "Não foi possível buscar a lista de gêneros da API.")
         return []
 
-
+# Funções de registro, login, logout, etc. permanecem as mesmas...
 def registro(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
         password2 = request.POST.get('password2')
-
         if password != password2:
             messages.error(request, 'As senhas não coincidem!')
             return redirect('jogos:registro')
@@ -45,37 +45,29 @@ def registro(request):
         if User.objects.filter(email=email).exists():
             messages.error(request, f'O e-mail "{email}" já foi cadastrado!')
             return redirect('jogos:registro')
-        
         user = User.objects.create_user(username=username, email=email, password=password)
         user.save()
-        
         auth_login(request, user)
         messages.success(request, f'Conta criada com sucesso! Bem-vindo, {username}.')
         return redirect('jogos:home')
-
     return render(request, 'jogos/registro.html')
-
 
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-
         user = authenticate(request, username=username, password=password)
-
         if user is not None:
             auth_login(request, user)
             return redirect('jogos:home')
         else:
             messages.error(request, 'Apelido ou senha inválidos.')
             return redirect('jogos:login')
-            
     return render(request, 'jogos/login.html')
 
 def logout_view(request):
     auth_logout(request)
     return redirect('jogos:login')
-
 
 @login_required
 def avaliar(request, jogo_id):
@@ -103,7 +95,6 @@ def buscar_jogos(request):
     context = {'jogos': jogos, 'pesquisa': pesquisa}
     return render(request, 'jogos/buscar_jogos.html', context)
 
-
 @login_required
 def adicionar_biblioteca(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
@@ -116,7 +107,6 @@ def adicionar_biblioteca(request, jogo_id):
         messages.success(request, f'O jogo "{jogo.titulo}" foi adicionado à sua biblioteca.')
     return redirect('jogos:avaliar', jogo_id=jogo.id)
 
-
 @login_required
 def minha_biblioteca(request):
     itens_biblioteca = Add_Biblioteca.objects.filter(usuario=request.user).order_by('-data_adicionado')
@@ -124,8 +114,8 @@ def minha_biblioteca(request):
     context = {'jogos': jogos_na_biblioteca, }
     return render(request, 'jogos/biblioteca.html', context)
 
-
 def home(request):
+    #... seu código da home continua o mesmo
     titulos_populares = [ "The Witcher 3: Wild Hunt", "Red Dead Redemption 2", "Grand Theft Auto V", "Hollow Knight", "Portal 2", "Minecraft", "God of War", "Elden Ring", "Fortnite Battle Royale", "The Legend of Zelda: Breath of the Wild", ]
     jogos_populares = Jogo.objects.filter( titulo__in=titulos_populares ).order_by('titulo')
     titulos_acao = [ "Sekiro: Shadows Die Twice", "Devil May Cry 5", "Doom Eternal", "Marvel Rivals", "Marvel's Spider-Man", "Assassin's Creed Valhalla", "Alan Wake 2", "Batman: Arkham Knight", "God of War: Ragnarök", ]
@@ -136,32 +126,9 @@ def home(request):
     jogos_rpg = Jogo.objects.filter( titulo__in=titulos_rpg ).order_by('titulo')
     titulos_shooter = [ "Call of Duty: Modern Warfare", "Apex Legends", "Overwatch 2", "Destiny 2", "Counter-Strike: Global Offensive", "Battlefield 4", "Halo 3", "S.T.A.L.K.E.R.: Clear Sky", ]
     jogos_shooter = Jogo.objects.filter( titulo__in=titulos_shooter ).order_by('titulo')
-    
-    
     all_genres = _get_all_genres(request)
-    
-    context = { 
-        'jogos_populares': jogos_populares, 
-        'jogos_acao': jogos_acao, 
-        'jogos_indie': jogos_indie, 
-        'jogos_rpg': jogos_rpg, 
-        'jogos_shooter': jogos_shooter,
-        'all_genres': all_genres, 
-    }
+    context = { 'jogos_populares': jogos_populares, 'jogos_acao': jogos_acao, 'jogos_indie': jogos_indie, 'jogos_rpg': jogos_rpg, 'jogos_shooter': jogos_shooter,'all_genres': all_genres, }
     return render(request, 'jogos/home.html', context)
-
-
-
-@login_required
-def configuracoes_conta(request):
-    """
-    Renderiza a página de configurações da conta.
-    O nome de usuário (request.user.username) é acessível automaticamente no template.
-    """
-    context = {}
-    return render(request, 'jogos/configuracoes.html', context)
-
-
 
 @require_GET
 def autocomplete_search(request):
@@ -174,28 +141,16 @@ def autocomplete_search(request):
         results_list.append({ "id": jogo.id, "name": jogo.titulo, "released": jogo.ano_lancamento.isoformat() if jogo.ano_lancamento else None, "background_image": jogo.background_image, })
     return JsonResponse({'results': results_list})
 
-
 @login_required
 def filtrar_por_genero(request):
-
+    #... seu código do filtro continua o mesmo
     all_genres = _get_all_genres(request)
-    
     selected_genres_ids_str = request.GET.getlist('genres')
     selected_genres_ids = [int(gid) for gid in selected_genres_ids_str if gid.isdigit()]
-    
     page_number = request.GET.get('page', 1)
-    games_page = {
-        'results': [],
-        'has_previous': False,
-        'previous_page_number': 1,
-        'number': 1,
-        'has_next': False,
-        'next_page_number': 1
-    }
-    
+    games_page = {'results': [], 'has_previous': False, 'previous_page_number': 1, 'number': 1, 'has_next': False, 'next_page_number': 1 }
     search_error = None
     form_submitted = 'genres' in request.GET
-
     if form_submitted:
         if not selected_genres_ids:
             search_error = "Por favor, selecione pelo menos um gênero para filtrar."
@@ -203,39 +158,51 @@ def filtrar_por_genero(request):
             genres_param = ",".join(selected_genres_ids_str)
             page_size = 15
             games_url = f"{RAWG_BASE_URL}/games?key={RAWG_API_KEY}&genres={genres_param}&ordering=name&page_size={page_size}&page={page_number}"
-            
             try:
                 response = requests.get(games_url)
                 response.raise_for_status()
                 data = response.json()
-                
                 total_games = data.get('count', 0)
                 total_pages = math.ceil(total_games / page_size)
                 current_page_num = int(page_number)
-
                 games_page['results'] = data.get('results', [])
                 games_page['number'] = current_page_num
-                
                 if current_page_num > 1:
                     games_page['has_previous'] = True
                     games_page['previous_page_number'] = current_page_num - 1
-                
                 if current_page_num < total_pages:
                     games_page['has_next'] = True
                     games_page['next_page_number'] = current_page_num + 1
-
             except requests.RequestException:
                 search_error = "Ocorreu um erro ao buscar os jogos. Tente novamente."
-
     genres_query_string = "&".join([f"genres={gid}" for gid in selected_genres_ids_str])
+    context = {'all_genres': all_genres, 'games_page': games_page, 'selected_genres_ids': selected_genres_ids, 'search_error': search_error, 'form_submitted': form_submitted, 'genres_query_string': genres_query_string, }
+    return render(request, 'jogos/filtrar.html', context)
 
+@login_required
+def configuracoes_conta(request):
+    # Garante que o perfil do usuário exista (robusto para usuários antigos)
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    
+    # Se o formulário for enviado (método POST)
+    if request.method == 'POST':
+        # Pega a lista de nomes de gêneros dos checkboxes marcados
+        generos_selecionados = request.POST.getlist('genres')
+        
+        # Atualiza o campo no modelo Profile e salva no banco de dados
+        profile.generos_favoritos = generos_selecionados
+        profile.save()
+        
+        messages.success(request, 'Suas preferências foram salvas com sucesso!')
+        # Redireciona para a mesma página para evitar reenvio do formulário
+        return redirect('jogos:configuracoes_conta')
+
+    # Busca a lista completa de gêneros da API para exibir no formulário
+    all_genres = _get_all_genres(request)
+    
     context = {
         'all_genres': all_genres,
-        'games_page': games_page,
-        'selected_genres_ids': selected_genres_ids,
-        'search_error': search_error,
-        'form_submitted': form_submitted,
-        'genres_query_string': genres_query_string,
+        # O perfil (com os gêneros já salvos) é enviado para o template
+        'profile': profile 
     }
-    
-    return render(request, 'jogos/filtrar.html', context)
+    return render(request, 'jogos/configuracoes.html', context)
