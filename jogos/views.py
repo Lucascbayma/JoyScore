@@ -9,7 +9,7 @@ import requests
 from django.conf import settings
 from django.views.decorators.http import require_GET
 import math 
-import random
+import random # Mantemos o import do random
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
@@ -115,34 +115,52 @@ def minha_biblioteca(request):
     return render(request, 'jogos/biblioteca.html', context)
 
 def home(request):
-    # Lógica de recomendações (permanece a mesma)
     RECOMENDACOES_POR_GENERO = { 'Action': ["Grand Theft Auto V", "Red Dead Redemption 2", "Marvel's Spider-Man", "God of War", "Doom Eternal", "Sekiro: Shadows Die Twice"], 'Indie': ["Hollow Knight", "Stardew Valley", "Celeste", "Cuphead", "Hades", "Disco Elysium"], 'Adventure': ["The Witcher 3: Wild Hunt", "The Legend of Zelda: Breath of the Wild", "Uncharted 4: A Thief's End", "Tomb Raider (2013)", "Life is Strange", "Alan Wake 2"], 'RPG': ["Elden Ring", "Persona 5 Royal", "Final Fantasy VII Remake", "Mass Effect Legendary Edition", "Fallout: New Vegas", "Cyberpunk 2077"], 'Strategy': ["Sid Meier's Civilization V", "XCOM 2", "StarCraft II: Wings of Liberty", "Into the Breach", "Age of Empires II: Definitive Edition", "Total War: WARHAMMER II"], 'Shooter': ["Counter-Strike: Global Offensive", "Apex Legends", "Overwatch 2", "Call of Duty: Modern Warfare", "Battlefield 4", "Destiny 2"], 'Puzzle': ["Portal 2", "The Witness", "Baba Is You", "Inside", "Return of the Obra Dinn", "Tetris Effect: Connected"], 'Simulation': ["Minecraft", "The Sims 4", "Cities: Skylines", "Microsoft Flight Simulator", "Kerbal Space Program", "Euro Truck Simulator 2"], 'Sports': ["FIFA 23", "NBA 2K23", "Rocket League", "Forza Horizon 5", "Madden NFL 23", "EA Sports FC 24"], 'Racing': ["Forza Horizon 5", "Gran Turismo 7", "Mario Kart 8 Deluxe", "Need for Speed: Heat", "DiRT Rally 2.0", "Assetto Corsa"], 'Fighting': ["Mortal Kombat 11", "Street Fighter 6", "Tekken 7", "Super Smash Bros. Ultimate", "Guilty Gear -Strive-", "Dragon Ball FighterZ"], 'Platformer': ["Celeste", "Hollow Knight", "Super Mario Odyssey", "Ori and the Will of the Wisps", "Shovel Knight: Treasure Trove", "Cuphead"], }
+    
     jogos_recomendados = []
+    
     if request.user.is_authenticated:
         try:
+            # >>>>> AQUI ESTÁ A MUDANÇA PRINCIPAL <<<<<
+            # Semeia o gerador aleatório com o ID do usuário para obter resultados consistentes
+            random.seed(request.user.id)
+
             profile = request.user.profile
             generos_favoritos = profile.generos_favoritos
+            
             if generos_favoritos:
                 jogos_na_biblioteca_ids = Add_Biblioteca.objects.filter(usuario=request.user).values_list('jogo_id', flat=True)
                 ids_ja_recomendados = set()
+                
+                # O shuffle agora será o mesmo para o mesmo usuário, a menos que as preferências mudem
                 random.shuffle(generos_favoritos)
+
                 for genero in generos_favoritos:
                     if len(jogos_recomendados) >= 10: break
+                    
                     candidatos = RECOMENDACOES_POR_GENERO.get(genero, [])
-                    random.shuffle(candidatos)
+                    random.shuffle(candidatos) # Este shuffle também será consistente
                     adicionados_neste_genero = 0
+
                     for titulo_jogo in candidatos:
                         jogo = Jogo.objects.filter(titulo=titulo_jogo).exclude(id__in=jogos_na_biblioteca_ids).exclude(id__in=ids_ja_recomendados).first()
+                        
                         if jogo and adicionados_neste_genero < 2:
                             jogos_recomendados.append(jogo)
                             ids_ja_recomendados.add(jogo.id)
                             adicionados_neste_genero += 1
                             if len(jogos_recomendados) >= 10: break
+                
                 if len(jogos_recomendados) < 10:
-                    jogos_populares_fallback = Jogo.objects.exclude(id__in=jogos_na_biblioteca_ids).exclude(id__in=ids_ja_recomendados).order_by('?')
+                    # >>>>> MUDANÇA NA LÓGICA DE FALLBACK <<<<<
+                    # Removemos o order_by('?') que é ineficiente e não pode ser semeado
+                    fallback_queryset = Jogo.objects.exclude(id__in=jogos_na_biblioteca_ids).exclude(id__in=ids_ja_recomendados)
+                    fallback_list = list(fallback_queryset) # Converte para lista
+                    random.shuffle(fallback_list) # Embaralha a lista de forma consistente
+
                     restantes = 10 - len(jogos_recomendados)
-                    for jogo in jogos_populares_fallback[:restantes]:
-                        jogos_recomendados.append(jogo)
+                    jogos_recomendados.extend(fallback_list[:restantes])
+
         except Profile.DoesNotExist:
             pass
 
@@ -157,20 +175,7 @@ def home(request):
     jogos_rpg = Jogo.objects.filter( titulo__in=titulos_rpg ).order_by('titulo')
     titulos_shooter = [ "Call of Duty: Modern Warfare", "Apex Legends", "Overwatch 2", "Destiny 2", "Counter-Strike: Global Offensive", "Battlefield 4", "Halo 3", "S.T.A.L.K.E.R.: Clear Sky", ]
     jogos_shooter = Jogo.objects.filter( titulo__in=titulos_shooter ).order_by('titulo')
-    
-    # >>>>> NOVA LISTA DE JOGOS PLAYSTATION <<<<<
-    titulos_playstation = [
-        "Astro Bot",
-        "The Last of Us",
-        "The Last of Us Part II",
-        "Uncharted 4: A Thief's End",
-        "God of War", # O de 2018
-        "God of War: Ragnarök",
-        "Ghost of Tsushima",
-        "Marvel's Spider-Man",
-        "Horizon Zero Dawn",
-        "Bloodborne"
-    ]
+    titulos_playstation = [ "Astro Bot", "The Last of Us", "The Last of Us Part II", "Uncharted 4: A Thief's End", "God of War", "God of War: Ragnarök", "Ghost of Tsushima", "Marvel's Spider-Man", "Horizon Zero Dawn", "Bloodborne" ]
     jogos_playstation = Jogo.objects.filter(titulo__in=titulos_playstation).order_by('titulo')
     
     context = { 
@@ -180,7 +185,7 @@ def home(request):
         'jogos_indie': jogos_indie, 
         'jogos_rpg': jogos_rpg, 
         'jogos_shooter': jogos_shooter,
-        'jogos_playstation': jogos_playstation, # Adicionada ao contexto
+        'jogos_playstation': jogos_playstation,
     }
     return render(request, 'jogos/home.html', context)
 
