@@ -9,113 +9,135 @@
 
 
 {% block content %}
-    <main class ="main-content">
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">Jogos Populares</h2>
-            </div>
-            <div class="card-container">
-                 {% for jogo in jogos_populares %}
-                    <a href="{% url 'jogos:avaliar' jogo.id %}" class="card-link">
-                        <div class="card">
-                            <img src="{{jogo.background_image}}" alt="{{jogo.titulo}}"> 
-                            <div class="card-info">
-                                <div class="card-title">{{jogo.titulo}}</div>
-                                <div class="card-subtitle">Data de Lançamento: {{jogo.ano_lancamento}}</div>
-                            </div>
-                        </div>
-                    </a>
-                 {% empty %}
-                    <p>Nenhum jogo popular encontrado no momento. Execute o comando de importação!</p>
-                 {% endfor %}
-            </div>
-        </section>
+<main class="main-content">
 
+    {% if user.is_authenticated and jogos_recomendados %}
         <section class="content-section">
             <div class="section-header">
-                <h2 class="section-title">Jogos de Ação</h2>
+                <h2 class="section-title">Jogos Recomendados para Você</h2>
             </div>
             <div class="card-container">
-                 {% for jogo in jogos_acao %}
+                {% for jogo in jogos_recomendados %}
                     <a href="{% url 'jogos:avaliar' jogo.id %}" class="card-link">
                         <div class="card">
-                            <img src="{{jogo.background_image}}" alt="{{jogo.titulo}}"> 
+                            <img src="{{ jogo.background_image }}" alt="{{ jogo.titulo }}"> 
                             <div class="card-info">
-                                <div class="card-title">{{jogo.titulo}}</div>
-                                <div class="card-subtitle">Data de Lançamento: {{jogo.ano_lancamento}}</div>
+                                <div class="card-title">{{ jogo.titulo }}</div>
+                                <div class="card-subtitle">Data de Lançamento: {{ jogo.ano_lancamento|date:"d/m/Y" }}</div>
                             </div>
                         </div>
                     </a>
-                 {% empty %}
-                    <p>Nenhum jogo de ação encontrado no momento.</p>
-                 {% endfor %}
+                {% endfor %}
             </div>
         </section>
+    {% endif %}
 
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">Jogos Indie</h2>
-            </div>
-            <div class="card-container">
-                 {% for jogo in jogos_indie %}
-                    <a href="{% url 'jogos:avaliar' jogo.id %}" class="card-link">
-                        <div class="card">
-                            <img src="{{jogo.background_image}}" alt="{{jogo.titulo}}"> 
-                            <div class="card-info">
-                                <div class="card-title">{{jogo.titulo}}</div>
-                                <div class="card-subtitle">Data de Lançamento: {{jogo.ano_lancamento}}</div>
-                            </div>
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">Jogos Populares</h2>
+        </div>
+        <div class="card-container">
+            {% for jogo in jogos_populares %}
+                <a href="{% url 'jogos:avaliar' jogo.id %}" class="card-link">
+                    <div class="card">
+                        <img src="{{jogo.background_image}}" alt="{{jogo.titulo}}"> 
+                        <div class="card-info">
+                            <div class="card-title">{{jogo.titulo}}</div>
+                            <div class="card-subtitle">Data de Lançamento: {{jogo.ano_lancamento}}</div>
                         </div>
-                    </a>
-                 {% empty %}
-                    <p>Nenhum jogo indie encontrado no momento.</p>
-                 {% endfor %}
-            </div>
-        </section>
+                    </div>
+                </a>
+            {% empty %}
+                <p>Nenhum jogo popular encontrado no momento.</p>
+            {% endfor %}
+        </div>
+    </section>
 
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">Jogos de RPG</h2>
-            </div>
-            <div class="card-container">
-                 {% for jogo in jogos_rpg %}
-                    <a href="{% url 'jogos:avaliar' jogo.id %}" class="card-link">
-                        <div class="card">
-                            <img src="{{jogo.background_image}}" alt="{{jogo.titulo}}"> 
-                            <div class="card-info">
-                                <div class="card-title">{{jogo.titulo}}</div>
-                                <div class="card-subtitle">Data de Lançamento: {{jogo.ano_lancamento}}</div>
-                            </div>
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">Jogos de Ação</h2>
+        </div>
+        <div class="card-container">
+            {% for jogo in jogos_acao %}
+                <a href="{% url 'jogos:avaliar' jogo.id %}" class="card-link">
+                    <div class="card">
+                        <img src="{{jogo.background_image}}" alt="{{jogo.titulo}}"> 
+                        <div class="card-info">
+                            <div class="card-title">{{jogo.titulo}}</div>
+                            <div class="card-subtitle">Data de Lançamento: {{jogo.ano_lancamento}}</div>
                         </div>
-                    </a>
-                 {% empty %}
-                    <p>Nenhum jogo de RPG encontrado no momento.</p>
-                 {% endfor %}
-            </div>
-        </section>
+                    </div>
+                </a>
+            {% empty %}
+                <p>Nenhum jogo de ação encontrado no momento.</p>
+            {% endfor %}
+        </div>
+    </section>
 
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">Jogos de Tiro (Shooter)</h2>
-            </div>
-            <div class="card-container">
-                 {% for jogo in jogos_shooter %}
-                    <a href="{% url 'jogos:avaliar' jogo.id %}" class="card-link">
-                        <div class="card">
-                            <img src="{{jogo.background_image}}" alt="{{jogo.titulo}}"> 
-                            <div class="card-info">
-                                <div class="card-title">{{jogo.titulo}}</div>
-                                <div class="card-subtitle">Data de Lançamento: {{jogo.ano_lancamento}}</div>
-                            </div>
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">Jogos Indie</h2>
+        </div>
+        <div class="card-container">
+            {% for jogo in jogos_indie %}
+                <a href="{% url 'jogos:avaliar' jogo.id %}" class="card-link">
+                    <div class="card">
+                        <img src="{{jogo.background_image}}" alt="{{jogo.titulo}}"> 
+                        <div class="card-info">
+                            <div class="card-title">{{jogo.titulo}}</div>
+                            <div class="card-subtitle">Data de Lançamento: {{jogo.ano_lancamento}}</div>
                         </div>
-                    </a>
-                 {% empty %}
-                    <p>Nenhum jogo de Tiro (Shooter) encontrado no momento.</p>
-                 {% endfor %}
-            </div>
-        </section>
+                    </div>
+                </a>
+            {% empty %}
+                <p>Nenhum jogo indie encontrado no momento.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">Jogos de RPG</h2>
+        </div>
+        <div class="card-container">
+            {% for jogo in jogos_rpg %}
+                <a href="{% url 'jogos:avaliar' jogo.id %}" class="card-link">
+                    <div class="card">
+                        <img src="{{jogo.background_image}}" alt="{{jogo.titulo}}"> 
+                        <div class="card-info">
+                            <div class="card-title">{{jogo.titulo}}</div>
+                            <div class="card-subtitle">Data de Lançamento: {{jogo.ano_lancamento}}</div>
+                        </div>
+                    </div>
+                </a>
+            {% empty %}
+                <p>Nenhum jogo de RPG encontrado no momento.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">Jogos de Tiro (Shooter)</h2>
+        </div>
+        <div class="card-container">
+            {% for jogo in jogos_shooter %}
+                <a href="{% url 'jogos:avaliar' jogo.id %}" class="card-link">
+                    <div class="card">
+                        <img src="{{jogo.background_image}}" alt="{{jogo.titulo}}"> 
+                        <div class="card-info">
+                            <div class="card-title">{{jogo.titulo}}</div>
+                            <div class="card-subtitle">Data de Lançamento: {{jogo.ano_lancamento}}</div>
+                        </div>
+                    </div>
+                </a>
+            {% empty %}
+                <p>Nenhum jogo de Tiro (Shooter) encontrado no momento.</p>
+            {% endfor %}
+        </div>
+    </section>
     
-    </main>
+</main>
 {% endblock %}
 
 {% block extra_scripts %}
