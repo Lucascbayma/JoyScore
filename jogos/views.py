@@ -179,6 +179,8 @@ def home(request):
     jogos_shooter = Jogo.objects.filter( titulo__in=titulos_shooter ).order_by('titulo')
     titulos_playstation = [ "Astro Bot", "The Last of Us", "The Last of Us Part II", "Uncharted 4: A Thief's End", "God of War", "God of War: Ragnarök", "Ghost of Tsushima", "Marvel's Spider-Man", "Horizon Zero Dawn", "Bloodborne" ]
     jogos_playstation = Jogo.objects.filter(titulo__in=titulos_playstation).order_by('titulo')
+    titulos_nintendo = [ "Super Smash Bros. Ultimate", "Super Mario Odyssey", "Animal Crossing: New Horizons", "Little Nightmares", "The Binding of Isaac", "The Legend of Zelda: Breath of the Wild", "Pokémon Alpha Sapphire, Omega Ruby", "Mario Kart 8", ]
+    jogos_nintendo = Jogo.objects.filter(titulo__in=titulos_nintendo).order_by('titulo')
     
     context = { 
         'jogos_recomendados': jogos_recomendados,
@@ -189,6 +191,7 @@ def home(request):
         'jogos_rpg': jogos_rpg, 
         'jogos_shooter': jogos_shooter,
         'jogos_playstation': jogos_playstation,
+        'jogos_nintendo': jogos_nintendo,
     }
     return render(request, 'jogos/home.html', context)
 
