@@ -21,3 +21,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('jogos.urls')), 
 ]
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('steam/', include('jogos_steam.urls')),
+]

@@ -17,7 +17,7 @@ from decouple import config
 
 load_dotenv() # Serve pra carregar as variáveis do arquivo .env
 
-
+STEAM_API_KEY="FE1CF9FF23F59C6282B288B67D9838D5"
 API_KEY = "2d6f7a2d7bca4536b96d4277f0152903"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -136,3 +136,18 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    # Seus outros apps (ex: 'jogos')
+    'jogos',
+
+    # Adicione o novo app aqui
+    'jogos_steam',
+]
