@@ -167,6 +167,8 @@ def home(request):
     # Carrega as outras seções da home
     titulos_populares = [ "The Witcher 3: Wild Hunt", "Red Dead Redemption 2", "Grand Theft Auto V", "Hollow Knight", "Portal 2", "Minecraft", "God of War", "Elden Ring", "Fortnite Battle Royale", "The Legend of Zelda: Breath of the Wild", ]
     jogos_populares = Jogo.objects.filter( titulo__in=titulos_populares ).order_by('titulo')
+    titulos_favs = [ "Pokémon X, Y", "Marvel's Spider-Man", "The Witcher 3: Wild Hunt", "Bloodborne", "FIFA 22", "Hollow Knight", ]
+    jogos_favs = Jogo.objects.filter( titulo__in=titulos_favs ).order_by('titulo')
     titulos_acao = [ "Sekiro: Shadows Die Twice", "Devil May Cry 5", "Doom Eternal", "Marvel Rivals", "Marvel's Spider-Man", "Assassin's Creed Valhalla", "Alan Wake 2", "Batman: Arkham Knight", "God of War: Ragnarök", ]
     jogos_acao = Jogo.objects.filter( titulo__in=titulos_acao ).order_by('titulo')
     titulos_indie = [ "Hades", "Cuphead", "Celeste", "Stardew Valley", "Hollow Knight", "Ori and the Will of the Wisps", "Disco Elysium", ]
@@ -180,6 +182,7 @@ def home(request):
     
     context = { 
         'jogos_recomendados': jogos_recomendados,
+        'jogos_favs': jogos_favs,
         'jogos_populares': jogos_populares, 
         'jogos_acao': jogos_acao, 
         'jogos_indie': jogos_indie, 
