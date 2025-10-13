@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'jogos_steam/steam_tac_toe.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="game-container">
+
+    <div class="side-panel">
+        <div id="turn-indicator" class="turn-indicator">
+            <h2 id="turn-text">Vez do Jogador</h2>
+            <img id="turn-image" src="https://placehold.co/100x100/e74c3c/FFFFFF?text=P1" alt="Jogador da Vez">
+        </div>
+        <button id="resortear-btn" class="resortear-button">Sortear Temas</button>
+    </div>
+
+    <div class="main-board">
+        <div class="label-logo">
+            <span>STEAM-TAC-TOE</span>
+        </div>
+
+        <div id="label-col-0" class="label-item">{{ colunas.0 }}</div>
+        <div id="label-col-1" class="label-item">{{ colunas.1 }}</div>
+        <div id="label-col-2" class="label-item">{{ colunas.2 }}</div>
+
+        <div id="label-row-0" class="label-item">{{ linhas.0 }}</div>
+        <div class="game-slot" data-row="0" data-col="0"><div class="plus">＋</div></div>
+        <div class="game-slot" data-row="0" data-col="1"><div class="plus">＋</div></div>
+        <div class="game-slot" data-row="0" data-col="2"><div class="plus">＋</div></div>
+
+        <div id="label-row-1" class="label-item">{{ linhas.1 }}</div>
+        <div class="game-slot" data-row="1" data-col="0"><div class="plus">＋</div></div>
+        <div class="game-slot" data-row="1" data-col="1"><div class="plus">＋</div></div>
+        <div class="game-slot" data-row="1" data-col="2"><div class="plus">＋</div></div>
+
+        <div id="label-row-2" class="label-item">{{ linhas.2 }}</div>
+        <div class="game-slot" data-row="2" data-col="0"><div class="plus">＋</div></div>
+        <div class="game-slot" data-row="2" data-col="1"><div class="plus">＋</div></div>
+        <div class="game-slot" data-row="2" data-col="2"><div class="plus">＋</div></div>
+    </div>
+
+</div>
+
+<div id="search-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button id="modal-close-btn" class="modal-close">&times;</button>
+        <h2>Escolha um Jogo</h2>
+        <p>O jogo deve pertencer aos gêneros: <strong id="modal-genres-text"></strong></p>
+        <div class="modal-search-box">
+            <input type="text" id="game-search-input" placeholder="Digite o nome do jogo...">
+        </div>
+        <ul id="search-results-list"></ul>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'jogos_steam/steam_tac_toe.js' %}"></script>
+{% endblock %}

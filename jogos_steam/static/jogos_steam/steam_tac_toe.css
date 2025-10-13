@@ -1,0 +1,205 @@
+/* CÓDIGO COMPLETO para: jogos_steam/static/jogos_steam/steam_tac_toe.css */
+
+/* --- NOVOS ESTILOS GERAIS E PAINEL LATERAL --- */
+.game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px; /* Espaço entre o painel e o tabuleiro */
+    margin: 40px auto;
+    width: fit-content; /* O container se ajusta ao conteúdo */
+}
+
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.turn-indicator {
+    background-color: #1c163a; /* Cor de fundo escura */
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 200px;
+    border: 2px solid #4a3c9a;
+}
+
+.turn-indicator h2 {
+    margin: 0 0 15px 0;
+    font-size: 1.2rem;
+    transition: color 0.3s;
+}
+
+.turn-indicator img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+}
+
+.text-red {
+    color: #e74c3c; /* Vermelho */
+}
+
+.text-blue {
+    color: #3498db; /* Azul */
+}
+
+.resortear-button {
+    background-color: #3c317c;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.resortear-button:hover {
+    background-color: #4a3c9a;
+}
+
+/* --- ESTILOS DO TABULEIRO ATUALIZADOS (TAMANHO E CORES) --- */
+.main-board {
+    display: grid;
+    /* Tamanho aumentado: 140px para rótulos, 3 colunas flexíveis */
+    grid-template-columns: 140px repeat(3, 1fr);
+    grid-template-rows: 140px repeat(3, 1fr);
+    gap: 12px;
+    background-color: #2a215a; /* Cor base do tabuleiro (azul/roxo escuro) */
+    padding: 12px;
+    border-radius: 10px;
+    /* Tamanho aumentado */
+    height: 700px;
+    width: 700px;
+}
+
+.label-logo, .label-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: #1c163a; /* Cor escura para os rótulos */
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 1rem;
+    color: #fff;
+    font-weight: bold;
+}
+
+.game-slot {
+    background-color: #3c317c; /* Cor dos quadrados (azul/roxo médio) */
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s;
+    color: #fff;
+}
+
+.game-slot:hover:not(.played) {
+    background-color: #4a3c9a; /* Cor de hover (azul/roxo claro) */
+}
+
+.plus {
+    font-size: 3rem;
+    opacity: 0.7;
+}
+
+/* --- ESTILOS DAS JOGADAS (BORDAS E IMAGEM) --- */
+.game-slot.played {
+    cursor: default;
+    padding: 5px;
+    background-color: #1c163a; /* Cor de fundo escura para slots jogados */
+}
+
+.game-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.played-slot-red {
+    border: 4px solid #e74c3c; /* Borda vermelha para Jogador 1 */
+}
+
+.played-slot-blue {
+    border: 4px solid #3498db; /* Borda azul para Jogador 2 */
+}
+
+/* --- ESTILOS DO MODAL E RESULTADOS (sem alterações de cor) --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.modal-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: #20184d;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    color: #fff;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px; right: 15px;
+    background: none; border: none;
+    color: #fff;
+    font-size: 2.5rem;
+    cursor: pointer;
+}
+
+.modal-content h2 { margin-top: 0; }
+
+.modal-search-box input {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+#search-results-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.search-result-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #444;
+    transition: background-color 0.2s;
+}
+
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover { background-color: #3a307c; }

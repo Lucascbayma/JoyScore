@@ -52,6 +52,8 @@
                     <li><a href="{% url 'jogos:home' %}">Início</a></li>
                     <li><a href="{% url 'jogos:minha_biblioteca' %}">Biblioteca</a></li>
                     
+                    <li><a href="{% url 'jogos_steam:steam_tac_toe' %}">Steam Tac Toe</a></li>
+                    
                     <li><a href="{% url 'jogos:configuracoes_conta' %}">Configurações de Conta</a></li>
                 </ul>
             </nav>
@@ -68,7 +70,6 @@
     </footer>
 
     <script>
-
         const themeToggleBtn = document.getElementById('theme-toggle');
 
         if (themeToggleBtn) {
@@ -90,7 +91,6 @@
                 body.setAttribute('data-theme', 'light');
                 lightThemeStyle.disabled = false;
                 
-
                 if (themeIcon) themeIcon.className = 'fas fa-moon'; 
                 if (themeText) themeText.textContent = 'Modo Escuro'; 
                 
@@ -98,7 +98,6 @@
                 body.setAttribute('data-theme', 'dark');
                 lightThemeStyle.disabled = true;
                 
-
                 if (themeIcon) themeIcon.className = 'fas fa-sun'; 
                 if (themeText) themeText.textContent = 'Modo Branco'; 
             }
