@@ -54,6 +54,27 @@
 
     <section class="content-section">
         <div class="section-header">
+            <h2 class="section-title">Favoritos dos desenvolvedores</h2>
+        </div>
+        <div class="card-container">
+            {% for jogo in jogos_favs %}
+                <a href="{% url 'jogos:avaliar' jogo.id %}" class="card-link">
+                    <div class="card">
+                        <img src="{{jogo.background_image}}" alt="{{jogo.titulo}}"> 
+                        <div class="card-info">
+                            <div class="card-title">{{jogo.titulo}}</div>
+                            <div class="card-subtitle">Data de Lançamento: {{jogo.ano_lancamento}}</div>
+                        </div>
+                    </div>
+                </a>
+            {% empty %}
+                <p>Nenhum jogo favorito dos desenvolvedores encontrado no momento.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="section-header">
             <h2 class="section-title">Jogos de Ação</h2>
         </div>
         <div class="card-container">
