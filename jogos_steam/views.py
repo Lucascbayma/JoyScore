@@ -1,4 +1,4 @@
-# CÓDIGO COMPLETO e FINALMENTE CORRIGIDO para: jogos_steam/views.py
+# CÓDIGO COMPLETO E FINAL para: jogos_steam/views.py
 
 import random
 import requests
@@ -6,20 +6,35 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.conf import settings
 
-# ... (as outras views não mudam, mas estão aqui para garantir) ...
+# --- INÍCIO DA CORREÇÃO FINAL ---
+# 1. Criamos uma função para "limpar" e padronizar os nomes dos gêneros
+def normalize_genre(genre_string):
+    """Converte uma string de gênero para um formato padrão e consistente."""
+    return genre_string.lower().replace('-', '').replace(' ', '')
+# --- FIM DA CORREÇÃO FINAL ---
+
+ALL_AVAILABLE_THEMES = [
+    "Action", "Indie", "Adventure", "RPG", "Strategy", "Simulation",
+    "Casual", "Sports", "Racing", "Violent", "Singleplayer", "Multiplayer",
+    "Free to Play", "Early Access", "Massively Multiplayer", "Co-op"
+]
+
 def steam_tac_toe_view(request):
-    LISTA_DE_GENEROS = [
-        "Action", "Indie", "Adventure", "RPG", "Strategy", "Simulation",
-        "Casual", "Sports", "Racing", "Violent", "Singleplayer", "Multiplayer",
-        "Free to Play", "Early Access", "Massively Multiplayer", "Co-op"
-    ]
-    generos_escolhidos = random.sample(LISTA_DE_GENEROS, 6)
+    custom_themes_str = request.GET.get('temas')
+    if custom_themes_str:
+        custom_themes_list = [theme.strip() for theme in custom_themes_str.split(',')]
+        valid_themes = [theme for theme in custom_themes_list if theme in ALL_AVAILABLE_THEMES]
+        themes_to_use = valid_themes if len(valid_themes) >= 6 else ALL_AVAILABLE_THEMES
+    else:
+        themes_to_use = ALL_AVAILABLE_THEMES
+    
+    generos_escolhidos = random.sample(themes_to_use, 6)
     context = {
         'linhas': generos_escolhidos[:3],
         'colunas': generos_escolhidos[3:],
+        'todos_os_temas': ALL_AVAILABLE_THEMES,
     }
     return render(request, 'jogos_steam/steam_tac_toe.html', context)
-
 
 def get_steam_app_list():
     url = "https://api.steampowered.com/ISteamApps/GetAppList/v2/"
@@ -34,13 +49,9 @@ STEAM_APPS = get_steam_app_list()
 
 def search_steam_games_api(request):
     query = request.GET.get('q', '').lower()
-    if not query or len(query) < 3:
-        return JsonResponse({'games': []})
-    
+    if not query or len(query) < 3: return JsonResponse({'games': []})
     results = [app for app in STEAM_APPS if query in app.get('name', '').lower()]
-    limited_results = results[:10]
-    return JsonResponse({'games': limited_results})
-
+    return JsonResponse({'games': results[:10]})
 
 def validate_game_move_api(request):
     if request.method == 'POST':
@@ -50,40 +61,32 @@ def validate_game_move_api(request):
 
         if not all([appid, row_genre, col_genre]):
             return JsonResponse({'success': False, 'message': 'Dados incompletos.'}, status=400)
-
-        # --- A CORREÇÃO FINAL ESTÁ AQUI ---
-        # Removemos o parâmetro '&l=brazilian' para forçar a API a responder em INGLÊS.
+        
         url = f"https://store.steampowered.com/api/appdetails?appids={appid}"
-        # --- FIM DA CORREÇÃO ---
         
         try:
-            response = requests.get(url)
-            response.raise_for_status()
-            data = response.json()
-
-            if not data[appid]['success']:
-                return JsonResponse({'success': False, 'message': 'Jogo não encontrado na Steam.'})
+            response = requests.get(url); response.raise_for_status(); data = response.json()
+            if not data[appid]['success']: return JsonResponse({'success': False})
 
             game_data = data[appid]['data']
-            
-            game_genres = [genre['description'] for genre in game_data.get('genres', [])]
-            game_categories = [cat['description'] for cat in game_data.get('categories', [])]
-            all_tags = game_genres + game_categories
+            game_genres = [g['description'] for g in game_data.get('genres', [])]
+            game_categories = [c['description'] for c in game_data.get('categories', [])]
+            all_tags_from_api = game_genres + game_categories
 
-            if row_genre in all_tags and col_genre in all_tags:
-                return JsonResponse({
-                    'success': True,
-                    'image_url': game_data.get('header_image')
-                })
+            # --- INÍCIO DA CORREÇÃO FINAL ---
+            # 2. Normalizamos os gêneros que precisamos e a lista da API
+            normalized_row = normalize_genre(row_genre)
+            normalized_col = normalize_genre(col_genre)
+            all_normalized_tags = [normalize_genre(tag) for tag in all_tags_from_api]
+            # --- FIM DA CORREÇÃO FINAL ---
+
+            # 3. A comparação agora é feita com os nomes "limpos"
+            if normalized_row in all_normalized_tags and normalized_col in all_normalized_tags:
+                return JsonResponse({'success': True, 'image_url': game_data.get('header_image')})
             else:
-                tags_formatadas = ", ".join(all_tags)
-                mensagem_erro = (
-                    f'Errado! O jogo "{game_data.get("name")}" não se encaixa em "{row_genre}" e "{col_genre}".\n\n'
-                    f'Os gêneros/categorias dele são: {tags_formatadas}'
-                )
-                return JsonResponse({'success': False, 'message': mensagem_erro})
+                return JsonResponse({'success': False})
 
         except (requests.exceptions.RequestException, KeyError):
-            return JsonResponse({'success': False, 'message': 'Erro ao comunicar com a API da Steam.'}, status=500)
+            return JsonResponse({'success': False}, status=500)
 
-    return JsonResponse({'success': False, 'message': 'Método inválido.'}, status=405)
+    return JsonResponse({'success': False}, status=405)
