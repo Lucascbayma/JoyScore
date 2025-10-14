@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameStatusBox = document.getElementById('game-status-box');
     const resortearBtn = document.getElementById('resortear-btn');
     const settingsBtn = document.getElementById('settings-btn');
+    const skipTurnBtn = document.getElementById('skip-turn-btn'); // NOVO
     const nextRoundBtn = document.getElementById('next-round-btn');
 
     // --- Seletores do Modal de Busca ---
@@ -60,15 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Lógica do Jogo (Vitória, Empate, Reinício) ---
     const checkWinCondition = (player) => {
-        // Checar linhas e colunas
         for (let i = 0; i < 3; i++) {
             if (boardState[i][0] === player && boardState[i][1] === player && boardState[i][2] === player) return true;
             if (boardState[0][i] === player && boardState[1][i] === player && boardState[2][i] === player) return true;
         }
-        // Checar diagonais
         if (boardState[0][0] === player && boardState[1][1] === player && boardState[2][2] === player) return true;
         if (boardState[0][2] === player && boardState[1][1] === player && boardState[2][0] === player) return true;
-        
         return false;
     };
     
@@ -102,12 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
         movesMade = 0;
         gameOver = false;
         currentPlayer = 'team_red';
-
         gameSlots.forEach(slot => {
             slot.innerHTML = '<div class="plus">＋</div>';
             slot.classList.remove('played', 'played-slot-red', 'played-slot-blue');
         });
-
         hideStatusMessages();
         updateTurnIndicator();
         toggleActionButtons(false);
@@ -116,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleActionButtons = (isGameOver) => {
         resortearBtn.style.display = isGameOver ? 'none' : 'block';
         settingsBtn.style.display = isGameOver ? 'none' : 'block';
+        skipTurnBtn.style.display = isGameOver ? 'none' : 'block'; // ATUALIZADO
         nextRoundBtn.style.display = isGameOver ? 'block' : 'none';
     };
 
@@ -304,6 +301,13 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = urlParams.has('temas') ? `${window.location.pathname}?${urlParams.toString()}` : window.location.pathname;
     });
     
+    // NOVO LISTENER PARA PULAR A VEZ
+    skipTurnBtn.addEventListener('click', () => {
+        if (gameOver) return; // Não faz nada se o jogo acabou
+        currentPlayer = (currentPlayer === 'team_red') ? 'team_blue' : 'team_red';
+        updateTurnIndicator();
+    });
+
     settingsBtn.addEventListener('click', openSettingsModal);
     closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
     settingsModal.addEventListener('click', (event) => { if (event.target === settingsModal) closeSettingsModal(); });

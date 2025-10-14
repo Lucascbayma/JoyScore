@@ -116,7 +116,7 @@
 #game-status-box.error-message span {
     display: none;
 }
-/* Novas classes de status */
+
 #game-status-box.win-message { font-size: 1.5rem; line-height: 1.2; animation: pulse 1s infinite; }
 #game-status-box.win-p1 { color: #e74c3c; }
 #game-status-box.win-p2 { color: #3498db; }
