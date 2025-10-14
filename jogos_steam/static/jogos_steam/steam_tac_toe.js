@@ -1,53 +1,56 @@
-// CÓDIGO COMPLETO para: jogos_steam/static/jogos_steam/steam_tac_toe.js
-
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- SELEÇÃO DE ELEMENTOS ---
     const modal = document.getElementById('search-modal');
     const closeModalBtn = document.getElementById('modal-close-btn');
     const gameSlots = document.querySelectorAll('.game-slot');
     const modalGenresText = document.getElementById('modal-genres-text');
     const searchInput = document.getElementById('game-search-input');
     const searchResultsList = document.getElementById('search-results-list');
-    const turnIndicatorText = document.getElementById('turn-text');
-    const turnIndicatorImage = document.getElementById('turn-image');
+    
+    const headerTurnText = document.getElementById('header-turn-text');
+    const p1ScoreDisplay = document.getElementById('p1-score');       
+    const p2ScoreDisplay = document.getElementById('p2-score');       
+
     const resortearBtn = document.getElementById('resortear-btn');
     
-    // --- MUDANÇA AQUI ---
     const gameStatusBox = document.getElementById('game-status-box');
-    const originalStatusContent = gameStatusBox.innerHTML; // Salva o conteúdo original ("STEAM-TAC-TOE")
+    
+    const originalStatusContent = gameStatusBox ? gameStatusBox.innerHTML : '<span>STEAM-TAC-TOE</span>'; 
 
     let activeSlot = null;
     let searchTimeout;
     let currentPlayer = 'team_red';
 
-    // --- LÓGICA ATUALIZADA PARA MOSTRAR/ESCONDER ERRO ---
     const showError = (message) => {
-        gameStatusBox.textContent = message; // Insere a mensagem de erro como texto
+        gameStatusBox.textContent = message; 
         gameStatusBox.classList.add('error-message');
     };
 
     const hideError = () => {
-        gameStatusBox.innerHTML = originalStatusContent; // Restaura o conteúdo original
+        gameStatusBox.innerHTML = originalStatusContent; 
         gameStatusBox.classList.remove('error-message');
     };
 
-    // --- LÓGICA DE TURNO (sem alterações) ---
     const updateTurnIndicator = () => {
+        if (headerTurnText) {
+            headerTurnText.classList.remove('text-red', 'text-blue');
+        }
+        
         if (currentPlayer === 'team_red') {
-            turnIndicatorText.textContent = 'Vez do Jogador 1';
-            turnIndicatorText.className = 'text-red';
-            turnIndicatorImage.src = 'https://placehold.co/100x100/e74c3c/FFFFFF?text=P1';
+            if (headerTurnText) {
+                headerTurnText.textContent = 'P1\'S TURN';
+                headerTurnText.classList.add('text-red');
+            }
         } else {
-            turnIndicatorText.textContent = 'Vez do Jogador 2';
-            turnIndicatorText.className = 'text-blue';
-            turnIndicatorImage.src = 'https://placehold.co/100x100/3498db/FFFFFF?text=P2';
+            if (headerTurnText) {
+                headerTurnText.textContent = 'P2\'S TURN';
+                headerTurnText.classList.add('text-blue');
+            }
         }
     };
 
-    // --- LÓGICA DO MODAL E BUSCA ---
     const openModal = (slot) => {
-        hideError(); // Limpa a mensagem de erro ao iniciar uma nova jogada
+        hideError(); 
         activeSlot = slot;
         const rowIndex = slot.dataset.row;
         const colIndex = slot.dataset.col;
@@ -91,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // --- LÓGICA DE VALIDAÇÃO E ATUALIZAÇÃO DO TABULEIRO ---
     const handleGameSelection = async (appid) => {
         if (!activeSlot) return;
 
@@ -110,16 +112,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (data.success) {
-                hideError(); // Limpa qualquer mensagem de erro antiga se a jogada for válida
+                hideError(); 
                 updateBoard(data.image_url);
             } else {
-                showError(data.message || 'Jogada inválida!'); // Usa a nova função para mostrar o erro no tabuleiro
+                showError(data.message || 'Jogada inválida!'); 
                 currentPlayer = (currentPlayer === 'team_red') ? 'team_blue' : 'team_red';
                 updateTurnIndicator();
             }
         } catch (error) {
             console.error('Erro ao validar jogada:', error);
-            showError('Erro de conexão. Tente novamente.'); // Mostra erro de conexão também
+            showError('Erro de conexão. Tente novamente.'); 
         } finally {
             closeModal();
         }
@@ -143,7 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTurnIndicator();
     };
 
-    // --- EVENTOS ---
     gameSlots.forEach(slot => {
         slot.addEventListener('click', () => {
             if (!slot.classList.contains('played')) {
