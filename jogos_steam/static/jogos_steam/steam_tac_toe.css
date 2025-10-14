@@ -60,11 +60,10 @@
     width: fit-content;
 }
 
-/* Container para os botões de ação (novo) */
 .action-buttons-container {
     display: flex;
     justify-content: center;
-    gap: 15px; /* Espaço entre os botões */
+    gap: 15px;
     margin-bottom: 15px;
 }
 
@@ -117,6 +116,18 @@
 #game-status-box.error-message span {
     display: none;
 }
+/* Novas classes de status */
+#game-status-box.win-message { font-size: 1.5rem; line-height: 1.2; animation: pulse 1s infinite; }
+#game-status-box.win-p1 { color: #e74c3c; }
+#game-status-box.win-p2 { color: #3498db; }
+#game-status-box.draw-message { color: #f1c40f; font-size: 1.5rem; }
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
 
 .game-slot {
     background-color: #3c317c;
@@ -162,7 +173,6 @@
     border: 4px solid #3498db;
 }
 
-/* Estilos de Modal (reutilizados e novos) */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
 .modal-overlay.visible { opacity: 1; visibility: visible; }
 .modal-content { background-color: #20184d; padding: 30px; border-radius: 10px; width: 90%; max-width: 600px; color: #fff; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
@@ -174,42 +184,9 @@
 .search-result-item:last-child { border-bottom: none; }
 .search-result-item:hover { background-color: #3a307c; }
 
-/* Estilos específicos para o modal de Configurações (novo) */
-#themes-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 10px;
-    max-height: 300px;
-    overflow-y: auto;
-    margin: 20px 0;
-    padding: 10px;
-    background-color: #1c163a;
-    border-radius: 5px;
-}
-.theme-item {
-    display: flex;
-    align-items: center;
-    background-color: #2a215a;
-    padding: 8px;
-    border-radius: 5px;
-}
-.theme-item input[type="checkbox"] {
-    margin-right: 10px;
-    transform: scale(1.2);
-    cursor: pointer;
-}
-.theme-item label {
-    cursor: pointer;
-    flex-grow: 1;
-}
-#settings-feedback {
-    color: #e74c3c;
-    min-height: 20px;
-    font-size: 0.9rem;
-    margin-top: 10px;
-    text-align: center;
-}
-.modal-footer {
-    text-align: right;
-    margin-top: 20px;
-}
+#themes-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; max-height: 300px; overflow-y: auto; margin: 20px 0; padding: 10px; background-color: #1c163a; border-radius: 5px; }
+.theme-item { display: flex; align-items: center; background-color: #2a215a; padding: 8px; border-radius: 5px; }
+.theme-item input[type="checkbox"] { margin-right: 10px; transform: scale(1.2); cursor: pointer; }
+.theme-item label { cursor: pointer; flex-grow: 1; }
+#settings-feedback { color: #e74c3c; min-height: 20px; font-size: 0.9rem; margin-top: 10px; text-align: center; }
+.modal-footer { text-align: right; margin-top: 20px; }

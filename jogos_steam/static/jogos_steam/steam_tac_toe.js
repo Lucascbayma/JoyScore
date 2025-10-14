@@ -5,8 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const headerTurnText = document.getElementById('header-turn-text');
     const p1ScoreDisplay = document.getElementById('p1-score');
     const p2ScoreDisplay = document.getElementById('p2-score');
-    const resortearBtn = document.getElementById('resortear-btn');
     const gameStatusBox = document.getElementById('game-status-box');
+    const resortearBtn = document.getElementById('resortear-btn');
+    const settingsBtn = document.getElementById('settings-btn');
+    const nextRoundBtn = document.getElementById('next-round-btn');
 
     // --- Seletores do Modal de Busca ---
     const searchModal = document.getElementById('search-modal');
@@ -15,8 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('game-search-input');
     const searchResultsList = document.getElementById('search-results-list');
     
-    // --- Seletores do Modal de Configurações (NOVOS) ---
-    const settingsBtn = document.getElementById('settings-btn');
+    // --- Seletores do Modal de Configurações ---
     const settingsModal = document.getElementById('settings-modal');
     const closeSettingsModalBtn = document.getElementById('settings-close-btn');
     const themesListContainer = document.getElementById('themes-list');
@@ -28,20 +29,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeSlot = null;
     let searchTimeout;
     let currentPlayer = 'team_red';
+    let p1Score = 0;
+    let p2Score = 0;
+    let gameOver = false;
+    let movesMade = 0;
+    let boardState = [ [null, null, null], [null, null, null], [null, null, null] ];
 
-    // --- Lógica de Erros e Turnos ---
+    // --- Lógica de Status (Erro, Turno, Vitória) ---
     const showError = (message) => {
         gameStatusBox.textContent = message; 
         gameStatusBox.classList.add('error-message');
     };
 
-    const hideError = () => {
+    const hideStatusMessages = () => {
         gameStatusBox.innerHTML = originalStatusContent; 
-        gameStatusBox.classList.remove('error-message');
+        gameStatusBox.classList.remove('error-message', 'win-message', 'win-p1', 'win-p2', 'draw-message');
     };
 
     const updateTurnIndicator = () => {
-        if (!headerTurnText) return;
+        if (!headerTurnText || gameOver) return;
         headerTurnText.classList.remove('text-red', 'text-blue');
         if (currentPlayer === 'team_red') {
             headerTurnText.textContent = "P1'S TURN";
@@ -52,9 +58,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // --- Lógica do Jogo (Vitória, Empate, Reinício) ---
+    const checkWinCondition = (player) => {
+        // Checar linhas e colunas
+        for (let i = 0; i < 3; i++) {
+            if (boardState[i][0] === player && boardState[i][1] === player && boardState[i][2] === player) return true;
+            if (boardState[0][i] === player && boardState[1][i] === player && boardState[2][i] === player) return true;
+        }
+        // Checar diagonais
+        if (boardState[0][0] === player && boardState[1][1] === player && boardState[2][2] === player) return true;
+        if (boardState[0][2] === player && boardState[1][1] === player && boardState[2][0] === player) return true;
+        
+        return false;
+    };
+    
+    const handleWin = (winner) => {
+        gameOver = true;
+        headerTurnText.textContent = "FIM DE JOGO";
+        if (winner === 'team_red') {
+            p1Score++;
+            p1ScoreDisplay.textContent = p1Score;
+            gameStatusBox.textContent = "P1 VENCEU!";
+            gameStatusBox.classList.add('win-message', 'win-p1');
+        } else {
+            p2Score++;
+            p2ScoreDisplay.textContent = p2Score;
+            gameStatusBox.textContent = "P2 VENCEU!";
+            gameStatusBox.classList.add('win-message', 'win-p2');
+        }
+        toggleActionButtons(true);
+    };
+
+    const handleDraw = () => {
+        gameOver = true;
+        headerTurnText.textContent = "FIM DE JOGO";
+        gameStatusBox.textContent = "EMPATE!";
+        gameStatusBox.classList.add('draw-message');
+        toggleActionButtons(true);
+    };
+
+    const startNewRound = () => {
+        boardState = [[null, null, null], [null, null, null], [null, null, null]];
+        movesMade = 0;
+        gameOver = false;
+        currentPlayer = 'team_red';
+
+        gameSlots.forEach(slot => {
+            slot.innerHTML = '<div class="plus">＋</div>';
+            slot.classList.remove('played', 'played-slot-red', 'played-slot-blue');
+        });
+
+        hideStatusMessages();
+        updateTurnIndicator();
+        toggleActionButtons(false);
+    };
+
+    const toggleActionButtons = (isGameOver) => {
+        resortearBtn.style.display = isGameOver ? 'none' : 'block';
+        settingsBtn.style.display = isGameOver ? 'none' : 'block';
+        nextRoundBtn.style.display = isGameOver ? 'block' : 'none';
+    };
+
     // --- Lógica do Modal de Busca ---
     const openSearchModal = (slot) => {
-        hideError(); 
+        hideStatusMessages();
         activeSlot = slot;
         const rowIndex = slot.dataset.row;
         const colIndex = slot.dataset.col;
@@ -72,66 +139,53 @@ document.addEventListener('DOMContentLoaded', () => {
         searchResultsList.innerHTML = '';
     };
 
-    // --- Lógica do Modal de Configurações (NOVA) ---
+    // --- Lógica do Modal de Configurações ---
     const openSettingsModal = () => {
         const allThemes = JSON.parse(document.getElementById('all-themes-data').textContent);
         const currentThemes = JSON.parse(document.getElementById('current-themes-data').textContent);
-        
-        themesListContainer.innerHTML = ''; // Limpa a lista antes de popular
-        settingsFeedback.textContent = ''; // Limpa o feedback
-
+        themesListContainer.innerHTML = '';
+        settingsFeedback.textContent = '';
         allThemes.forEach(theme => {
             const isChecked = currentThemes.includes(theme);
             const themeId = `theme-${theme.replace(/\s+/g, '-')}`;
-            
             const itemDiv = document.createElement('div');
             itemDiv.className = 'theme-item';
-            
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.id = themeId;
             checkbox.value = theme;
             checkbox.checked = isChecked;
-            
             const label = document.createElement('label');
             label.htmlFor = themeId;
             label.textContent = theme;
-            
             itemDiv.appendChild(checkbox);
             itemDiv.appendChild(label);
             themesListContainer.appendChild(itemDiv);
-
-            // Adiciona o listener para validação
             checkbox.addEventListener('click', (event) => {
                 const checkedCount = themesListContainer.querySelectorAll('input[type="checkbox"]:checked').length;
                 if (checkedCount < 6) {
-                    event.preventDefault(); // Impede de desmarcar
+                    event.preventDefault();
                     settingsFeedback.textContent = 'Você deve selecionar pelo menos 6 temas!';
                     setTimeout(() => { settingsFeedback.textContent = ''; }, 2000);
                 }
             });
         });
-
         settingsModal.classList.add('visible');
     };
 
-    const closeSettingsModal = () => {
-        settingsModal.classList.remove('visible');
-    };
+    const closeSettingsModal = () => settingsModal.classList.remove('visible');
 
     const saveSettings = () => {
         const selectedThemes = Array.from(themesListContainer.querySelectorAll('input:checked')).map(cb => cb.value);
-        
         if (selectedThemes.length < 6) {
             settingsFeedback.textContent = 'Erro: Pelo menos 6 temas devem ser selecionados.';
             return;
         }
-
         const themesParam = encodeURIComponent(selectedThemes.join(','));
         window.location.href = `${window.location.pathname}?temas=${themesParam}`;
     };
 
-    // --- Comunicação com a API ---
+    // --- Comunicação com a API e atualização do Tabuleiro ---
     const fetchGames = async (query) => {
         if (query.length < 3) { searchResultsList.innerHTML = ''; return; }
         searchResultsList.innerHTML = '<li>Buscando...</li>';
@@ -160,13 +214,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleGameSelection = async (appid) => {
         if (!activeSlot) return;
-
         const rowIndex = activeSlot.dataset.row;
         const colIndex = activeSlot.dataset.col;
         const rowGenre = document.getElementById(`label-row-${rowIndex}`).textContent.trim();
         const colGenre = document.getElementById(`label-col-${colIndex}`).textContent.trim();
         const csrftoken = getCookie('csrftoken');
-
         try {
             const response = await fetch('/steam/api/validate-move/', {
                 method: 'POST',
@@ -174,43 +226,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: new URLSearchParams({ 'appid': appid, 'row_genre': rowGenre, 'col_genre': colGenre }),
             });
             const data = await response.json();
-
             if (data.success) {
-                hideError(); 
+                hideStatusMessages();
                 updateBoard(data.image_url);
             } else {
-                showError(data.message || 'Jogada inválida!'); 
+                showError(data.message || 'Jogada inválida!');
                 currentPlayer = (currentPlayer === 'team_red') ? 'team_blue' : 'team_red';
                 updateTurnIndicator();
             }
         } catch (error) {
             console.error('Erro ao validar jogada:', error);
-            showError('Erro de conexão. Tente novamente.'); 
+            showError('Erro de conexão. Tente novamente.');
         } finally {
             closeSearchModal();
         }
     };
     
-    // --- Atualização do Tabuleiro ---
     const updateBoard = (imageUrl) => {
         if (!activeSlot) return;
+        const playerWhoMoved = currentPlayer;
+        const row = parseInt(activeSlot.dataset.row, 10);
+        const col = parseInt(activeSlot.dataset.col, 10);
+
+        boardState[row][col] = playerWhoMoved;
+        movesMade++;
+
         activeSlot.innerHTML = '';
         activeSlot.classList.add('played');
         const img = document.createElement('img');
         img.src = imageUrl;
         activeSlot.appendChild(img);
 
-        if (currentPlayer === 'team_red') {
-            activeSlot.classList.add('played-slot-red');
-            currentPlayer = 'team_blue';
+        activeSlot.classList.add(playerWhoMoved === 'team_red' ? 'played-slot-red' : 'played-slot-blue');
+
+        if (checkWinCondition(playerWhoMoved)) {
+            handleWin(playerWhoMoved);
+        } else if (movesMade === 9) {
+            handleDraw();
         } else {
-            activeSlot.classList.add('played-slot-blue');
-            currentPlayer = 'team_red';
+            currentPlayer = (playerWhoMoved === 'team_red') ? 'team_blue' : 'team_red';
+            updateTurnIndicator();
         }
-        updateTurnIndicator();
     };
 
-    // --- Função Utilitária ---
+    // --- Utilitários e Listeners ---
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -226,43 +285,30 @@ document.addEventListener('DOMContentLoaded', () => {
         return cookieValue;
     }
 
-    // --- Listeners de Eventos ---
     gameSlots.forEach(slot => {
         slot.addEventListener('click', () => {
-            if (!slot.classList.contains('played')) {
+            if (!slot.classList.contains('played') && !gameOver) {
                 openSearchModal(slot);
             }
         });
     });
 
     closeSearchModalBtn.addEventListener('click', closeSearchModal);
-    searchModal.addEventListener('click', (event) => {
-        if (event.target === searchModal) closeSearchModal();
-    });
-    
+    searchModal.addEventListener('click', (event) => { if (event.target === searchModal) closeSearchModal(); });
     searchInput.addEventListener('input', () => {
         clearTimeout(searchTimeout);
-        const query = searchInput.value;
-        searchTimeout = setTimeout(() => fetchGames(query), 300);
+        searchTimeout = setTimeout(() => fetchGames(searchInput.value), 300);
     });
-
     resortearBtn.addEventListener('click', () => {
-        // Mantém os temas customizados ao resortear
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('temas')) {
-            window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
-        } else {
-            window.location.reload();
-        }
+        window.location.href = urlParams.has('temas') ? `${window.location.pathname}?${urlParams.toString()}` : window.location.pathname;
     });
     
-    // Listeners do modal de configurações (NOVOS)
     settingsBtn.addEventListener('click', openSettingsModal);
     closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
-    settingsModal.addEventListener('click', (event) => {
-        if (event.target === settingsModal) closeSettingsModal();
-    });
+    settingsModal.addEventListener('click', (event) => { if (event.target === settingsModal) closeSettingsModal(); });
     saveSettingsBtn.addEventListener('click', saveSettings);
+    nextRoundBtn.addEventListener('click', startNewRound);
 
     // --- Inicialização ---
     updateTurnIndicator();
