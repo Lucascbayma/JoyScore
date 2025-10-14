@@ -1,5 +1,3 @@
-# CÓDIGO COMPLETO E FINAL para: jogos_steam/views.py
-
 import random
 import requests
 from django.shortcuts import render
@@ -7,12 +5,11 @@ from django.http import JsonResponse
 from django.conf import settings
 
 def normalize_genre(genre_string):
-    """Converte uma string de gênero para um formato padrão e consistente."""
     return genre_string.lower().replace('-', '').replace(' ', '')
 
 ALL_AVAILABLE_THEMES = [
     "Action", "Indie", "Adventure", "RPG", "Strategy", "Simulation",
-    "Casual", "Sports", "Racing", "Violent", "Singleplayer", "Multiplayer",
+    "Casual", "Sports", "Racing", "Violent", "Single-player", "Multi-player",
     "Free to Play", "Early Access", "Massively Multiplayer", "Co-op"
 ]
 
@@ -74,20 +71,16 @@ def validate_game_move_api(request):
 
             normalized_row = normalize_genre(row_genre)
             normalized_col = normalize_genre(col_genre)
-            all_normalized_tags = {normalize_genre(tag) for tag in all_tags_from_api} # Usar um set é mais rápido
+            all_normalized_tags = {normalize_genre(tag) for tag in all_tags_from_api}
 
-            # Verifica se a jogada é válida
             if normalized_row in all_normalized_tags and normalized_col in all_normalized_tags:
                 return JsonResponse({'success': True, 'image_url': game_data.get('header_image')})
             else:
-                # --- INÍCIO DA NOVA LÓGICA DE MENSAGEM DE ERRO ---
-                # 1. Encontrar quais temas do nosso bingo o jogo realmente tem
                 valid_genres_for_bingo = [
                     theme for theme in ALL_AVAILABLE_THEMES 
                     if normalize_genre(theme) in all_normalized_tags
                 ]
 
-                # 2. Construir a mensagem
                 if not valid_genres_for_bingo:
                     message = f"{game_name} não se encaixa em '{row_genre}' e '{col_genre}'. Ele não possui nenhum dos gêneros do nosso bingo."
                 else:
@@ -95,7 +88,6 @@ def validate_game_move_api(request):
                     message = f"Jogada inválida! '{game_name}' não é '{row_genre}' e '{col_genre}'. No bingo, ele se encaixa em: {genres_str}."
                 
                 return JsonResponse({'success': False, 'message': message})
-                # --- FIM DA NOVA LÓGICA ---
 
         except (requests.exceptions.RequestException, KeyError):
             return JsonResponse({'success': False, 'message': 'Erro ao consultar a API da Steam.'}, status=500)
