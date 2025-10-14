@@ -1,52 +1,62 @@
-/* CÓDIGO COMPLETO para: jogos_steam/static/jogos_steam/steam_tac_toe.css */
-
-/* --- NOVOS ESTILOS GERAIS E PAINEL LATERAL --- */
-.game-container {
+.game-header {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 40px;
-    margin: 40px auto;
-    width: fit-content;
-}
-
-.side-panel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-}
-
-.turn-indicator {
-    background-color: #1c163a;
-    padding: 20px;
+    background-color: #2a215a; 
+    padding: 15px 30px;
     border-radius: 10px;
-    text-align: center;
-    width: 200px;
+    margin-bottom: 25px;
+    width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.score-box {
+    display: flex;
+    align-items: baseline;
+    font-weight: bold;
+    font-size: 1.8rem;
+    color: #fff;
+    flex-grow: 1;
+}
+
+.score-box.p1-box {
+    justify-content: flex-start;
+    color: #e74c3c; 
+}
+
+.score-box.p2-box {
+    justify-content: flex-end;
+    color: #3498db; 
+}
+
+.score-label {
+    font-size: 1.2rem;
+    margin: 0 5px;
+}
+
+.score-value {
+    font-size: 2.5rem;
+    padding: 0 5px;
+}
+
+.turn-box {
+    flex-grow: 0;
+    white-space: nowrap;
+    background-color: #1c163a;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #fff;
     border: 2px solid #4a3c9a;
 }
 
-.turn-indicator h2 {
-    margin: 0 0 15px 0;
-    font-size: 1.2rem;
-    transition: color 0.3s;
-}
-
-.turn-indicator img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    border: 4px solid #fff;
-}
-
-/* --- O ESTILO DO ANTIGO ERROR-CONTAINER FOI REMOVIDO --- */
-
-.text-red {
-    color: #e74c3c;
-}
-
-.text-blue {
-    color: #3498db;
+.game-container {
+    display: block;
+    margin: 0 auto;
+    width: fit-content;
 }
 
 .resortear-button {
@@ -65,11 +75,15 @@
     background-color: #4a3c9a;
 }
 
-/* --- ESTILOS DO TABULEIRO ATUALIZADOS --- */
+.resortear-button.top-button {
+    display: block;
+    margin: 0 auto 15px auto;
+}
+
 .main-board {
     display: grid;
     grid-template-columns: 140px repeat(3, 150px);
-    grid-template-rows: 140px repeat(3, 225px);
+    grid-template-rows: 140px repeat(3, 150px);
     gap: 12px;
     background-color: #2a215a;
     padding: 12px;
@@ -90,15 +104,12 @@
     font-weight: bold;
 }
 
-/* --- MUDANÇA AQUI: NOVO ESTILO PARA A CAIXA DE STATUS/ERRO --- */
 #game-status-box.error-message {
-    color: #e74c3c; /* Cor do texto fica vermelha */
-    font-size: 0.85rem; /* Fonte menor para caber a mensagem */
+    color: #e74c3c;
+    font-size: 0.85rem;
     line-height: 1.3;
-    font-weight: normal; /* Tira o negrito para diferenciar do título */
+    font-weight: normal;
 }
-
-/* Esconde o texto "STEAM-TAC-TOE" original quando a mensagem de erro está ativa */
 #game-status-box.error-message span {
     display: none;
 }
@@ -124,18 +135,19 @@
     opacity: 0.7;
 }
 
-/* --- ESTILOS DAS JOGADAS --- */
 .game-slot.played {
     cursor: default;
-    padding: 5px;
+    padding: 0px;
     background-color: #1c163a;
 }
 
 .game-slot img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 6px;
+    padding: 2px;
+    background-color: #1c163a;
 }
 
 .played-slot-red {
@@ -146,7 +158,6 @@
     border: 4px solid #3498db;
 }
 
-/* --- ESTILOS DO MODAL (sem alteração) --- */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
 .modal-overlay.visible { opacity: 1; visibility: visible; }
 .modal-content { background-color: #20184d; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; color: #fff; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
