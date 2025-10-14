@@ -7,16 +7,25 @@
 
 {% block content %}
 
-<div class="game-container">
-
-    <div class="side-panel">
-        <div id="turn-indicator" class="turn-indicator">
-            <h2 id="turn-text">Vez do Jogador</h2>
-            <img id="turn-image" src="https://placehold.co/100x100/e74c3c/FFFFFF?text=P1" alt="Jogador da Vez">
-        </div>
-        
-        <button id="resortear-btn" class="resortear-button">Sortear Temas</button>
+<header class="game-header">
+    <div class="score-box p1-box">
+        <span class="score-label">P1</span>
+        <span id="p1-score" class="score-value">0</span>
     </div>
+
+    <div class="turn-box">
+        <span id="header-turn-text">P1'S TURN</span>
+    </div>
+
+    <div class="score-box p2-box">
+        <span id="p2-score" class="score-value">0</span>
+        <span class="score-label">P2</span>
+    </div>
+</header>
+
+<div class="game-container">
+    
+    <button id="resortear-btn" class="resortear-button top-button">Sortear Temas</button>
 
     <div class="main-board">
         <div id="game-status-box" class="label-logo">
