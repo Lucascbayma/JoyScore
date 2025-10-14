@@ -6,12 +6,9 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.conf import settings
 
-# --- INÍCIO DA CORREÇÃO FINAL ---
-# 1. Criamos uma função para "limpar" e padronizar os nomes dos gêneros
 def normalize_genre(genre_string):
     """Converte uma string de gênero para um formato padrão e consistente."""
     return genre_string.lower().replace('-', '').replace(' ', '')
-# --- FIM DA CORREÇÃO FINAL ---
 
 ALL_AVAILABLE_THEMES = [
     "Action", "Indie", "Adventure", "RPG", "Strategy", "Simulation",
@@ -66,27 +63,41 @@ def validate_game_move_api(request):
         
         try:
             response = requests.get(url); response.raise_for_status(); data = response.json()
-            if not data[appid]['success']: return JsonResponse({'success': False})
+            if not data[appid]['success']: 
+                return JsonResponse({'success': False, 'message': 'Não foi possível encontrar detalhes para este jogo.'})
 
             game_data = data[appid]['data']
+            game_name = game_data.get('name', 'Este jogo') # Pegamos o nome do jogo
             game_genres = [g['description'] for g in game_data.get('genres', [])]
             game_categories = [c['description'] for c in game_data.get('categories', [])]
             all_tags_from_api = game_genres + game_categories
 
-            # --- INÍCIO DA CORREÇÃO FINAL ---
-            # 2. Normalizamos os gêneros que precisamos e a lista da API
             normalized_row = normalize_genre(row_genre)
             normalized_col = normalize_genre(col_genre)
-            all_normalized_tags = [normalize_genre(tag) for tag in all_tags_from_api]
-            # --- FIM DA CORREÇÃO FINAL ---
+            all_normalized_tags = {normalize_genre(tag) for tag in all_tags_from_api} # Usar um set é mais rápido
 
-            # 3. A comparação agora é feita com os nomes "limpos"
+            # Verifica se a jogada é válida
             if normalized_row in all_normalized_tags and normalized_col in all_normalized_tags:
                 return JsonResponse({'success': True, 'image_url': game_data.get('header_image')})
             else:
-                return JsonResponse({'success': False})
+                # --- INÍCIO DA NOVA LÓGICA DE MENSAGEM DE ERRO ---
+                # 1. Encontrar quais temas do nosso bingo o jogo realmente tem
+                valid_genres_for_bingo = [
+                    theme for theme in ALL_AVAILABLE_THEMES 
+                    if normalize_genre(theme) in all_normalized_tags
+                ]
+
+                # 2. Construir a mensagem
+                if not valid_genres_for_bingo:
+                    message = f"{game_name} não se encaixa em '{row_genre}' e '{col_genre}'. Ele não possui nenhum dos gêneros do nosso bingo."
+                else:
+                    genres_str = ', '.join(valid_genres_for_bingo)
+                    message = f"Jogada inválida! '{game_name}' não é '{row_genre}' e '{col_genre}'. No bingo, ele se encaixa em: {genres_str}."
+                
+                return JsonResponse({'success': False, 'message': message})
+                # --- FIM DA NOVA LÓGICA ---
 
         except (requests.exceptions.RequestException, KeyError):
-            return JsonResponse({'success': False}, status=500)
+            return JsonResponse({'success': False, 'message': 'Erro ao consultar a API da Steam.'}, status=500)
 
-    return JsonResponse({'success': False}, status=405)
+    return JsonResponse({'success': False, 'message': 'Método inválido.'}, status=405)

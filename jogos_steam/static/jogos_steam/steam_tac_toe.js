@@ -9,32 +9,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalGenresText = document.getElementById('modal-genres-text');
     const searchInput = document.getElementById('game-search-input');
     const searchResultsList = document.getElementById('search-results-list');
-    // NOVOS ELEMENTOS
     const turnIndicatorText = document.getElementById('turn-text');
     const turnIndicatorImage = document.getElementById('turn-image');
     const resortearBtn = document.getElementById('resortear-btn');
+    
+    // --- MUDANÇA AQUI ---
+    const gameStatusBox = document.getElementById('game-status-box');
+    const originalStatusContent = gameStatusBox.innerHTML; // Salva o conteúdo original ("STEAM-TAC-TOE")
 
     let activeSlot = null;
     let searchTimeout;
-    let currentPlayer = 'team_red'; // Jogador 1 (Vermelho) começa
+    let currentPlayer = 'team_red';
 
-    // --- NOVA LÓGICA DE TURNO ---
+    // --- LÓGICA ATUALIZADA PARA MOSTRAR/ESCONDER ERRO ---
+    const showError = (message) => {
+        gameStatusBox.textContent = message; // Insere a mensagem de erro como texto
+        gameStatusBox.classList.add('error-message');
+    };
+
+    const hideError = () => {
+        gameStatusBox.innerHTML = originalStatusContent; // Restaura o conteúdo original
+        gameStatusBox.classList.remove('error-message');
+    };
+
+    // --- LÓGICA DE TURNO (sem alterações) ---
     const updateTurnIndicator = () => {
         if (currentPlayer === 'team_red') {
             turnIndicatorText.textContent = 'Vez do Jogador 1';
             turnIndicatorText.className = 'text-red';
-            // Placeholder de imagem vermelha (P1)
             turnIndicatorImage.src = 'https://placehold.co/100x100/e74c3c/FFFFFF?text=P1';
         } else {
             turnIndicatorText.textContent = 'Vez do Jogador 2';
             turnIndicatorText.className = 'text-blue';
-            // Placeholder de imagem azul (P2)
             turnIndicatorImage.src = 'https://placehold.co/100x100/3498db/FFFFFF?text=P2';
         }
     };
 
     // --- LÓGICA DO MODAL E BUSCA ---
     const openModal = (slot) => {
+        hideError(); // Limpa a mensagem de erro ao iniciar uma nova jogada
         activeSlot = slot;
         const rowIndex = slot.dataset.row;
         const colIndex = slot.dataset.col;
@@ -53,10 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const fetchGames = async (query) => {
-        if (query.length < 3) {
-            searchResultsList.innerHTML = '';
-            return;
-        }
+        if (query.length < 3) { searchResultsList.innerHTML = ''; return; }
         searchResultsList.innerHTML = '<li>Buscando...</li>';
         try {
             const response = await fetch(`/steam/api/search-games/?q=${encodeURIComponent(query)}`);
@@ -70,10 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const displayResults = (games) => {
         searchResultsList.innerHTML = '';
-        if (games.length === 0) {
-            searchResultsList.innerHTML = '<li>Nenhum jogo encontrado.</li>';
-            return;
-        }
+        if (games.length === 0) { searchResultsList.innerHTML = '<li>Nenhum jogo encontrado.</li>'; return; }
         games.forEach(game => {
             const li = document.createElement('li');
             li.textContent = game.name;
@@ -97,28 +104,22 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/steam/api/validate-move/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrftoken,
-                },
-                body: new URLSearchParams({
-                    'appid': appid, 'row_genre': rowGenre, 'col_genre': colGenre,
-                }),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': csrftoken },
+                body: new URLSearchParams({ 'appid': appid, 'row_genre': rowGenre, 'col_genre': colGenre }),
             });
             const data = await response.json();
 
             if (data.success) {
+                hideError(); // Limpa qualquer mensagem de erro antiga se a jogada for válida
                 updateBoard(data.image_url);
             } else {
-                alert(data.message || 'Jogada inválida!');
-                // Troca o turno mesmo se errar e atualiza o indicador
+                showError(data.message || 'Jogada inválida!'); // Usa a nova função para mostrar o erro no tabuleiro
                 currentPlayer = (currentPlayer === 'team_red') ? 'team_blue' : 'team_red';
                 updateTurnIndicator();
             }
-
         } catch (error) {
             console.error('Erro ao validar jogada:', error);
-            alert('Ocorreu um erro. Tente novamente.');
+            showError('Erro de conexão. Tente novamente.'); // Mostra erro de conexão também
         } finally {
             closeModal();
         }
@@ -126,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updateBoard = (imageUrl) => {
         if (!activeSlot) return;
-
         activeSlot.innerHTML = '';
         activeSlot.classList.add('played');
         const img = document.createElement('img');
@@ -135,12 +135,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (currentPlayer === 'team_red') {
             activeSlot.classList.add('played-slot-red');
-            currentPlayer = 'team_blue'; // Passa a vez para o azul
+            currentPlayer = 'team_blue';
         } else {
             activeSlot.classList.add('played-slot-blue');
-            currentPlayer = 'team_red'; // Passa a vez para o vermelho
+            currentPlayer = 'team_red';
         }
-        // Atualiza o indicador visual após a jogada
         updateTurnIndicator();
     };
 
@@ -164,14 +163,10 @@ document.addEventListener('DOMContentLoaded', () => {
         searchTimeout = setTimeout(() => fetchGames(query), 300);
     });
 
-    // NOVO EVENTO: Botão de sortear temas
     resortearBtn.addEventListener('click', () => {
-        // A forma mais simples de "sortear" é recarregar a página.
-        // O backend já gera novos temas a cada carregamento.
         window.location.reload();
     });
 
-    // Função auxiliar para cookie CSRF
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -187,6 +182,5 @@ document.addEventListener('DOMContentLoaded', () => {
         return cookieValue;
     }
     
-    // INICIALIZAÇÃO: Define o indicador de turno quando a página carrega
     updateTurnIndicator();
 });
