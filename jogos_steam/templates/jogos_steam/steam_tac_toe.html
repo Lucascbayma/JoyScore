@@ -25,7 +25,10 @@
 
 <div class="game-container">
     
-    <button id="resortear-btn" class="resortear-button top-button">Sortear Temas</button>
+    <div class="action-buttons-container">
+        <button id="resortear-btn" class="action-button">Sortear Temas</button>
+        <button id="settings-btn" class="action-button">Configurações</button>
+    </div>
 
     <div class="main-board">
         <div id="game-status-box" class="label-logo">
@@ -65,6 +68,24 @@
         <ul id="search-results-list"></ul>
     </div>
 </div>
+
+<div id="settings-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button id="settings-close-btn" class="modal-close">&times;</button>
+        <h2>Configurar Temas</h2>
+        <p>Escolha os temas que poderão ser sorteados no jogo. (Mínimo de 6)</p>
+        <div id="themes-list">
+            </div>
+        <div id="settings-feedback"></div>
+        <div class="modal-footer">
+            <button id="save-settings-btn" class="action-button">Salvar Alterações</button>
+        </div>
+    </div>
+</div>
+
+
+{{ todos_os_temas|json_script:"all-themes-data" }}
+{{ temas_atuais|json_script:"current-themes-data" }}
 
 {% endblock %}
 

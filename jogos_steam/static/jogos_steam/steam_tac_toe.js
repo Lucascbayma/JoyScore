@@ -1,26 +1,35 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const modal = document.getElementById('search-modal');
-    const closeModalBtn = document.getElementById('modal-close-btn');
+    // --- Seletores do Jogo Principal ---
     const gameSlots = document.querySelectorAll('.game-slot');
+    const headerTurnText = document.getElementById('header-turn-text');
+    const p1ScoreDisplay = document.getElementById('p1-score');
+    const p2ScoreDisplay = document.getElementById('p2-score');
+    const resortearBtn = document.getElementById('resortear-btn');
+    const gameStatusBox = document.getElementById('game-status-box');
+
+    // --- Seletores do Modal de Busca ---
+    const searchModal = document.getElementById('search-modal');
+    const closeSearchModalBtn = document.getElementById('modal-close-btn');
     const modalGenresText = document.getElementById('modal-genres-text');
     const searchInput = document.getElementById('game-search-input');
     const searchResultsList = document.getElementById('search-results-list');
     
-    const headerTurnText = document.getElementById('header-turn-text');
-    const p1ScoreDisplay = document.getElementById('p1-score');       
-    const p2ScoreDisplay = document.getElementById('p2-score');       
+    // --- Seletores do Modal de Configurações (NOVOS) ---
+    const settingsBtn = document.getElementById('settings-btn');
+    const settingsModal = document.getElementById('settings-modal');
+    const closeSettingsModalBtn = document.getElementById('settings-close-btn');
+    const themesListContainer = document.getElementById('themes-list');
+    const saveSettingsBtn = document.getElementById('save-settings-btn');
+    const settingsFeedback = document.getElementById('settings-feedback');
 
-    const resortearBtn = document.getElementById('resortear-btn');
-    
-    const gameStatusBox = document.getElementById('game-status-box');
-    
+    // --- Variáveis de Estado ---
     const originalStatusContent = gameStatusBox ? gameStatusBox.innerHTML : '<span>STEAM-TAC-TOE</span>'; 
-
     let activeSlot = null;
     let searchTimeout;
     let currentPlayer = 'team_red';
 
+    // --- Lógica de Erros e Turnos ---
     const showError = (message) => {
         gameStatusBox.textContent = message; 
         gameStatusBox.classList.add('error-message');
@@ -32,24 +41,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const updateTurnIndicator = () => {
-        if (headerTurnText) {
-            headerTurnText.classList.remove('text-red', 'text-blue');
-        }
-        
+        if (!headerTurnText) return;
+        headerTurnText.classList.remove('text-red', 'text-blue');
         if (currentPlayer === 'team_red') {
-            if (headerTurnText) {
-                headerTurnText.textContent = 'P1\'S TURN';
-                headerTurnText.classList.add('text-red');
-            }
+            headerTurnText.textContent = "P1'S TURN";
+            headerTurnText.classList.add('text-red');
         } else {
-            if (headerTurnText) {
-                headerTurnText.textContent = 'P2\'S TURN';
-                headerTurnText.classList.add('text-blue');
-            }
+            headerTurnText.textContent = "P2'S TURN";
+            headerTurnText.classList.add('text-blue');
         }
     };
 
-    const openModal = (slot) => {
+    // --- Lógica do Modal de Busca ---
+    const openSearchModal = (slot) => {
         hideError(); 
         activeSlot = slot;
         const rowIndex = slot.dataset.row;
@@ -57,17 +61,77 @@ document.addEventListener('DOMContentLoaded', () => {
         const rowGenre = document.getElementById(`label-row-${rowIndex}`).textContent.trim();
         const colGenre = document.getElementById(`label-col-${colIndex}`).textContent.trim();
         modalGenresText.textContent = `${rowGenre} e ${colGenre}`;
-        modal.classList.add('visible');
+        searchModal.classList.add('visible');
         searchInput.focus();
     };
 
-    const closeModal = () => {
-        modal.classList.remove('visible');
+    const closeSearchModal = () => {
+        searchModal.classList.remove('visible');
         activeSlot = null;
         searchInput.value = '';
         searchResultsList.innerHTML = '';
     };
 
+    // --- Lógica do Modal de Configurações (NOVA) ---
+    const openSettingsModal = () => {
+        const allThemes = JSON.parse(document.getElementById('all-themes-data').textContent);
+        const currentThemes = JSON.parse(document.getElementById('current-themes-data').textContent);
+        
+        themesListContainer.innerHTML = ''; // Limpa a lista antes de popular
+        settingsFeedback.textContent = ''; // Limpa o feedback
+
+        allThemes.forEach(theme => {
+            const isChecked = currentThemes.includes(theme);
+            const themeId = `theme-${theme.replace(/\s+/g, '-')}`;
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'theme-item';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = themeId;
+            checkbox.value = theme;
+            checkbox.checked = isChecked;
+            
+            const label = document.createElement('label');
+            label.htmlFor = themeId;
+            label.textContent = theme;
+            
+            itemDiv.appendChild(checkbox);
+            itemDiv.appendChild(label);
+            themesListContainer.appendChild(itemDiv);
+
+            // Adiciona o listener para validação
+            checkbox.addEventListener('click', (event) => {
+                const checkedCount = themesListContainer.querySelectorAll('input[type="checkbox"]:checked').length;
+                if (checkedCount < 6) {
+                    event.preventDefault(); // Impede de desmarcar
+                    settingsFeedback.textContent = 'Você deve selecionar pelo menos 6 temas!';
+                    setTimeout(() => { settingsFeedback.textContent = ''; }, 2000);
+                }
+            });
+        });
+
+        settingsModal.classList.add('visible');
+    };
+
+    const closeSettingsModal = () => {
+        settingsModal.classList.remove('visible');
+    };
+
+    const saveSettings = () => {
+        const selectedThemes = Array.from(themesListContainer.querySelectorAll('input:checked')).map(cb => cb.value);
+        
+        if (selectedThemes.length < 6) {
+            settingsFeedback.textContent = 'Erro: Pelo menos 6 temas devem ser selecionados.';
+            return;
+        }
+
+        const themesParam = encodeURIComponent(selectedThemes.join(','));
+        window.location.href = `${window.location.pathname}?temas=${themesParam}`;
+    };
+
+    // --- Comunicação com a API ---
     const fetchGames = async (query) => {
         if (query.length < 3) { searchResultsList.innerHTML = ''; return; }
         searchResultsList.innerHTML = '<li>Buscando...</li>';
@@ -123,10 +187,11 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Erro ao validar jogada:', error);
             showError('Erro de conexão. Tente novamente.'); 
         } finally {
-            closeModal();
+            closeSearchModal();
         }
     };
-
+    
+    // --- Atualização do Tabuleiro ---
     const updateBoard = (imageUrl) => {
         if (!activeSlot) return;
         activeSlot.innerHTML = '';
@@ -145,29 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTurnIndicator();
     };
 
-    gameSlots.forEach(slot => {
-        slot.addEventListener('click', () => {
-            if (!slot.classList.contains('played')) {
-                openModal(slot);
-            }
-        });
-    });
-
-    closeModalBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', (event) => {
-        if (event.target === modal) closeModal();
-    });
-
-    searchInput.addEventListener('input', () => {
-        clearTimeout(searchTimeout);
-        const query = searchInput.value;
-        searchTimeout = setTimeout(() => fetchGames(query), 300);
-    });
-
-    resortearBtn.addEventListener('click', () => {
-        window.location.reload();
-    });
-
+    // --- Função Utilitária ---
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -182,6 +225,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return cookieValue;
     }
+
+    // --- Listeners de Eventos ---
+    gameSlots.forEach(slot => {
+        slot.addEventListener('click', () => {
+            if (!slot.classList.contains('played')) {
+                openSearchModal(slot);
+            }
+        });
+    });
+
+    closeSearchModalBtn.addEventListener('click', closeSearchModal);
+    searchModal.addEventListener('click', (event) => {
+        if (event.target === searchModal) closeSearchModal();
+    });
     
+    searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        const query = searchInput.value;
+        searchTimeout = setTimeout(() => fetchGames(query), 300);
+    });
+
+    resortearBtn.addEventListener('click', () => {
+        // Mantém os temas customizados ao resortear
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('temas')) {
+            window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
+        } else {
+            window.location.reload();
+        }
+    });
+    
+    // Listeners do modal de configurações (NOVOS)
+    settingsBtn.addEventListener('click', openSettingsModal);
+    closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
+    settingsModal.addEventListener('click', (event) => {
+        if (event.target === settingsModal) closeSettingsModal();
+    });
+    saveSettingsBtn.addEventListener('click', saveSettings);
+
+    // --- Inicialização ---
     updateTurnIndicator();
 });

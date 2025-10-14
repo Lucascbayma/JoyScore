@@ -15,20 +15,34 @@ ALL_AVAILABLE_THEMES = [
 
 def steam_tac_toe_view(request):
     custom_themes_str = request.GET.get('temas')
+    
     if custom_themes_str:
         custom_themes_list = [theme.strip() for theme in custom_themes_str.split(',')]
+        # Filtra para garantir que apenas temas válidos da lista principal sejam usados
         valid_themes = [theme for theme in custom_themes_list if theme in ALL_AVAILABLE_THEMES]
+        # Se, após a filtragem, houver menos de 6 temas válidos, usa a lista completa como fallback
         themes_to_use = valid_themes if len(valid_themes) >= 6 else ALL_AVAILABLE_THEMES
     else:
         themes_to_use = ALL_AVAILABLE_THEMES
     
-    generos_escolhidos = random.sample(themes_to_use, 6)
+    # Garante que há temas suficientes para sortear
+    num_to_sample = min(6, len(themes_to_use))
+    generos_escolhidos = random.sample(themes_to_use, num_to_sample)
+    
+    # Preenche com temas padrão se não houver 6 após o sorteio (caso de emergência)
+    while len(generos_escolhidos) < 6:
+        fallback_theme = random.choice(ALL_AVAILABLE_THEMES)
+        if fallback_theme not in generos_escolhidos:
+            generos_escolhidos.append(fallback_theme)
+
     context = {
         'linhas': generos_escolhidos[:3],
         'colunas': generos_escolhidos[3:],
         'todos_os_temas': ALL_AVAILABLE_THEMES,
+        'temas_atuais': themes_to_use, # Envia a lista de temas atualmente em uso para o template
     }
     return render(request, 'jogos_steam/steam_tac_toe.html', context)
+
 
 def get_steam_app_list():
     url = "https://api.steampowered.com/ISteamApps/GetAppList/v2/"
@@ -47,6 +61,7 @@ def search_steam_games_api(request):
     results = [app for app in STEAM_APPS if query in app.get('name', '').lower()]
     return JsonResponse({'games': results[:10]})
 
+
 def validate_game_move_api(request):
     if request.method == 'POST':
         appid = request.POST.get('appid', '').strip()
@@ -64,7 +79,7 @@ def validate_game_move_api(request):
                 return JsonResponse({'success': False, 'message': 'Não foi possível encontrar detalhes para este jogo.'})
 
             game_data = data[appid]['data']
-            game_name = game_data.get('name', 'Este jogo') # Pegamos o nome do jogo
+            game_name = game_data.get('name', 'Este jogo')
             game_genres = [g['description'] for g in game_data.get('genres', [])]
             game_categories = [c['description'] for c in game_data.get('categories', [])]
             all_tags_from_api = game_genres + game_categories
