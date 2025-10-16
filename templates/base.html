@@ -26,10 +26,12 @@
 <body data-theme="dark">
     <header class="header">
         <div class="logo-container">
-            <img src="{% static 'jogos/imagens/logo.png' %}"
-                 alt="JoyScore"
-                 class="logo-img"
-                 style="display:block; max-width:220px; max-height:72px; width:auto; height:auto;">
+            <a href="{% url 'jogos:home' %}" class="logo-link">
+                <img src="{% static 'jogos/imagens/logo.png' %}"
+                    alt="JoyScore"
+                    class="logo-img"
+                    style="display:block; max-width:220px; max-height:72px; width:auto; height:auto;">
+            </a>
         </div>
 
         {% if request.resolver_match.url_name == 'home' %}
