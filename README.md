@@ -66,13 +66,15 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <li>Seleção de mais histórias para implementar.✅</li>
 <li>Ambiente de versionamento atuante.✅</li>
 <li>Deployment das novas histórias.</li>
-<li>Adicionar novo screencast com ênfase nas novas histórias</li>
+<li>Adicionar novo screencast com ênfase nas novas histórias.</li>
 <li>Issue/bug tracker atualizado.</li>
 <li>CI/CD com build e deployment automatizado.</li>
 <li>Testes de Sistema E2E Automatizados.</li>
-<li>Atualização sobre o uso da programação em pares.</li>
+<li>Atualização sobre o uso da programação em pares.✅</li>
 <li>Quadro da Sprint 03 atualizado refletindo a entrega.✅</li>
 </ul>
+  <li><a href="https://docs.google.com/document/d/1cLlLR55E9F2QSTH3upHOF6-ahyTImWCMaRnRvmUL4mg/edit?tab=t.0">Relatório de programação em par </a></li>
+  <li><a href="https://lcsbayma.pythonanywhere.com/">Link do site JoyScore</a></li>
   <p align="center">
   <img src="images/Sprint03.png" alt="Sprint 03 do JIRA" width="1500"/>
 </p>
