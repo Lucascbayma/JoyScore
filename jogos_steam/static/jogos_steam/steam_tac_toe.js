@@ -286,7 +286,15 @@ document.addEventListener('DOMContentLoaded', () => {
         slot.addEventListener('click', () => {
             if (!slot.classList.contains('played') && !gameOver) {
                 openSearchModal(slot);
-            }
+            }else if (slot.classList.contains('played') && !gameOver) {
+            showError('Essa casa já foi preenchida!');
+
+            setTimeout(() => {
+                if (!gameOver) {
+                    hideStatusMessages();
+                }
+            }, 3000);
+        }
         });
     });
 
