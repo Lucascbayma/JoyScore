@@ -251,7 +251,7 @@ def configuracoes_conta(request):
         generos_selecionados = request.POST.getlist('genres')
         profile.generos_favoritos = generos_selecionados
         profile.save()
-        messages.success(request, 'Suas preferências foram salvas com sucesso!')
+        # messages.success(request, 'Suas preferências foram salvas com sucesso!') # <-- LINHA REMOVIDA (COMENTADA)
         return redirect('jogos:configuracoes_conta')
     all_genres = _get_all_genres(request)
     context = {'all_genres': all_genres, 'profile': profile }
