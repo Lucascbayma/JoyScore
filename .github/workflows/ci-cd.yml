@@ -1,0 +1,50 @@
+name: Django CI/CD Gratuito
+
+on:
+  push:
+    branches:
+      - main # Roda quando há push na branch principal
+  pull_request:
+    branches:
+      - main # Roda quando há pull request para a branch principal
+
+jobs:
+  # 1. Job de Integração Contínua (CI - Testes)
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10' # Sua versão do Python
+        cache: 'pip'
+    - name: Install Dependencies
+      run: pip install -r requirements.txt
+    - name: Run Tests
+      run: python manage.py test # Apenas se passar nos testes!
+      
+  # 2. Job de Deployment (CD) - Roda somente se o CI for SUCESSO
+  cd:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+    # Passo 1: Dispara o Webhook (Força o Git Pull, Migrações, Collect Static no PA)
+    # A maneira mais simples é fazer um 'curl' no webhook que você criou
+    - name: Trigger PythonAnywhere Webhook for Deployment
+      # Use o Secret que você configurou no seu Webhook do GitHub se tiver usado um!
+      run: |
+        curl -X POST \
+        -H "Content-Type: application/json" \
+        -d '{"ref": "refs/heads/${{ github.ref_name }}"}' \
+        https://${{ secrets.PA_WEBAPP_DOMAIN }}/webhook/github/ 
+        
+    # Passo 2: Recarrega o Web App usando a API do PythonAnywhere
+    # Isto garante que o Django carregue as novas alterações de código e as novas Migrações.
+    - name: Reload PythonAnywhere Webapp (via API)
+      uses: jensvog/pythonanywhere-webapp-reload-action@v1 # Ação simples para reload via API
+      with:
+        username: ${{ secrets.PA_USERNAME }}
+        api-token: ${{ secrets.PA_API_TOKEN }} 
+        domain-name: ${{ secrets.PA_WEBAPP_DOMAIN }} 
+        host: 'www.pythonanywhere.com' # Use 'eu.pythonanywhere.com' se estiver na Europa
