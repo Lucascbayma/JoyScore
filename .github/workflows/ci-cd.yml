@@ -13,20 +13,22 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4 
+    - uses: actions/checkout@v4
     - name: Set up Python
       uses: actions/setup-python@v4 
       with:
-        python-version: '3.10' # Sua versão do Python
-        
+        python-version: '3.10'
+
     - name: Install Dependencies
-      # O comando padrão para instalar dependências
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        
+
+    # NOVO PASSO: Configura o PYTHONPATH e testa o Django
     - name: Run Tests
-      # Garanta que o python usado é o do ambiente configurado
+      # Adicione a variável de ambiente aqui
+      env:
+        PYTHONPATH: ${{ github.workspace }}
       run: python manage.py test
       
   # 2. Job de Deployment (CD) - Roda somente se o CI for SUCESSO
