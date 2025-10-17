@@ -13,6 +13,11 @@ import random # Mantemos o import do random
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+from GitPython.repo import Repo
+import os
+import subprocess
+import logging
 
 RAWG_API_KEY = settings.API_KEY
 RAWG_BASE_URL = "https://api.rawg.io/api"
@@ -256,3 +261,48 @@ def configuracoes_conta(request):
     all_genres = _get_all_genres(request)
     context = {'all_genres': all_genres, 'profile': profile }
     return render(request, 'jogos/configuracoes.html', context)
+
+# Configuração básica de log para depuração no PythonAnywhere
+logger = logging.getLogger(__name__)
+
+REPO_PATH = '/home/LcsBayma/joyscore/'
+VENV_NAME = 'venv_joyscore'
+
+@csrf_exempt
+def github_webhook(request):
+    if request.method == 'POST':
+        try:
+            # Caminhos para executáveis DENTRO do VENV
+            PYTHON_PATH = f'/home/LcsBayma/.virtualenvs/{VENV_NAME}/bin/python'
+            PIP_PATH = f'/home/LcsBayma/.virtualenvs/{VENV_NAME}/bin/pip'
+            manage_py_path = f'{REPO_PATH}manage.py'
+
+            # 1. Puxar o código mais recente
+            logger.info("Iniciando git pull...")
+            repo = Repo(REPO_PATH)
+            origin = repo.remotes.origin
+            origin.pull()
+
+            # 2. Rodar pip install -r requirements.txt
+            # Garante que novas dependências sejam instaladas.
+            logger.info("Instalando dependências...")
+            subprocess.run([PIP_PATH, 'install', '-r', f'{REPO_PATH}requirements.txt'])
+
+            # 3. Rodar Migrações
+            logger.info("Rodando migrações...")
+            subprocess.run([PYTHON_PATH, manage_py_path, 'migrate', '--noinput'])
+
+            # 4. Coletar Estáticos
+            logger.info("Coletando estáticos...")
+            subprocess.run([PYTHON_PATH, manage_py_path, 'collectstatic', '--noinput'])
+
+            # 5. Sucesso
+            logger.info("Deployment concluído com sucesso!")
+            return HttpResponse('Deployment concluído!', status=200)
+
+        except Exception as e:
+            # Se der erro, ele aparece no log do seu Webapp ou na Bash Console
+            logger.error(f"Erro no deployment: {e}")
+            return HttpResponse(f'Erro no deployment: {e}', status=500)
+
+    return HttpResponse('Método não permitido.', status=405)
