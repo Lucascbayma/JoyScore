@@ -27,6 +27,9 @@ jobs:
     - name: Install system dependencies for GitPython
       run: sudo apt-get update && sudo apt-get install -y git
 
+    - name: DEBUG - Show requirements.txt content
+      run: cat requirements.txt
+
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
