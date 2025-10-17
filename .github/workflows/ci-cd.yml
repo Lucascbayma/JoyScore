@@ -18,14 +18,14 @@ jobs:
       
     steps:
     - uses: actions/checkout@v4
+
+    - name: Install system dependencies (git)
+      run: sudo apt-get update && sudo apt-get install -y git
       
     - name: Set up Python
       uses: actions/setup-python@v4 
       with:
         python-version: '3.10'
-
-    - name: Install system dependencies for GitPython
-      run: sudo apt-get update && sudo apt-get install -y git
 
     - name: DEBUG - Show requirements.txt content
       run: cat requirements.txt
