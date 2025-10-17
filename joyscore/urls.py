@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from core.views import github_webhook
+from jogos.views import github_webhook
 
 urlpatterns = [
     # Rota para o painel de administração do Django
