@@ -9,7 +9,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 service = Service(ChromeDriverManager().install())
 BASE_URL = "http://lcsbayma.pythonanywhere.com"
-DELAY_PARA_VER = 0.5
+DELAY_PARA_VER = 1.5
 
 
 def configurar_driver():
@@ -524,6 +524,7 @@ if __name__ == "__main__":
             rodar_teste_ir_para_biblioteca(driver, wait) 
             rodar_teste_ir_para_configuracoes(driver, wait) 
             rodar_teste_preferencias_e_tema(driver, wait)
+            rodar_teste_voltar_home(driver, wait)
 
             print("\nTodos os testes foram executados.")
             print("O navegador permanecerá aberto por mais 5 segundos...")
