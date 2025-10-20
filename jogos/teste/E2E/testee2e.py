@@ -9,7 +9,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 service = Service(ChromeDriverManager().install())
 BASE_URL = "http://lcsbayma.pythonanywhere.com"
-DELAY_PARA_VER = 1.5
+DELAY_PARA_VER = 0.5
 
 
 def configurar_driver():
@@ -439,8 +439,8 @@ def rodar_teste_ir_para_configuracoes(driver, wait):
         print("--- Finalizando Teste de Navegação para Configurações ---")
 
 
-def rodar_teste_salvar_preferencias_genero(driver, wait):
-    print("\n--- Iniciando Teste de Salvar Gêneros Favoritos ---")
+def rodar_teste_preferencias_e_tema(driver, wait):
+    print("\n--- Iniciando Teste de Configurações (Gêneros e Tema) ---")
     try:
         print("Página de Configurações aberta.")
         time.sleep(DELAY_PARA_VER * 0.5) 
@@ -473,7 +473,8 @@ def rodar_teste_salvar_preferencias_genero(driver, wait):
         driver.execute_script("arguments[0].click();", save_button)
         
         try:
-            wait.until(
+            short_wait = WebDriverWait(driver, 5)
+            short_wait.until(
                 EC.visibility_of_element_located(
                     (By.XPATH, "//*[contains(text(), 'Preferências salvas com sucesso')]")
                 )
@@ -481,14 +482,29 @@ def rodar_teste_salvar_preferencias_genero(driver, wait):
             print("✅ Mensagem 'Preferências salvas com sucesso' detectada!")
         except Exception:
             print("⚠️ Preferências salvas, mas nenhuma mensagem de sucesso foi detectada.")
+        
+        time.sleep(1.0) 
 
-        print(">>> Teste de Salvar Gêneros Favoritos: SUCESSO")
+        print("Rolando para a seção de Tema...")
+        theme_button = wait.until(EC.presence_of_element_located((
+            By.ID, "theme-toggle"
+        )))
+        driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", theme_button)
+        print("Rolou para o botão de tema.")
+        time.sleep(1.5) 
+
+        print("Clicando em 'Modo Branco'...")
+        driver.execute_script("arguments[0].click();", theme_button)
+        print("✅ Clicou para alterar o tema.")
+        time.sleep(DELAY_PARA_VER)
+
+        print(">>> Teste de Configurações (Gêneros e Tema): SUCESSO")
 
     except Exception as e:
-        print("XXX Teste de Salvar Gêneros Favoritos: FALHOU XXX")
+        print("XXX Teste de Configurações (Gêneros e Tema): FALHOU XXX")
         print(f"Erro: {e}")
     finally:
-        print("--- Finalizando Teste de Salvar Gêneros Favoritos ---")
+        print("--- Finalizando Teste de Configurações (Gêneros e Tema) ---")
 
 
 if __name__ == "__main__":
@@ -507,7 +523,7 @@ if __name__ == "__main__":
             rodar_teste_dar_nota_e_comentar(driver, wait) 
             rodar_teste_ir_para_biblioteca(driver, wait) 
             rodar_teste_ir_para_configuracoes(driver, wait) 
-            rodar_teste_salvar_preferencias_genero(driver, wait)
+            rodar_teste_preferencias_e_tema(driver, wait)
 
             print("\nTodos os testes foram executados.")
             print("O navegador permanecerá aberto por mais 5 segundos...")
