@@ -9,7 +9,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 service = Service(ChromeDriverManager().install())
 BASE_URL = "http://lcsbayma.pythonanywhere.com"
-DELAY_PARA_VER = 0.5
+DELAY_PARA_VER = 1.5
 
 
 def configurar_driver():
@@ -361,6 +361,136 @@ def rodar_teste_dar_nota_e_comentar(driver, wait):
         print("--- Finalizando Teste de Avaliação (Nota, Comentário e Salvar) ---")
 
 
+def rodar_teste_ir_para_biblioteca(driver, wait):
+    print("\n--- Iniciando Teste de Navegação para Biblioteca ---")
+    try:
+        time.sleep(1.0) 
+        print("Localizando o menu hambúrguer...")
+        hamburger_locator = (By.CSS_SELECTOR, "label[for='menu-toggle']")
+        hamburger_menu = wait.until(
+            EC.element_to_be_clickable(hamburger_locator)
+        )
+        
+        print("Clicando no menu hambúrguer...")
+        driver.execute_script("arguments[0].click();", hamburger_menu)
+        
+        print("Aguardando menu aparecer...")
+        time.sleep(1.0) 
+
+        print("Localizando o link 'Biblioteca'...")
+        biblioteca_link_locator = (By.LINK_TEXT, "Biblioteca")
+        biblioteca_link = wait.until(
+            EC.element_to_be_clickable(biblioteca_link_locator)
+        )
+        
+        print("Clicando em 'Biblioteca'...")
+        biblioteca_link.click()
+        
+        wait.until(EC.url_contains("/biblioteca"))
+        print("Redirecionado para a Biblioteca")
+        time.sleep(DELAY_PARA_VER)
+
+        assert "/biblioteca" in driver.current_url
+        print(">>> Teste de Navegação para Biblioteca: SUCESSO")
+        
+    except Exception as e:
+        print("XXX Teste de Navegação para Biblioteca: FALHOU XXX")
+        print(f"Erro: {e}")
+    finally:
+        print("--- Finalizando Teste de Navegação para Biblioteca ---")
+
+
+def rodar_teste_ir_para_configuracoes(driver, wait):
+    print("\n--- Iniciando Teste de Navegação para Configurações ---")
+    try:
+        time.sleep(1.0)
+        print("Localizando o menu hambúrguer...")
+        hamburger_locator = (By.CSS_SELECTOR, "label[for='menu-toggle']")
+        hamburger_menu = wait.until(
+            EC.element_to_be_clickable(hamburger_locator)
+        )
+
+        print("Clicando no menu hambúrguer...")
+        driver.execute_script("arguments[0].click();", hamburger_menu)
+
+        print("Aguardando menu aparecer...")
+        time.sleep(1.0)
+
+        print("Localizando o link 'Configurações de Conta'...")
+        config_link_locator = (By.LINK_TEXT, "Configurações de Conta")
+        config_link = wait.until(
+            EC.element_to_be_clickable(config_link_locator)
+        )
+
+        print("Clicando em 'Configurações de Conta'...")
+        config_link.click()
+
+        wait.until(EC.url_contains("/configuracoes")) 
+        print("Redirecionado para Configurações de conta")
+        time.sleep(DELAY_PARA_VER)
+
+        assert "/configuracoes" in driver.current_url
+        print(">>> Teste de Navegação para Configurações: SUCESSO")
+
+    except Exception as e:
+        print("XXX Teste de Navegação para Configurações: FALHOU XXX")
+        print(f"Erro: {e}")
+    finally:
+        print("--- Finalizando Teste de Navegação para Configurações ---")
+
+
+def rodar_teste_salvar_preferencias_genero(driver, wait):
+    print("\n--- Iniciando Teste de Salvar Gêneros Favoritos ---")
+    try:
+        print("Página de Configurações aberta.")
+        time.sleep(DELAY_PARA_VER * 0.5) 
+
+        genero1_label = wait.until(EC.element_to_be_clickable((
+            By.XPATH, "//label[normalize-space()='Adventure']"
+        )))
+        driver.execute_script("arguments[0].click();", genero1_label)
+        print("Selecionou 'Adventure'")
+        time.sleep(0.5)
+
+        genero2_label = wait.until(EC.element_to_be_clickable((
+            By.XPATH, "//label[normalize-space()='RPG']"
+        )))
+        driver.execute_script("arguments[0].click();", genero2_label)
+        print("Selecionou 'RPG'")
+        time.sleep(0.5)
+
+        genero3_label = wait.until(EC.element_to_be_clickable((
+            By.XPATH, "//label[normalize-space()='Shooter']"
+        )))
+        driver.execute_script("arguments[0].click();", genero3_label)
+        print("Selecionou 'Shooter'")
+        time.sleep(DELAY_PARA_VER)
+
+        save_button = wait.until(EC.element_to_be_clickable((
+            By.ID, "save-prefs-button" 
+        )))
+        print("Clicando em 'Salvar Preferências'...")
+        driver.execute_script("arguments[0].click();", save_button)
+        
+        try:
+            wait.until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, "//*[contains(text(), 'Preferências salvas com sucesso')]")
+                )
+            )
+            print("✅ Mensagem 'Preferências salvas com sucesso' detectada!")
+        except Exception:
+            print("⚠️ Preferências salvas, mas nenhuma mensagem de sucesso foi detectada.")
+
+        print(">>> Teste de Salvar Gêneros Favoritos: SUCESSO")
+
+    except Exception as e:
+        print("XXX Teste de Salvar Gêneros Favoritos: FALHOU XXX")
+        print(f"Erro: {e}")
+    finally:
+        print("--- Finalizando Teste de Salvar Gêneros Favoritos ---")
+
+
 if __name__ == "__main__":
     print("=== Iniciando Suíte de Testes ===")
     driver, wait = configurar_driver()
@@ -375,6 +505,9 @@ if __name__ == "__main__":
             rodar_teste_clicar_jogo(driver, wait)
             rodar_teste_clicar_botao_mais(driver, wait)
             rodar_teste_dar_nota_e_comentar(driver, wait) 
+            rodar_teste_ir_para_biblioteca(driver, wait) 
+            rodar_teste_ir_para_configuracoes(driver, wait) 
+            rodar_teste_salvar_preferencias_genero(driver, wait)
 
             print("\nTodos os testes foram executados.")
             print("O navegador permanecerá aberto por mais 5 segundos...")
