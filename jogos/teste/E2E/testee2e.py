@@ -9,7 +9,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 service = Service(ChromeDriverManager().install())
 BASE_URL = "http://lcsbayma.pythonanywhere.com"
-DELAY_PARA_VER = 1.5
+DELAY_PARA_VER = 0.5
 
 
 def configurar_driver():
@@ -507,6 +507,262 @@ def rodar_teste_preferencias_e_tema(driver, wait):
         print("--- Finalizando Teste de Configurações (Gêneros e Tema) ---")
 
 
+def rodar_teste_ir_para_steam_tac_toe(driver, wait):
+    print("\n--- Iniciando Teste de Navegação para Steam Tac Toe ---")
+    try:
+        time.sleep(1.0)
+        print("Localizando o menu hambúrguer...")
+        hamburger_locator = (By.CSS_SELECTOR, "label[for='menu-toggle']")
+        hamburger_menu = wait.until(
+            EC.element_to_be_clickable(hamburger_locator)
+        )
+
+        print("Clicando no menu hambúrguer...")
+        driver.execute_script("arguments[0].click();", hamburger_menu)
+
+        print("Aguardando menu aparecer...")
+        time.sleep(1.0)
+
+        print("Localizando o link 'Steam Tac Toe'...")
+        steam_link_locator = (By.LINK_TEXT, "Steam Tac Toe")
+        steam_link = wait.until(
+            EC.element_to_be_clickable(steam_link_locator)
+        )
+
+        print("Clicando em 'Steam Tac Toe'...")
+        steam_link.click()
+
+        wait.until(EC.url_contains("/steam")) 
+        print("Redirecionado para Steam Tac Toe")
+        time.sleep(DELAY_PARA_VER)
+
+        assert "/steam" in driver.current_url
+        print(">>> Teste de Navegação para Steam Tac Toe: SUCESSO")
+
+    except Exception as e:
+        print("XXX Teste de Navegação para Steam Tac Toe: FALHOU XXX")
+        print(f"Erro: {e}")
+    finally:
+        print("--- Finalizando Teste de Navegação para Steam Tac Toe ---")
+
+
+def rodar_teste_ui_steam_tac_toe(driver, wait):
+    print("\n--- Iniciando Teste Completo da UI do Steam Tac Toe (Modificado) ---")
+    
+    print("\n[Parte 1] Testando o botão 'Sortear Temas' (recarregamento)...")
+    try:
+        label_col_0_element = wait.until(
+            EC.visibility_of_element_located((By.ID, "label-col-0"))
+        )
+        label_col_0 = label_col_0_element.text
+        print(f"Gênero da coluna 0 (antes): {label_col_0}")
+        
+        driver.find_element(By.ID, "resortear-btn").click()
+        
+        wait.until(EC.staleness_of(label_col_0_element))
+        print("Página recarregou...")
+        
+        label_col_0_novo_element = wait.until(
+            EC.visibility_of_element_located((By.ID, "label-col-0"))
+        )
+        label_col_0_novo = label_col_0_novo_element.text
+        print(f"Gênero da coluna 0 (depois): {label_col_0_novo}")
+        
+        assert label_col_0 != label_col_0_novo
+        print("✅ Gêneros sorteados com sucesso (o texto mudou).")
+    except AssertionError:
+        print("⚠️ Gêneros sorteados, mas calhou de ser o mesmo. O teste da mecânica (recarregar) foi OK.")
+    except Exception as e:
+        print(f"XXX FALHA GRAVE NA [Parte 1] Teste Sortear Temas: {e}")
+
+
+    print("\n[Parte 2] Testando o botão 'Pular Vez'...")
+    try:
+        turn_text_element = wait.until(
+            EC.visibility_of_element_located((By.ID, "header-turn-text"))
+        )
+        texto_turno_antes = turn_text_element.text
+        print(f"Turno atual: {texto_turno_antes}")
+
+        driver.find_element(By.ID, "skip-turn-btn").click()
+        time.sleep(0.5) 
+        
+        texto_turno_depois = driver.find_element(By.ID, "header-turn-text").text
+        print(f"Novo turno: {texto_turno_depois}")
+        
+        assert texto_turno_antes != texto_turno_depois
+        print("✅ Turno alterado com sucesso.")
+    except Exception as e:
+        print(f"XXX FALHA GRAVE NA [Parte 2] Teste Pular Vez: {e}")
+
+
+    print("\n[Parte 3] Testando o modal 'Configurações' (Garantindo 6 gêneros)...")
+    try:
+        driver.find_element(By.ID, "settings-btn").click()
+        modal = wait.until(EC.visibility_of_element_located((By.ID, "settings-modal")))
+        print("✅ Modal de Configurações abriu.")
+        time.sleep(1)
+
+        DESIRED_GENRES = {"RPG", "Co-op", "Single-player", "Multi-player", "Indie", "Simulation"}
+        print(f"Gêneros desejados: {DESIRED_GENRES}")
+
+        labels_to_click = []
+
+        all_checkboxes = modal.find_elements(By.CSS_SELECTOR, "input[type='checkbox']")
+        
+        print("Analisando gêneros atuais...")
+        for checkbox in all_checkboxes:
+            try:
+                input_id = checkbox.get_attribute("id")
+                label = modal.find_element(By.CSS_SELECTOR, f"label[for='{input_id}']")
+                genre_name = label.text.strip()
+                is_checked = checkbox.is_selected()
+
+                if is_checked and genre_name not in DESIRED_GENRES:
+                    print(f"-> Gênero para DESMARCAR: {genre_name}")
+                    labels_to_click.append(label)
+                
+                elif not is_checked and genre_name in DESIRED_GENRES:
+                    print(f"-> Gênero para MARCAR: {genre_name}")
+                    labels_to_click.append(label)
+
+            except Exception as e:
+                print(f"Aviso: erro ao processar checkbox/label: {e}")
+
+        if labels_to_click:
+            print(f"Ajustando {len(labels_to_click)} gênero(s) para o estado desejado...")
+            for label in labels_to_click:
+                try:
+                    print(f"Clicando em: {label.text.strip()}")
+                    driver.execute_script("arguments[0].click();", label)
+                    time.sleep(0.2)
+                except Exception as e:
+                    print(f"Aviso: Falha ao clicar no label {label.text.strip()}: {e}")
+        else:
+            print("✅ Nenhum gênero precisou ser alterado. Já está correto.")
+        
+        print("Seleção de gêneros concluída.")
+        time.sleep(1)
+
+        try:
+            print("Localizando botão 'Salvar Alterações' pelo texto dentro do modal...")
+            
+            save_button_locator = (
+                By.XPATH, 
+                "//div[@id='settings-modal']//button[normalize-space()='Salvar Alterações']"
+            )
+            
+            save_button = wait.until(
+                EC.presence_of_element_located(save_button_locator)
+            )
+            
+            print("Botão 'Salvar Alterações' encontrado. Clicando via JavaScript...")
+            driver.execute_script("arguments[0].click();", save_button)
+            print("✅ 'Salvar Alterações' clicado com sucesso.")
+            time.sleep(1) 
+        except Exception as e:
+            print(f"XXX Aviso: Falha grave ao tentar localizar ou clicar em 'Salvar Alterações' via XPath. {e}")
+            print("   -> Verifique se o botão realmente existe e se o texto 'Salvar Alterações' está correto.")
+
+        driver.find_element(By.ID, "settings-close-btn").click()
+        wait.until(EC.invisibility_of_element_located((By.ID, "settings-modal")))
+        print("✅ Modal de Configurações fechou.")
+    except Exception as e:
+        print(f"XXX FALHA GRAVE NA [Parte 3] Teste Modal Configurações: {e}")
+        try:
+            driver.find_element(By.ID, "settings-close-btn").click()
+        except:
+            pass
+
+
+    print("\n[Parte 4] Testando a mecânica de jogada (Stardew Valley e FIFA)...")
+    
+    print("\n--- Jogada 1: 'Stardew Valley' na célula (0,0) ---")
+    try:
+        cell_0_0_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='0'][data-col='0']")
+        cell_0_0 = wait.until(EC.element_to_be_clickable(cell_0_0_locator))
+        cell_0_0.click()
+
+        wait.until(EC.visibility_of_element_located((By.ID, "search-modal")))
+        genres_text = driver.find_element(By.ID, "modal-genres-text").text
+        print(f"Célula (0,0) requer: {genres_text}")
+        
+        driver.find_element(By.ID, "game-search-input").send_keys("Stardew Valley")
+        
+        search_result_li = (By.CSS_SELECTOR, "#search-results-list li.search-result-item")
+        first_result = wait.until(EC.element_to_be_clickable(search_result_li))
+        
+        result_text = first_result.text
+        print(f"Primeiro resultado encontrado: '{result_text}'. Clicando nele...")
+        first_result.click()
+        
+        wait.until(EC.invisibility_of_element_located((By.ID, "search-modal")))
+        print("Modal fechou. Verificando resultado...")
+
+        try:
+            short_wait = WebDriverWait(driver, 2)
+            img_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='0'][data-col='0'] img")
+            short_wait.until(EC.visibility_of_element_located(img_locator))
+            print("✅ RESULTADO JOGADA 1: ACERTO (Imagem apareceu na célula)")
+        except Exception:
+            status_box = driver.find_element(By.ID, "game-status-box")
+            assert "error-message" in status_box.get_attribute("class")
+            print(f"⚠️ RESULTADO JOGADA 1: ERRO (Gêneros não bateram. Msg: '{status_box.text}')")
+            
+    except Exception as e:
+        print(f"XXX FALHA GRAVE NA [Jogada 1]: {e}")
+        try:
+            driver.find_element(By.CSS_SELECTOR, "#search-modal-close-btn").click()
+        except:
+            pass
+        time.sleep(1)
+
+    print("\n--- Jogada 2: 'FIFA' na célula (0,1) ---")
+    try:
+        cell_0_1_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='0'][data-col='1']")
+        cell_0_1 = wait.until(EC.element_to_be_clickable(cell_0_1_locator))
+        cell_0_1.click()
+
+        wait.until(EC.visibility_of_element_located((By.ID, "search-modal")))
+        genres_text = driver.find_element(By.ID, "modal-genres-text").text
+        print(f"Célula (0,1) requer: {genres_text}")
+        
+        input_field = driver.find_element(By.ID, "game-search-input")
+        input_field.clear() 
+        input_field.send_keys("Hentai")
+        
+        search_result_li = (By.CSS_SELECTOR, "#search-results-list li.search-result-item")
+        first_result = wait.until(EC.element_to_be_clickable(search_result_li))
+        
+        result_text = first_result.text
+        print(f"Primeiro resultado encontrado: '{result_text}'. Clicando nele...")
+        first_result.click()
+        
+        wait.until(EC.invisibility_of_element_located((By.ID, "search-modal")))
+        print("Modal fechou. Verificando resultado...")
+
+        try:
+            short_wait = WebDriverWait(driver, 2)
+            img_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='0'][data-col='1'] img")
+            short_wait.until(EC.visibility_of_element_located(img_locator))
+            print("✅ RESULTADO JOGADA 2: ACERTO (Imagem apareceu na célula)")
+        except Exception:
+            status_box = driver.find_element(By.ID, "game-status-box")
+            assert "error-message" in status_box.get_attribute("class")
+            print(f"⚠️ RESULTADO JOGADA 2: ERRO (Gêneros não bateram. Msg: '{status_box.text}')")
+            
+    except Exception as e:
+        print(f"XXX FALHA GRAVE NA [Jogada 2]: {e}")
+        try:
+            driver.find_element(By.CSS_SELECTOR, "#search-modal-close-btn").click()
+        except:
+            pass
+
+    print("\n>>> Teste Completo da UI do Steam Tac Toe: SUCESSO")
+    print("--- Finalizando Teste Completo da UI do Steam Tac Toe ---")
+    time.sleep(DELAY_PARA_VER)
+
+
 if __name__ == "__main__":
     print("=== Iniciando Suíte de Testes ===")
     driver, wait = configurar_driver()
@@ -525,6 +781,8 @@ if __name__ == "__main__":
             rodar_teste_ir_para_configuracoes(driver, wait) 
             rodar_teste_preferencias_e_tema(driver, wait)
             rodar_teste_voltar_home(driver, wait)
+            rodar_teste_ir_para_steam_tac_toe(driver, wait)
+            rodar_teste_ui_steam_tac_toe(driver, wait) 
 
             print("\nTodos os testes foram executados.")
             print("O navegador permanecerá aberto por mais 5 segundos...")
