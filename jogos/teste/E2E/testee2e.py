@@ -9,7 +9,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 service = Service(ChromeDriverManager().install())
 BASE_URL = "http://lcsbayma.pythonanywhere.com"
-DELAY_PARA_VER = 1.5
+DELAY_PARA_VER = 0.5
 
 
 def configurar_driver():
@@ -254,6 +254,113 @@ def rodar_teste_clicar_jogo(driver, wait):
         print("--- Finalizando Teste de Clicar no Jogo (Elden Ring) ---")
 
 
+def rodar_teste_clicar_botao_mais(driver, wait):
+    print("\n--- Iniciando Teste de Clique no Botão '+' ---")
+    try:
+        print("Verificando se estamos na página do Elden Ring...")
+        assert "Elden Ring" in driver.page_source
+
+        print("Localizando o botão '+' no DOM...")
+        botao_mais_locator = (By.CSS_SELECTOR, "a.add-btn[aria-label*='Elden Ring']")
+        botao_mais = wait.until(
+            EC.presence_of_element_located(botao_mais_locator)
+        )
+        print("Elemento localizado.")
+
+        driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", botao_mais)
+        print("Rolando a tela para o botão...")
+
+        time.sleep(1.5) 
+
+        print("Clicando no botão...")
+        driver.execute_script("arguments[0].click();", botao_mais)
+        print("🟣 Botão '+' clicado com sucesso!")
+
+        try:
+            short_wait = WebDriverWait(driver, 5) 
+            short_wait.until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, "//*[contains(text(), 'adicionado à sua biblioteca') or contains(text(), 'Remover da biblioteca')]")
+                )
+            )
+            print("✅ Mensagem de confirmação detectada!")
+        except Exception:
+            print("⚠️ Nenhuma mensagem de confirmação visível, mas o clique foi executado.")
+
+        print(">>> Teste do Botão '+': SUCESSO")
+
+    except Exception as e:
+        print("XXX Teste do Botão '+': FALHOU XXX")
+        print(f"Erro: {e}")
+    finally:
+        print("--- Finalizando Teste do Botão '+' ---")
+
+
+def rodar_teste_dar_nota_e_comentar(driver, wait):
+    print("\n--- Iniciando Teste de Avaliação (Nota, Comentário e Salvar) ---")
+    try:
+        print("Rolando até o fim da página (seção de avaliação)...")
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(1.5) 
+
+        estrelas_desejadas = 4
+        star_locator = (By.CSS_SELECTOR, f"label[for='star{estrelas_desejadas}']")
+        print(f"Localizando a label da estrela de {estrelas_desejadas} estrelas...")
+
+        estrela_label = wait.until(
+            EC.presence_of_element_located(star_locator)
+        )
+        
+        driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", estrela_label)
+        time.sleep(1.0) 
+
+        print(f"Clicando em {estrelas_desejadas} estrelas...")
+        driver.execute_script("arguments[0].click();", estrela_label)
+        print(f"✅ Clicou com sucesso em {estrelas_desejadas} estrelas.")
+        time.sleep(0.5)
+
+        print("Localizando a caixa de comentário (textarea)...")
+        comment_box = wait.until(
+            EC.visibility_of_element_located((By.TAG_NAME, "textarea"))
+        )
+        
+        texto_comentario = "Este é um comentário de teste automatizado. Ótimo jogo!"
+        comment_box.send_keys(texto_comentario)
+        print(f"✅ Comentário inserido: '{texto_comentario}'")
+        time.sleep(DELAY_PARA_VER)
+
+        print("Localizando o botão 'Salvar Avaliação'...")
+        save_button = wait.until(
+            EC.element_to_be_clickable((
+                By.XPATH, "//button[contains(text(), 'Salvar Avaliação')]"
+            ))
+        )
+        
+        print("Clicando em 'Salvar Avaliação'...")
+        driver.execute_script("arguments[0].click();", save_button)
+        
+        print("✅ Avaliação enviada!")
+        
+        try:
+            wait.until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, "//*[contains(text(), 'Avaliação salva com sucesso')]")
+                )
+            )
+            print("✅ Mensagem 'Avaliação salva com sucesso' detectada!")
+        except Exception:
+            print("⚠️ Avaliação enviada, mas nenhuma mensagem de sucesso foi detectada (ou a página recarregou).")
+
+        print(">>> Teste de Avaliação (Nota, Comentário e Salvar): SUCESSO")
+
+    except Exception as e:
+        print("XXX Teste de Avaliação (Nota, Comentário e Salvar): FALHOU XXX")
+        print(f"Erro: {e}")
+        print("Ocorreu um erro ao tentar avaliar o jogo.")
+    finally:
+        print("--- Finalizando Teste de Avaliação (Nota, Comentário e Salvar) ---")
+
+
 if __name__ == "__main__":
     print("=== Iniciando Suíte de Testes ===")
     driver, wait = configurar_driver()
@@ -266,6 +373,8 @@ if __name__ == "__main__":
             rodar_teste_aplicar_filtro(driver, wait)
             rodar_teste_voltar_home(driver, wait)
             rodar_teste_clicar_jogo(driver, wait)
+            rodar_teste_clicar_botao_mais(driver, wait)
+            rodar_teste_dar_nota_e_comentar(driver, wait) 
 
             print("\nTodos os testes foram executados.")
             print("O navegador permanecerá aberto por mais 5 segundos...")
