@@ -11,6 +11,7 @@ service = Service(ChromeDriverManager().install())
 BASE_URL = "http://lcsbayma.pythonanywhere.com"
 DELAY_PARA_VER = 1.5
 
+
 def configurar_driver():
     try:
         driver = webdriver.Chrome(service=service)
@@ -22,9 +23,9 @@ def configurar_driver():
         print("(Verifique se o Google Chrome está instalado no computador)")
         return None, None
 
+
 def rodar_teste_login(driver, wait):
     print("--- Iniciando Teste de Login ---")
-
     try:
         driver.get(BASE_URL)
         print("Página de login aberta")
@@ -63,11 +64,11 @@ def rodar_teste_login(driver, wait):
     finally:
         print("--- Finalizando Teste de Login ---")
 
+
 def rodar_teste_registro(driver, wait):
     print("\n--- Iniciando Teste de Registro ---")
-
     try:
-        driver.get(BASE_URL) 
+        driver.get(BASE_URL)
         print("Página de login aberta (para ir ao registro)")
         time.sleep(DELAY_PARA_VER)
 
@@ -89,8 +90,7 @@ def rodar_teste_registro(driver, wait):
         print(f"Preencheu Apelido: {novo_usuario}")
         time.sleep(DELAY_PARA_VER * 0.5)
 
-        NOME_CAMPO_EMAIL = "email"
-        driver.find_element(By.NAME, NOME_CAMPO_EMAIL).send_keys(novo_email)
+        driver.find_element(By.NAME, "email").send_keys(novo_email)
         print(f"Preencheu Email: {novo_email}")
         time.sleep(DELAY_PARA_VER * 0.5)
 
@@ -98,8 +98,7 @@ def rodar_teste_registro(driver, wait):
         print("Preencheu Senha")
         time.sleep(DELAY_PARA_VER * 0.5)
 
-        NOME_CAMPO_CONFIRMACAO = "password2"
-        driver.find_element(By.NAME, NOME_CAMPO_CONFIRMACAO).send_keys("senha_teste123")
+        driver.find_element(By.NAME, "password2").send_keys("senha_teste123")
         print("Preencheu Confirmação de Senha")
         time.sleep(DELAY_PARA_VER)
 
@@ -123,6 +122,7 @@ def rodar_teste_registro(driver, wait):
     finally:
         print("--- Finalizando Teste de Registro ---")
 
+
 def rodar_teste_filtro(driver, wait):
     print("\n--- Iniciando Teste de Filtro de Gêneros ---")
     try:
@@ -132,14 +132,13 @@ def rodar_teste_filtro(driver, wait):
         filtro_link = wait.until(
             EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, "Filtrar Gêneros"))
         )
-        
         print("Clicando em 'Filtrar Gêneros'")
         filtro_link.click()
 
         wait.until(EC.url_contains("/filtrar"))
         print("Redirecionado para a página de filtro")
         time.sleep(DELAY_PARA_VER)
-        
+
         assert "/filtrar" in driver.current_url
         print(">>> Teste de Filtro: SUCESSO")
 
@@ -149,36 +148,30 @@ def rodar_teste_filtro(driver, wait):
         time.sleep(2)
     finally:
         print("--- Finalizando Teste de Filtro ---")
+
+
 def rodar_teste_aplicar_filtro(driver, wait):
     print("\n--- Iniciando Teste de Aplicação de Filtro ---")
     try:
         print("Página de filtro aberta")
-        time.sleep(DELAY_PARA_VER) 
-        
-        label_action_locator = (By.XPATH, "//label[normalize-space()='Action']")
-        label_action = wait.until(EC.visibility_of_element_located(label_action_locator))
+        time.sleep(DELAY_PARA_VER)
+
+        label_action = wait.until(EC.visibility_of_element_located((By.XPATH, "//label[normalize-space()='Action']")))
         driver.execute_script("arguments[0].click();", label_action)
-        print("Selecionou o gênero 'Action' (via JS)")
-        time.sleep(0.5) 
+        print("Selecionou o gênero 'Action'")
+        time.sleep(0.5)
 
-        label_indie_locator = (By.XPATH, "//label[normalize-space()='Indie']")
-        label_indie = wait.until(EC.visibility_of_element_located(label_indie_locator))
+        label_indie = wait.until(EC.visibility_of_element_located((By.XPATH, "//label[normalize-space()='Indie']")))
         driver.execute_script("arguments[0].click();", label_indie)
-        print("Selecionou o gênero 'Indie' (via JS)")
-        
-        time.sleep(1) 
+        print("Selecionou o gênero 'Indie'")
+        time.sleep(1)
 
-        button_locator = (By.CSS_SELECTOR, "button.filter-button")
-        
-        print("Procurando o botão 'Filtrar Jogos' (com seletor button.filter-button)...")
-        submit_button = wait.until(EC.element_to_be_clickable(button_locator))
-        
-        print("Clicando em 'Filtrar Jogos' (via JS)")
-        driver.execute_script("arguments[0].click();", submit_button)
+        button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.filter-button")))
+        driver.execute_script("arguments[0].click();", button)
+        print("Clicou em 'Filtrar Jogos'")
 
-        print("Aguardando carregamento da página de resultados...")
         wait.until(EC.url_contains("genres="))
-        print("Página de resultados do filtro carregada")
+        print("Página de resultados carregada")
         time.sleep(DELAY_PARA_VER)
 
         assert "genres=" in driver.current_url
@@ -191,22 +184,92 @@ def rodar_teste_aplicar_filtro(driver, wait):
     finally:
         print("--- Finalizando Teste de Aplicação de Filtro ---")
 
+
+def rodar_teste_voltar_home(driver, wait):
+    print("\n--- Iniciando Teste de Voltar para Home (pelo Logo) ---")
+    try:
+        time.sleep(DELAY_PARA_VER)
+        logo_link = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".logo-container a")))
+        print("Clicando no logo para voltar à home")
+        logo_link.click()
+
+        home_element = (By.XPATH, "//h2[contains(text(), 'JOGOS POPULARES')]")
+        wait.until(EC.visibility_of_element_located(home_element))
+        print("Redirecionado para a Página Home")
+        time.sleep(DELAY_PARA_VER)
+
+        assert "/home" in driver.current_url or "/dashboard" in driver.current_url
+        print(">>> Teste de Voltar para Home: SUCESSO")
+
+    except Exception as e:
+        print(f"XXX Teste de Voltar para Home: FALHOU XXX")
+        print(f"Erro: {e}")
+    finally:
+        print("--- Finalizando Teste de Voltar para Home ---")
+
+
+def rodar_teste_clicar_jogo(driver, wait):
+    print("\n--- Iniciando Teste de Clicar no Jogo Elden Ring ---")
+    try:
+        print("Atualmente na Home Page")
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(1)
+        driver.execute_script("window.scrollTo(0, 0);")
+        time.sleep(1)
+
+        print("Tentando clicar na IMAGEM do jogo 'Elden Ring'...")
+        try:
+            jogo_elden = wait.until(EC.element_to_be_clickable((
+                By.XPATH,
+                "//a[contains(@href, '/avaliar/') and .//img[contains(@alt, 'Elden Ring')]]"
+            )))
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", jogo_elden)
+            time.sleep(0.8)
+            driver.execute_script("arguments[0].click();", jogo_elden)
+            print("Clicou na imagem do jogo Elden Ring.")
+        except Exception:
+            print("Imagem não encontrada, tentando clicar no texto...")
+            jogo_elden = wait.until(EC.element_to_be_clickable((
+                By.XPATH,
+                "//a[contains(@href, '/avaliar/') and .//text()[contains(., 'Elden Ring')]]"
+            )))
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", jogo_elden)
+            time.sleep(0.8)
+            driver.execute_script("arguments[0].click();", jogo_elden)
+            print("Clicou no texto do jogo Elden Ring.")
+
+        wait.until(EC.url_contains("/avaliar/"))
+        title_locator = (By.XPATH, "//*[self::h1 or self::h2][contains(text(), 'Elden Ring')]")
+        wait.until(EC.visibility_of_element_located(title_locator))
+        print("Página de avaliação do Elden Ring carregada com sucesso.")
+        time.sleep(DELAY_PARA_VER)
+
+        assert "/avaliar/" in driver.current_url
+        print(">>> Teste de Clicar no Jogo (Elden Ring): SUCESSO")
+
+    except Exception as e:
+        print(f"XXX Teste de Clicar no Jogo (Elden Ring): FALHOU XXX")
+        print(f"Erro: {e}")
+    finally:
+        print("--- Finalizando Teste de Clicar no Jogo (Elden Ring) ---")
+
+
 if __name__ == "__main__":
     print("=== Iniciando Suíte de Testes ===")
-    
-    driver, wait = configurar_driver() 
-    
+    driver, wait = configurar_driver()
+
     if driver:
         try:
             rodar_teste_login(driver, wait)
             rodar_teste_registro(driver, wait)
             rodar_teste_filtro(driver, wait)
             rodar_teste_aplicar_filtro(driver, wait)
-            
+            rodar_teste_voltar_home(driver, wait)
+            rodar_teste_clicar_jogo(driver, wait)
+
             print("\nTodos os testes foram executados.")
             print("O navegador permanecerá aberto por mais 5 segundos...")
-            time.sleep(5) 
-
+            time.sleep(5)
         except Exception as e:
             print(f"XXX Um erro crítico interrompeu a suíte de testes: {e}")
         finally:
