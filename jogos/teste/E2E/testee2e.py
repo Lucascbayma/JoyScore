@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.keys import Keys 
 
 service = Service(ChromeDriverManager().install())
 BASE_URL = "http://lcsbayma.pythonanywhere.com"
@@ -16,7 +17,7 @@ def configurar_driver():
     try:
         driver = webdriver.Chrome(service=service)
         driver.maximize_window()
-        wait = WebDriverWait(driver, 10)
+        wait = WebDriverWait(driver, 10) 
         return driver, wait
     except Exception as e:
         print(f"ERRO CRÍTICO: Não foi possível iniciar o WebDriver: {e}")
@@ -122,6 +123,45 @@ def rodar_teste_registro(driver, wait):
     finally:
         print("--- Finalizando Teste de Registro ---")
 
+def rodar_teste_busca_alternada(driver, wait):
+    print("\n--- Iniciando Teste de Busca Alternada (Digita e Apaga) ---")
+    
+    jogos_para_testar = [
+        "Cyberpunk 2077",
+        "Witcher",
+        "JogoInexistente12345",
+        "Red Dead Redemption 2"
+    ]
+    
+    try:
+        print("Localizando barra de busca...")
+        search_bar = wait.until(
+            EC.visibility_of_element_located((By.ID, "game-search-input"))
+        )
+        print("Barra de busca localizada com sucesso.")
+        
+        for game_name in jogos_para_testar:
+            
+            print(f"Digitando '{game_name}'...")
+            for char in game_name:
+                search_bar.send_keys(char)
+                time.sleep(0.05)
+            
+            print(f"Terminou de digitar '{game_name}'.")
+            time.sleep(2.0) 
+            
+            print("Limpando a barra de busca...")
+            search_bar.clear()
+            print("Barra de busca limpa.")
+            time.sleep(1.0)
+
+        print(">>> Teste de Busca Alternada: SUCESSO")
+
+    except Exception as e:
+        print(f"XXX Teste de Busca Alternada: FALHOU XXX")
+        print(f"Erro detalhado: {e}") 
+    finally:
+        print("--- Finalizando Teste de Busca Alternada ---")
 
 def rodar_teste_filtro(driver, wait):
     print("\n--- Iniciando Teste de Filtro de Gêneros ---")
@@ -255,7 +295,7 @@ def rodar_teste_clicar_jogo(driver, wait):
 
 
 def rodar_teste_clicar_botao_mais(driver, wait):
-    print("\n--- Iniciando Teste de Clique no Botão '+' ---")
+    print("\n--- Iniciando Teste de Clique no Botão '+' (Elden Ring) ---")
     try:
         print("Verificando se estamos na página do Elden Ring...")
         assert "Elden Ring" in driver.page_source
@@ -297,7 +337,7 @@ def rodar_teste_clicar_botao_mais(driver, wait):
 
 
 def rodar_teste_dar_nota_e_comentar(driver, wait):
-    print("\n--- Iniciando Teste de Avaliação (Nota, Comentário e Salvar) ---")
+    print("\n--- Iniciando Teste de Avaliação (Elden Ring) ---")
     try:
         print("Rolando até o fim da página (seção de avaliação)...")
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -351,14 +391,14 @@ def rodar_teste_dar_nota_e_comentar(driver, wait):
         except Exception:
             print("⚠️ Avaliação enviada, mas nenhuma mensagem de sucesso foi detectada (ou a página recarregou).")
 
-        print(">>> Teste de Avaliação (Nota, Comentário e Salvar): SUCESSO")
+        print(">>> Teste de Avaliação (Elden Ring): SUCESSO")
 
     except Exception as e:
-        print("XXX Teste de Avaliação (Nota, Comentário e Salvar): FALHOU XXX")
+        print("XXX Teste de Avaliação (Elden Ring): FALHOU XXX")
         print(f"Erro: {e}")
         print("Ocorreu um erro ao tentar avaliar o jogo.")
     finally:
-        print("--- Finalizando Teste de Avaliação (Nota, Comentário e Salvar) ---")
+        print("--- Finalizando Teste de Avaliação (Elden Ring) ---")
 
 
 def rodar_teste_ir_para_biblioteca(driver, wait):
@@ -398,6 +438,73 @@ def rodar_teste_ir_para_biblioteca(driver, wait):
         print(f"Erro: {e}")
     finally:
         print("--- Finalizando Teste de Navegação para Biblioteca ---")
+
+
+def rodar_teste_modificar_avaliacao_biblioteca(driver, wait):
+    print("\n--- Iniciando Teste de Modificação de Avaliação (Biblioteca) ---")
+    try:
+        print("Procurando 'Cyberpunk 2077' na biblioteca...")
+        jogo_locator = (By.XPATH, "//div[contains(@class, 'library-item')]//h3[contains(text(), 'Cyberpunk 2077')]/ancestor::a")
+        jogo_link = wait.until(EC.element_to_be_clickable(jogo_locator))
+        
+        driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", jogo_link)
+        time.sleep(1.0)
+        print("Clicando em 'Cyberpunk 2077'...")
+        jogo_link.click()
+        
+        wait.until(EC.url_contains("/avaliar/"))
+        wait.until(EC.visibility_of_element_located((By.XPATH, "//*[self::h1 or self::h2][contains(text(), 'Cyberpunk 2077')]")))
+        print("Página de avaliação carregada.")
+        
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(1.5) 
+        
+        estrelas_antigas = 3
+        star_locator_antigo = (By.CSS_SELECTOR, f"label[for='star{estrelas_antigas}']")
+        print(f"Tentando clicar na nota antiga ({estrelas_antigas} estrelas)...")
+        estrela_label_antiga = wait.until(EC.presence_of_element_located(star_locator_antigo))
+        driver.execute_script("arguments[0].click();", estrela_label_antiga)
+        time.sleep(0.5)
+
+        estrelas_novas = 5
+        star_locator_novo = (By.CSS_SELECTOR, f"label[for='star{estrelas_novas}']")
+        print(f"Clicando na nota nova ({estrelas_novas} estrelas)...")
+        estrela_label_nova = wait.until(EC.presence_of_element_located(star_locator_novo))
+        driver.execute_script("arguments[0].click();", estrela_label_nova)
+        print(f"✅ Clicou com sucesso em {estrelas_novas} estrelas.")
+        time.sleep(0.5)
+        
+        comment_box = wait.until(EC.visibility_of_element_located((By.TAG_NAME, "textarea")))
+        comment_box.clear()
+        texto_comentario_novo = "Comentário atualizado. Jogo excelente agora."
+        comment_box.send_keys(texto_comentario_novo)
+        print(f"✅ Comentário atualizado: '{texto_comentario_novo}'")
+        time.sleep(DELAY_PARA_VER)
+
+        save_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Salvar Avaliação')]")))
+        driver.execute_script("arguments[0].click();", save_button)
+        print("✅ Avaliação atualizada enviada!")
+        
+        wait.until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), 'Avaliação salva com sucesso')]")))
+        print("✅ Mensagem 'Avaliação salva com sucesso' detectada!")
+        
+        driver.execute_script("window.scrollTo(0, 0);")
+        print("Rolou para o topo da página.")
+        time.sleep(1.0)
+        
+        botao_remover = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "a.add-btn[aria-label*='Cyberpunk 2077']")))
+        driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", botao_remover)
+        time.sleep(1.5)
+        driver.execute_script("arguments[0].click();", botao_remover)
+        print("🟣 Botão (Remover/Checkmark) clicado com sucesso!")
+        
+        print(">>> Teste de Modificação de Avaliação (Biblioteca): SUCESSO")
+        
+    except Exception as e:
+        print("XXX Teste de Modificação de Avaliação (Biblioteca): FALHOU XXX")
+        print(f"Erro: {e}")
+    finally:
+        print("--- Finalizando Teste de Modificação de Avaliação (Biblioteca) ---")
 
 
 def rodar_teste_ir_para_configuracoes(driver, wait):
@@ -729,7 +836,7 @@ def rodar_teste_ui_steam_tac_toe(driver, wait):
         
         input_field = driver.find_element(By.ID, "game-search-input")
         input_field.clear() 
-        input_field.send_keys("Hentai")
+        input_field.send_keys("FIFA")
         
         search_result_li = (By.CSS_SELECTOR, "#search-results-list li.search-result-item")
         first_result = wait.until(EC.element_to_be_clickable(search_result_li))
@@ -757,6 +864,30 @@ def rodar_teste_ui_steam_tac_toe(driver, wait):
             driver.find_element(By.CSS_SELECTOR, "#search-modal-close-btn").click()
         except:
             pass
+            
+    print("\n--- Jogada 3: Testando clique em célula preenchida (Stardew Valley) ---")
+    try:
+        cell_0_0_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='0'][data-col='0']")
+        cell_0_0 = wait.until(EC.presence_of_element_located(cell_0_0_locator))
+
+        img_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='0'][data-col='0'] img")
+        wait.until(EC.visibility_of_element_located(img_locator))
+        print("Célula (0,0) já contém Stardew Valley. Clicando nela...")
+
+        cell_0_0.click()
+        print("Clicou na célula (0,0) preenchida.")
+
+        try:
+            short_wait = WebDriverWait(driver, 2) 
+            short_wait.until(EC.visibility_of_element_located((By.ID, "search-modal")))
+            print("XXX RESULTADO JOGADA 3: FALHA (Modal abriu indevidamente)")
+            driver.find_element(By.CSS_SELECTOR, "#search-modal-close-btn").click()
+        except Exception:
+            print("✅ RESULTADO JOGADA 3: SUCESSO (Modal não abriu, como esperado)")
+            
+    except Exception as e:
+        print(f"XXX FALHA GRAVE NA [Jogada 3]: {e}")
+
 
     print("\n>>> Teste Completo da UI do Steam Tac Toe: SUCESSO")
     print("--- Finalizando Teste Completo da UI do Steam Tac Toe ---")
@@ -771,6 +902,7 @@ if __name__ == "__main__":
         try:
             rodar_teste_login(driver, wait)
             rodar_teste_registro(driver, wait)
+            rodar_teste_busca_alternada(driver, wait)          
             rodar_teste_filtro(driver, wait)
             rodar_teste_aplicar_filtro(driver, wait)
             rodar_teste_voltar_home(driver, wait)
@@ -778,6 +910,7 @@ if __name__ == "__main__":
             rodar_teste_clicar_botao_mais(driver, wait)
             rodar_teste_dar_nota_e_comentar(driver, wait) 
             rodar_teste_ir_para_biblioteca(driver, wait) 
+            rodar_teste_modificar_avaliacao_biblioteca(driver, wait)
             rodar_teste_ir_para_configuracoes(driver, wait) 
             rodar_teste_preferencias_e_tema(driver, wait)
             rodar_teste_voltar_home(driver, wait)
