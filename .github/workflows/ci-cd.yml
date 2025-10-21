@@ -46,14 +46,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     # Passo 1: Dispara o Webhook (Força o Git Pull, Migrações, Collect Static no PA)
-    # A maneira mais simples é fazer um 'curl' no webhook que você criou
     - name: Trigger PythonAnywhere Webhook for Deployment
-      # Use o Secret que você configurou no seu Webhook do GitHub se tiver usado um!
       run: |
         curl -X POST \
         -H "Content-Type: application/json" \
         -d '{"ref": "refs/heads/${{ github.ref_name }}"}' \
         https://${{ secrets.PA_WEBAPP_DOMAIN }}/webhook/github/ 
+        
+    # PASSO 2 CORRIGIDO: Recarrega o Web App usando CURL manual (API Direta)
+    - name: Reload PythonAnywhere Webapp (via CURL API)
+      env:
+        PA_TOKEN: ${{ secrets.PA_API_TOKEN }}
+        PA_DOMAIN: ${{ secrets.PA_WEBAPP_DOMAIN }}
+        PA_USERNAME: ${{ secrets.PA_USERNAME }}
+      run: |
+        # Chama a API v0 do PythonAnywhere para recarregar o Web App
+        curl -X POST \
+        -H "Authorization: Token $PA_TOKEN" \
+        "https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/webapps/$PA_DOMAIN/reload/"
         
     # Passo 2: Recarrega o Web App usando a API do PythonAnywhere
     # Isto garante que o Django carregue as novas alterações de código e as novas Migrações.
