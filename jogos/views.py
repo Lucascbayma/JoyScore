@@ -125,8 +125,6 @@ def home(request):
     
     if request.user.is_authenticated:
         try:
-            # >>>>> AQUI ESTÁ A MUDANÇA PRINCIPAL <<<<<
-            # Semeia o gerador aleatório com o ID do usuário para obter resultados consistentes
             random.seed(request.user.id)
 
             profile = request.user.profile
@@ -156,8 +154,6 @@ def home(request):
                             if len(jogos_recomendados) >= 10: break
                 
                 if len(jogos_recomendados) < 10:
-                    # >>>>> MUDANÇA NA LÓGICA DE FALLBACK <<<<<
-                    # Removemos o order_by('?') que é ineficiente e não pode ser semeado
                     fallback_queryset = Jogo.objects.exclude(id__in=jogos_na_biblioteca_ids).exclude(id__in=ids_ja_recomendados)
                     fallback_list = list(fallback_queryset) # Converte para lista
                     random.shuffle(fallback_list) # Embaralha a lista de forma consistente
@@ -199,7 +195,6 @@ def home(request):
     }
     return render(request, 'jogos/home.html', context)
 
-# --- O resto das suas views continua aqui ---
 @require_GET
 def autocomplete_search(request):
     query = request.GET.get('q')
@@ -221,8 +216,11 @@ def filtrar_por_genero(request):
     search_error = None
     form_submitted = 'genres' in request.GET
     if form_submitted:
+        # Agora validamos os dois casos
         if not selected_genres_ids:
-            search_error = "Por favor, selecione pelo menos um gênero para filtrar."
+            search_error = "Por favor, selecione pelo menos 1 gênero para filtrar."
+        elif len(selected_genres_ids) > 2:
+            search_error = "Você só pode selecionar até 2 gêneros."
         else:
             genres_param = ",".join(selected_genres_ids_str)
             page_size = 15

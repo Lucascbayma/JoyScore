@@ -15,12 +15,19 @@
         </div>
 
         <form method="GET" action="{% url 'jogos:filtrar_por_genero' %}" id="genre-filter-form">
+            
+            <div id="filter-error-message" style="color: red; font-weight: bold; margin-bottom: 10px;">
+                {% if search_error %}
+                    <p>{{ search_error }}</p>
+                {% endif %}
+            </div>
             <p class="filter-instructions">Selecione até 2 gêneros para encontrar jogos.</p>
             
             <div class="genre-container">
                 {% for genre in all_genres %}
                     <div class="genre-item">
                         <input type="checkbox" name="genres" value="{{ genre.id }}" id="genre-{{ genre.id }}"
+                               class="genre-checkbox" {% comment %} Adicionei uma classe para o JS pegar fácil {% endcomment %}
                                {% if genre.id in selected_genres_ids %}checked{% endif %}>
                         <label for="genre-{{ genre.id }}">{{ genre.name }}</label>
                     </div>
@@ -53,14 +60,10 @@
             {% endfor %}
         </div>
 
-        {% if search_error %}
-            <p class="filter-message">{{ search_error }}</p>
-
-        {% elif not games_page.results and form_submitted %}
+        {% comment %} O bloco 'if search_error' foi movido para cima {% endcomment %}
+        {% if not games_page.results and form_submitted and not search_error %}
             <p class="filter-message">Nenhum jogo encontrado para os gêneros selecionados.</p>
         {% endif %}
-
-
         {% if games_page.results and games_page.has_previous or games_page.has_next %}
             <div class="pagination-controls">
                 {% if games_page.has_previous %}
@@ -82,17 +85,38 @@
 {% block extra_scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Seleciona todos os checkboxes E o container de erro
     const checkboxes = document.querySelectorAll('input[name="genres"]');
+    const errorMessageContainer = document.getElementById('filter-error-message');
     const maxChecked = 2;
 
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', () => {
+            // Limpa a mensagem de erro de JS anterior ao tentar de novo
+            // Só limpa se a mensagem for a de "2 gêneros"
+            if (errorMessageContainer.textContent.includes('Você só pode selecionar até 2 gêneros.')) {
+                 errorMessageContainer.innerHTML = '';
+            }
+
             let checkedCount = document.querySelectorAll('input[name="genres"]:checked').length;
             
             if (checkedCount > maxChecked) {
-                checkbox.checked = false;
+                checkbox.checked = false; // Desfaz a seleção
+                // Exibe a mensagem de erro instantânea
+                errorMessageContainer.innerHTML = '<p>Você só pode selecionar até 2 gêneros.</p>';
             }
         });
+    });
+
+    const form = document.getElementById('genre-filter-form');
+    form.addEventListener('submit', (event) => {
+        let checkedCount = document.querySelectorAll('input[name="genres"]:checked').length;
+        if (checkedCount === 0) {
+            // Impede o formulário de ser enviado
+            event.preventDefault(); 
+            // Mostra o erro de 0 selecionados instantaneamente
+            errorMessageContainer.innerHTML = '<p>Por favor, selecione pelo menos 1 gênero para filtrar.</p>';
+        }
     });
 });
 </script>
