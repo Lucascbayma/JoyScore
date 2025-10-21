@@ -80,7 +80,7 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <img src="images/Sprint03.png" alt="Sprint 03 do JIRA" width="1500"/>
 </ul>
 <p align="center">
-<img src="images/bug_tracker_joyscore_att" alt="Bug tracker atualizado" width="1500"/>
+<img src="images/bug_tracker_joyscore_att.jpeg" alt="Bug tracker atualizado" width="1500"/>
 </p>
 </p>
 </details>
