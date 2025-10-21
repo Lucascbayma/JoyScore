@@ -65,11 +65,11 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <ul>
 <li>Seleção de mais histórias para implementar.✅</li>
 <li>Ambiente de versionamento atuante.✅</li>
-<li>Deployment das novas histórias.</li>
+<li>Deployment das novas histórias.✅</li>
 <li>Adicionar novo screencast com ênfase nas novas histórias.</li>
-<li>Issue/bug tracker atualizado.</li>
-<li>CI/CD com build e deployment automatizado.</li>
-<li>Testes de Sistema E2E Automatizados.</li>
+<li>Issue/bug tracker atualizado.✅</li>
+<li>CI/CD com build e deployment automatizado.✅</li>
+<li>Testes de Sistema E2E Automatizados.✅</li>
 <li>Atualização sobre o uso da programação em pares.✅</li>
 <li>Quadro da Sprint 03 atualizado refletindo a entrega.✅</li>
 </ul>
