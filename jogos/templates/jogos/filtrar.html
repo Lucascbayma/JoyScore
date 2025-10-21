@@ -21,13 +21,14 @@
                     <p>{{ search_error }}</p>
                 {% endif %}
             </div>
+
             <p class="filter-instructions">Selecione até 2 gêneros para encontrar jogos.</p>
             
             <div class="genre-container">
                 {% for genre in all_genres %}
                     <div class="genre-item">
                         <input type="checkbox" name="genres" value="{{ genre.id }}" id="genre-{{ genre.id }}"
-                               class="genre-checkbox" {% comment %} Adicionei uma classe para o JS pegar fácil {% endcomment %}
+                               class="genre-checkbox"
                                {% if genre.id in selected_genres_ids %}checked{% endif %}>
                         <label for="genre-{{ genre.id }}">{{ genre.name }}</label>
                     </div>
@@ -48,7 +49,8 @@
         
         <div class="results-grid">
             {% for game in games_page.results %}
-                <div class="card-link">
+                
+                <a href="{% url 'jogos:avaliar_from_rawg' game.id %}" class="card-link">
                     <div class="card">
                         <img src="{{ game.background_image }}" alt="{{ game.name }}">
                         <div class="card-info">
@@ -56,14 +58,15 @@
                             <div class="card-subtitle">Lançamento: {{ game.released|date:"d/m/Y" }}</div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
+                </a>
+                {% endfor %}
         </div>
 
-        {% comment %} O bloco 'if search_error' foi movido para cima {% endcomment %}
         {% if not games_page.results and form_submitted and not search_error %}
             <p class="filter-message">Nenhum jogo encontrado para os gêneros selecionados.</p>
         {% endif %}
+
+
         {% if games_page.results and games_page.has_previous or games_page.has_next %}
             <div class="pagination-controls">
                 {% if games_page.has_previous %}
@@ -93,7 +96,6 @@ document.addEventListener('DOMContentLoaded', function() {
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', () => {
             // Limpa a mensagem de erro de JS anterior ao tentar de novo
-            // Só limpa se a mensagem for a de "2 gêneros"
             if (errorMessageContainer.textContent.includes('Você só pode selecionar até 2 gêneros.')) {
                  errorMessageContainer.innerHTML = '';
             }
@@ -102,19 +104,17 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (checkedCount > maxChecked) {
                 checkbox.checked = false; // Desfaz a seleção
-                // Exibe a mensagem de erro instantânea
                 errorMessageContainer.innerHTML = '<p>Você só pode selecionar até 2 gêneros.</p>';
             }
         });
     });
 
+    // Validação de 0 gêneros no clique do botão (impede o submit)
     const form = document.getElementById('genre-filter-form');
     form.addEventListener('submit', (event) => {
         let checkedCount = document.querySelectorAll('input[name="genres"]:checked').length;
         if (checkedCount === 0) {
-            // Impede o formulário de ser enviado
-            event.preventDefault(); 
-            // Mostra o erro de 0 selecionados instantaneamente
+            event.preventDefault(); // Impede o formulário de ser enviado
             errorMessageContainer.innerHTML = '<p>Por favor, selecione pelo menos 1 gênero para filtrar.</p>';
         }
     });

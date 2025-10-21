@@ -8,6 +8,16 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 class Jogo(models.Model):
+    # --- INÍCIO DA ALTERAÇÃO ---
+    # Adicionamos este campo para ser a "ponte" com a API
+    rawg_id = models.IntegerField(
+        unique=True, 
+        null=True, 
+        blank=True, 
+        help_text="ID do jogo na API RAWG"
+    )
+    # --- FIM DA ALTERAÇÃO ---
+    
     titulo = models.CharField(max_length=200, unique=True)
     desenvolvedor = models.CharField(max_length=200, blank=True)
     ano_lancamento = models.DateField(blank=True,null=True)

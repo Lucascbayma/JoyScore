@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 import os
 import subprocess
 import logging
+import dateutil.parser # <-- IMPORT NECESSÁRIO PARA CONVERTER DATA DA API
 
 RAWG_API_KEY = settings.API_KEY
 RAWG_BASE_URL = "https://api.rawg.io/api"
@@ -90,6 +91,79 @@ def avaliar(request, jogo_id):
     context = {'jogo': jogo, 'avaliacao_existente': avaliacao_existente, 'esta_na_biblioteca': esta_na_biblioteca }
     return render(request, 'jogos/avaliar_jogo.html', context)
 
+# --- INÍCIO DA ALTERAÇÃO (NOVA VIEW "PONTE") ---
+
+@login_required
+def redirecionar_para_avaliacao(request, rawg_id):
+    """
+    Esta view age como uma "ponte". 
+    1. Recebe um ID da API RAWG.
+    2. Verifica se o jogo já existe no banco de dados local (usando 'rawg_id').
+    3. Se não existe, busca na API RAWG e cria o jogo localmente.
+    4. Redireciona o usuário para a página 'avaliar' padrão com o ID local do jogo.
+    """
+    try:
+        # 1. Tenta encontrar o jogo no banco local pelo rawg_id
+        jogo = Jogo.objects.get(rawg_id=rawg_id)
+    
+    except Jogo.DoesNotExist:
+        # 2. Se não encontrar, busca na API RAWG para criar
+        game_details_url = f"{RAWG_BASE_URL}/games/{rawg_id}?key={RAWG_API_KEY}"
+        try:
+            response = requests.get(game_details_url)
+            response.raise_for_status()
+            data = response.json()
+
+            # Pega os dados da API
+            titulo = data.get('name')
+            devs = data.get('developers', [])
+            desenvolvedor = ", ".join([d.get('name') for d in devs]) if devs else ""
+            
+            release_date_str = data.get('released')
+            release_date_obj = None
+            if release_date_str:
+                try:
+                    # Converte a string 'YYYY-MM-DD' para um objeto date
+                    release_date_obj = dateutil.parser.parse(release_date_str).date()
+                except ValueError:
+                    release_date_obj = None # Ignora se a data for inválida
+
+            genres = data.get('genres', [])
+            genero = genres[0].get('name', "") if genres else ""
+            
+            # 3. Cria o jogo no banco local
+            # Usamos get_or_create pelo título para evitar duplicatas
+            jogo, created = Jogo.objects.get_or_create(
+                titulo=titulo,
+                defaults={
+                    'rawg_id': rawg_id,
+                    'desenvolvedor': desenvolvedor,
+                    'ano_lancamento': release_date_obj,
+                    'genero': genero,
+                    'background_image': data.get('background_image'),
+                    'descricao': data.get('description_raw', '')
+                }
+            )
+            
+            # Se o jogo foi 'pego' (created=False) mas não tinha o rawg_id, atualiza.
+            if not created and not jogo.rawg_id:
+                jogo.rawg_id = rawg_id
+                jogo.save()
+        
+        except requests.RequestException:
+            messages.error(request, "Não foi possível buscar os detalhes do jogo na API. Tente novamente.")
+            return redirect('jogos:filtrar_por_genero')
+        except Exception as e:
+            # Captura erro se o título já existir (unique=True)
+            messages.error(request, f"Ocorreu um erro ao salvar o jogo: {e}.")
+            return redirect('jogos:filtrar_por_genero')
+
+    # 4. Redireciona para a página de avaliação normal com o ID LOCAL
+    return redirect('jogos:avaliar', jogo_id=jogo.id)
+
+# --- FIM DA ALTERAÇÃO ---
+
+
 @login_required
 def buscar_jogos(request):
     pesquisa = request.GET.get('q')
@@ -134,14 +208,13 @@ def home(request):
                 jogos_na_biblioteca_ids = Add_Biblioteca.objects.filter(usuario=request.user).values_list('jogo_id', flat=True)
                 ids_ja_recomendados = set()
                 
-                # O shuffle agora será o mesmo para o mesmo usuário, a menos que as preferências mudem
                 random.shuffle(generos_favoritos)
 
                 for genero in generos_favoritos:
                     if len(jogos_recomendados) >= 10: break
                     
                     candidatos = RECOMENDACOES_POR_GENERO.get(genero, [])
-                    random.shuffle(candidatos) # Este shuffle também será consistente
+                    random.shuffle(candidatos)
                     adicionados_neste_genero = 0
 
                     for titulo_jogo in candidatos:
@@ -155,8 +228,8 @@ def home(request):
                 
                 if len(jogos_recomendados) < 10:
                     fallback_queryset = Jogo.objects.exclude(id__in=jogos_na_biblioteca_ids).exclude(id__in=ids_ja_recomendados)
-                    fallback_list = list(fallback_queryset) # Converte para lista
-                    random.shuffle(fallback_list) # Embaralha a lista de forma consistente
+                    fallback_list = list(fallback_queryset)
+                    random.shuffle(fallback_list)
 
                     restantes = 10 - len(jogos_recomendados)
                     jogos_recomendados.extend(fallback_list[:restantes])
@@ -164,7 +237,6 @@ def home(request):
         except Profile.DoesNotExist:
             pass
 
-    # Carrega as outras seções da home
     titulos_populares = [ "The Witcher 3: Wild Hunt", "Red Dead Redemption 2", "Grand Theft Auto V", "Hollow Knight", "Portal 2", "Minecraft", "God of War", "Elden Ring", "Fortnite Battle Royale", "The Legend of Zelda: Breath of the Wild", ]
     jogos_populares = Jogo.objects.filter( titulo__in=titulos_populares ).order_by('titulo')
     titulos_favs = [ "Pokémon X, Y", "Marvel's Spider-Man", "The Witcher 3: Wild Hunt", "Bloodborne", "FIFA 22", "Hollow Knight", ]
@@ -216,7 +288,6 @@ def filtrar_por_genero(request):
     search_error = None
     form_submitted = 'genres' in request.GET
     if form_submitted:
-        # Agora validamos os dois casos
         if not selected_genres_ids:
             search_error = "Por favor, selecione pelo menos 1 gênero para filtrar."
         elif len(selected_genres_ids) > 2:
@@ -253,13 +324,11 @@ def configuracoes_conta(request):
         generos_selecionados = request.POST.getlist('genres')
         profile.generos_favoritos = generos_selecionados
         profile.save()
-        # messages.success(request, 'Suas preferências foram salvas com sucesso!') # <-- LINHA REMOVIDA (COMENTADA)
         return redirect('jogos:configuracoes_conta')
     all_genres = _get_all_genres(request)
     context = {'all_genres': all_genres, 'profile': profile }
     return render(request, 'jogos/configuracoes.html', context)
 
-# Configuração básica de log para depuração no PythonAnywhere
 logger = logging.getLogger(__name__)
 
 REPO_PATH = '/home/LcsBayma/joyscore/'
@@ -268,28 +337,20 @@ VENV_NAME = 'venv_joyscore'
 @csrf_exempt
 def github_webhook(request):
     if request.method == 'POST':
-        # IMPORTE GITPYTHON DENTRO DA FUNÇÃO
         try:
-            from GitPython.repo import Repo # <<< AGORA ESTÁ ISOLADO!
+            from GitPython.repo import Repo 
             
-            # Seu código de deploy (repo_path, VENV_NAME, etc...)
             REPO_PATH = '/home/LcsBayma/joyscore/'
-            # ... (código de setup de caminhos) ...
 
-            # 1. Puxar o código mais recente
-            # ...
             repo = Repo(REPO_PATH)
             origin = repo.remotes.origin
             origin.pull()
-            # ... (resto do seu código)
             
             return HttpResponse('Deployment concluído!', status=200)
 
         except ImportError:
-            # Em caso de falha de importação durante um teste de CI, apenas ignora
             return HttpResponse('Erro de importação de GitPython no servidor.', status=500)
         except Exception as e:
-            # ... (código de erro)
             pass
 
     return HttpResponse('Método não permitido.', status=405)
