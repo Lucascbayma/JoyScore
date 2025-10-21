@@ -189,41 +189,63 @@ def rodar_teste_filtro(driver, wait):
     finally:
         print("--- Finalizando Teste de Filtro ---")
 
-
 def rodar_teste_aplicar_filtro(driver, wait):
-    print("\n--- Iniciando Teste de Aplicação de Filtro ---")
+    print("\n--- Iniciando Teste de Aplicação de Filtro (Múltiplas Etapas) ---")
     try:
         print("Página de filtro aberta")
         time.sleep(DELAY_PARA_VER)
 
+        print("Etapa 1: Clicando em 'Filtrar Jogos' (sem gêneros)")
+        button1 = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.filter-button")))
+        driver.execute_script("arguments[0].click();", button1)
+        
+        wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "button.filter-button")))
+        print("Página recarregada (sem filtros).")
+        time.sleep(DELAY_PARA_VER)
+
+        print("Etapa 2: Selecionando 1 gênero ('Action')")
         label_action = wait.until(EC.visibility_of_element_located((By.XPATH, "//label[normalize-space()='Action']")))
         driver.execute_script("arguments[0].click();", label_action)
-        print("Selecionou o gênero 'Action'")
+        print("Selecionou 'Action'")
         time.sleep(0.5)
+
+        button2 = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.filter-button")))
+        driver.execute_script("arguments[0].click();", button2)
+        print("Clicou em 'Filtrar Jogos' (com 'Action')")
+
+        wait.until(EC.url_contains("genres="))
+        print("Página de resultados carregada com 'Action'.")
+        time.sleep(DELAY_PARA_VER)
+
+        print("Etapa 3: Selecionando 2 gêneros ('Action' + 'Indie')")
 
         label_indie = wait.until(EC.visibility_of_element_located((By.XPATH, "//label[normalize-space()='Indie']")))
         driver.execute_script("arguments[0].click();", label_indie)
-        print("Selecionou o gênero 'Indie'")
-        time.sleep(1)
+        print("Selecionou 'Indie'")
+        time.sleep(0.5)
 
-        button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.filter-button")))
-        driver.execute_script("arguments[0].click();", button)
-        print("Clicou em 'Filtrar Jogos'")
+        button3 = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.filter-button")))
+        driver.execute_script("arguments[0].click();", button3)
+        print("Clicou em 'Filtrar Jogos' (com 'Action' e 'Indie')")
 
         wait.until(EC.url_contains("genres="))
-        print("Página de resultados carregada")
+        print("Página de resultados carregada com 2 gêneros.")
         time.sleep(DELAY_PARA_VER)
 
-        assert "genres=" in driver.current_url
-        print(">>> Teste de Aplicação de Filtro: SUCESSO")
+        print("Etapa 4: Selecionando 1 gênero ('RPG') (sem filtrar)")
+        label_rpg = wait.until(EC.visibility_of_element_located((By.XPATH, "//label[normalize-space()='RPG']")))
+        driver.execute_script("arguments[0].click();", label_rpg)
+        print("Selecionou 'RPG'")
+        time.sleep(DELAY_PARA_VER) 
+
+        print(">>> Teste de Aplicação de Filtro (Múltiplas Etapas): SUCESSO")
 
     except Exception as e:
-        print(f"XXX Teste de Aplicação de Filtro: FALHOU XXX")
+        print(f"XXX Teste de Aplicação de Filtro (Múltiplas Etapas): FALHOU XXX")
         print(f"Erro: {e}")
         time.sleep(2)
     finally:
-        print("--- Finalizando Teste de Aplicação de Filtro ---")
-
+        print("--- Finalizando Teste de Aplicação de Filtro (Múltiplas Etapas) ---")
 
 def rodar_teste_voltar_home(driver, wait):
     print("\n--- Iniciando Teste de Voltar para Home (pelo Logo) ---")
