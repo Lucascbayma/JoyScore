@@ -465,30 +465,43 @@ def rodar_teste_ir_para_biblioteca(driver, wait):
 def rodar_teste_modificar_avaliacao_biblioteca(driver, wait):
     print("\n--- Iniciando Teste de Modificação de Avaliação (Biblioteca) ---")
     try:
-        print("Procurando 'Cyberpunk 2077' na biblioteca...")
-        jogo_locator = (By.XPATH, "//div[contains(@class, 'library-item')]//h3[contains(text(), 'Cyberpunk 2077')]/ancestor::a")
+        nome_jogo = "Elden Ring"
+        
+        print(f"Procurando '{nome_jogo}' na biblioteca...")
+        jogo_locator = (By.XPATH, f"//a[@class='game-item-link'][.//span[@class='game-title'][contains(text(), '{nome_jogo}')]]")
         jogo_link = wait.until(EC.element_to_be_clickable(jogo_locator))
         
         driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", jogo_link)
         time.sleep(1.0)
-        print("Clicando em 'Cyberpunk 2077'...")
+        print(f"Clicando em '{nome_jogo}'...")
         jogo_link.click()
         
         wait.until(EC.url_contains("/avaliar/"))
-        wait.until(EC.visibility_of_element_located((By.XPATH, "//*[self::h1 or self::h2][contains(text(), 'Cyberpunk 2077')]")))
+        wait.until(EC.visibility_of_element_located((By.XPATH, f"//*[self::h1 or self::h2][contains(text(), '{nome_jogo}')]")))
         print("Página de avaliação carregada.")
         
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(1.5) 
         
-        estrelas_antigas = 3
-        star_locator_antigo = (By.CSS_SELECTOR, f"label[for='star{estrelas_antigas}']")
-        print(f"Tentando clicar na nota antiga ({estrelas_antigas} estrelas)...")
+        print("Procurando a avaliação atual (estrela marcada)...")
+        checked_star_input_locator = (By.CSS_SELECTOR, "input[type='radio'][id^='star']:checked")
+        checked_star_input = wait.until(EC.presence_of_element_located(checked_star_input_locator))
+        
+        id_estrela_antiga = checked_star_input.get_attribute("id") 
+        estrelas_antigas_num = int(id_estrela_antiga.replace("star", "")) 
+        print(f"Avaliação atual encontrada: {estrelas_antigas_num} estrelas.")
+
+        star_locator_antigo = (By.CSS_SELECTOR, f"label[for='{id_estrela_antiga}']")
+        print(f"Clicando na nota antiga ({estrelas_antigas_num} estrelas)...")
         estrela_label_antiga = wait.until(EC.presence_of_element_located(star_locator_antigo))
         driver.execute_script("arguments[0].click();", estrela_label_antiga)
         time.sleep(0.5)
 
-        estrelas_novas = 5
+        if estrelas_antigas_num == 5:
+            estrelas_novas = 4
+        else:
+            estrelas_novas = 5
+            
         star_locator_novo = (By.CSS_SELECTOR, f"label[for='star{estrelas_novas}']")
         print(f"Clicando na nota nova ({estrelas_novas} estrelas)...")
         estrela_label_nova = wait.until(EC.presence_of_element_located(star_locator_novo))
@@ -498,7 +511,7 @@ def rodar_teste_modificar_avaliacao_biblioteca(driver, wait):
         
         comment_box = wait.until(EC.visibility_of_element_located((By.TAG_NAME, "textarea")))
         comment_box.clear()
-        texto_comentario_novo = "Comentário atualizado. Jogo excelente agora."
+        texto_comentario_novo = "Atualizando minha nota. Jogo fenomenal, uma obra-prima!"
         comment_box.send_keys(texto_comentario_novo)
         print(f"✅ Comentário atualizado: '{texto_comentario_novo}'")
         time.sleep(DELAY_PARA_VER)
@@ -514,11 +527,19 @@ def rodar_teste_modificar_avaliacao_biblioteca(driver, wait):
         print("Rolou para o topo da página.")
         time.sleep(1.0)
         
-        botao_remover = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "a.add-btn[aria-label*='Cyberpunk 2077']")))
+        botao_remover = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, f"a.add-btn[aria-label*='{nome_jogo}']")))
         driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", botao_remover)
         time.sleep(1.5)
         driver.execute_script("arguments[0].click();", botao_remover)
         print("🟣 Botão (Remover/Checkmark) clicado com sucesso!")
+       
+        print("Voltando para a Biblioteca...")
+        driver.back()
+        
+        wait.until(EC.url_contains("/biblioteca")) 
+        wait.until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), 'MINHA BIBLIOTECA')]")))
+        print("✅ Voltou para a página da Biblioteca.")
+        time.sleep(1.0)
         
         print(">>> Teste de Modificação de Avaliação (Biblioteca): SUCESSO")
         
@@ -527,7 +548,6 @@ def rodar_teste_modificar_avaliacao_biblioteca(driver, wait):
         print(f"Erro: {e}")
     finally:
         print("--- Finalizando Teste de Modificação de Avaliação (Biblioteca) ---")
-
 
 def rodar_teste_ir_para_configuracoes(driver, wait):
     print("\n--- Iniciando Teste de Navegação para Configurações ---")
