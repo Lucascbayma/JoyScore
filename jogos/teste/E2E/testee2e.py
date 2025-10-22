@@ -472,7 +472,7 @@ def rodar_teste_modificar_avaliacao_biblioteca(driver, wait):
         jogo_link = wait.until(EC.element_to_be_clickable(jogo_locator))
         
         driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", jogo_link)
-        time.sleep(1.0)
+        time.sleep(1.0) 
         print(f"Clicando em '{nome_jogo}'...")
         jogo_link.click()
         
@@ -516,6 +516,26 @@ def rodar_teste_modificar_avaliacao_biblioteca(driver, wait):
         print(f"✅ Comentário atualizado: '{texto_comentario_novo}'")
         time.sleep(DELAY_PARA_VER)
 
+        
+        print("Localizando o botão 'Remover' (✓)...")
+        
+        botao_remover_locator = (By.CSS_SELECTOR, f"a.add-btn.added[aria-label*='{nome_jogo}']")
+        
+        botao_remover = wait.until(
+            EC.presence_of_element_located(botao_remover_locator)
+        )
+        print("Elemento localizado.")
+
+        driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", botao_remover)
+        print("Rolando a tela para o botão...")
+        time.sleep(1.5) 
+
+        print("Clicando no botão...")
+        driver.execute_script("arguments[0].click();", botao_remover)
+        print("🟣 Botão (Remover/Checkmark) clicado com sucesso!")
+        
+        time.sleep(1.0) 
+
         save_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Salvar Avaliação')]")))
         driver.execute_script("arguments[0].click();", save_button)
         print("✅ Avaliação atualizada enviada!")
@@ -523,16 +543,7 @@ def rodar_teste_modificar_avaliacao_biblioteca(driver, wait):
         wait.until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), 'Avaliação salva com sucesso')]")))
         print("✅ Mensagem 'Avaliação salva com sucesso' detectada!")
         
-        driver.execute_script("window.scrollTo(0, 0);")
-        print("Rolou para o topo da página.")
-        time.sleep(1.0)
         
-        botao_remover = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, f"a.add-btn[aria-label*='{nome_jogo}']")))
-        driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", botao_remover)
-        time.sleep(1.5)
-        driver.execute_script("arguments[0].click();", botao_remover)
-        print("🟣 Botão (Remover/Checkmark) clicado com sucesso!")
-       
         print("Voltando para a Biblioteca...")
         driver.back()
         
