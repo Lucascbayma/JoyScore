@@ -78,7 +78,7 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <li><a href="https://youtu.be/5hL2SDaS-tk">Vídeo da implementação de novas funcionalidades</a></li>
 </ul>
 <p align="center">
-<img src="images/Sprint03.png" alt="Sprint 03 do JIRA" width="1500"/>
+<img src="images/Sprint_3_backlog.jpeg" alt="Sprint 3 do JIRA" width="1500"/>
 </ul>
 <p align="center">
 <img src="images/bug_tracker_joyscore_att.jpeg" alt="Bug tracker atualizado" width="1500"/>
