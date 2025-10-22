@@ -1100,6 +1100,7 @@ if __name__ == "__main__":
             rodar_teste_dar_nota_e_comentar(driver, wait) 
             rodar_teste_ir_para_biblioteca(driver, wait) 
             rodar_teste_modificar_avaliacao_biblioteca(driver, wait)
+            rodar_teste_ir_para_biblioteca(driver, wait) 
             rodar_teste_ir_para_configuracoes(driver, wait) 
             rodar_teste_preferencias_e_tema(driver, wait)
             rodar_teste_voltar_home(driver, wait)
