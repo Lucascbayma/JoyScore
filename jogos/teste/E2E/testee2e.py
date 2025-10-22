@@ -837,6 +837,8 @@ def rodar_teste_ui_steam_tac_toe(driver, wait):
 
     print("\n[Parte 4] Testando a mecânica de jogada (Stardew Valley e FIFA)...")
     
+    jogada_1_sucesso = False
+    
     print("\n--- Jogada 1: 'Stardew Valley' na célula (0,0) ---")
     try:
         cell_0_0_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='0'][data-col='0']")
@@ -847,7 +849,9 @@ def rodar_teste_ui_steam_tac_toe(driver, wait):
         genres_text = driver.find_element(By.ID, "modal-genres-text").text
         print(f"Célula (0,0) requer: {genres_text}")
         
-        driver.find_element(By.ID, "game-search-input").send_keys("Stardew Valley")
+        input_field = driver.find_element(By.ID, "game-search-input")
+        input_field.clear()
+        input_field.send_keys("Stardew Valley")
         
         search_result_li = (By.CSS_SELECTOR, "#search-results-list li.search-result-item")
         first_result = wait.until(EC.element_to_be_clickable(search_result_li))
@@ -864,6 +868,7 @@ def rodar_teste_ui_steam_tac_toe(driver, wait):
             img_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='0'][data-col='0'] img")
             short_wait.until(EC.visibility_of_element_located(img_locator))
             print("✅ RESULTADO JOGADA 1: ACERTO (Imagem apareceu na célula)")
+            jogada_1_sucesso = True
         except Exception:
             status_box = driver.find_element(By.ID, "game-status-box")
             assert "error-message" in status_box.get_attribute("class")
@@ -917,31 +922,162 @@ def rodar_teste_ui_steam_tac_toe(driver, wait):
             driver.find_element(By.CSS_SELECTOR, "#search-modal-close-btn").click()
         except:
             pass
-            
-    print("\n--- Jogada 3: Testando clique em célula preenchida (Stardew Valley) ---")
+        time.sleep(1)
+        
+    print("\n--- Jogada 3: 'Stardew Valley' na célula (1,0) (Abaixo da Jogada 1) ---")
     try:
-        cell_0_0_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='0'][data-col='0']")
-        cell_0_0 = wait.until(EC.presence_of_element_located(cell_0_0_locator))
+        cell_1_0_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='1'][data-col='0']")
+        cell_1_0 = wait.until(EC.element_to_be_clickable(cell_1_0_locator))
+        cell_1_0.click()
 
-        img_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='0'][data-col='0'] img")
-        wait.until(EC.visibility_of_element_located(img_locator))
-        print("Célula (0,0) já contém Stardew Valley. Clicando nela...")
-
-        cell_0_0.click()
-        print("Clicou na célula (0,0) preenchida.")
+        wait.until(EC.visibility_of_element_located((By.ID, "search-modal")))
+        genres_text = driver.find_element(By.ID, "modal-genres-text").text
+        print(f"Célula (1,0) requer: {genres_text}")
+        
+        input_field = driver.find_element(By.ID, "game-search-input")
+        input_field.clear() 
+        input_field.send_keys("Stardew Valley")
+        
+        search_result_li = (By.CSS_SELECTOR, "#search-results-list li.search-result-item")
+        first_result = wait.until(EC.element_to_be_clickable(search_result_li))
+        
+        result_text = first_result.text
+        print(f"Primeiro resultado encontrado: '{result_text}'. Clicando nele...")
+        first_result.click()
+        
+        wait.until(EC.invisibility_of_element_located((By.ID, "search-modal")))
+        print("Modal fechou. Verificando resultado...")
 
         try:
-            short_wait = WebDriverWait(driver, 2) 
-            short_wait.until(EC.visibility_of_element_located((By.ID, "search-modal")))
-            print("XXX RESULTADO JOGADA 3: FALHA (Modal abriu indevidamente)")
-            driver.find_element(By.CSS_SELECTOR, "#search-modal-close-btn").click()
+            short_wait = WebDriverWait(driver, 2)
+            img_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='1'][data-col='0'] img")
+            short_wait.until(EC.visibility_of_element_located(img_locator))
+            print("✅ RESULTADO JOGADA 3: ACERTO (Imagem apareceu na célula)")
         except Exception:
-            print("✅ RESULTADO JOGADA 3: SUCESSO (Modal não abriu, como esperado)")
+            status_box = driver.find_element(By.ID, "game-status-box")
+            assert "error-message" in status_box.get_attribute("class")
+            print(f"⚠️ RESULTADO JOGADA 3: ERRO (Gêneros não bateram. Msg: '{status_box.text}')")
             
     except Exception as e:
         print(f"XXX FALHA GRAVE NA [Jogada 3]: {e}")
+        try:
+            driver.find_element(By.CSS_SELECTOR, "#search-modal-close-btn").click()
+        except:
+            pass
+        time.sleep(1)
+
+    print("\n--- Jogada 4: 'Terraria' na célula (1,1) (À direita da Jogada 3) ---")
+    try:
+        cell_1_1_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='1'][data-col='1']")
+        cell_1_1 = wait.until(EC.element_to_be_clickable(cell_1_1_locator))
+        cell_1_1.click()
+
+        wait.until(EC.visibility_of_element_located((By.ID, "search-modal")))
+        genres_text = driver.find_element(By.ID, "modal-genres-text").text
+        print(f"Célula (1,1) requer: {genres_text}")
+        
+        input_field = driver.find_element(By.ID, "game-search-input")
+        input_field.clear() 
+        input_field.send_keys("Terraria") 
+        
+        search_result_li = (By.CSS_SELECTOR, "#search-results-list li.search-result-item")
+        first_result = wait.until(EC.element_to_be_clickable(search_result_li))
+        
+        result_text = first_result.text
+        print(f"Primeiro resultado encontrado: '{result_text}'. Clicando nele...")
+        first_result.click()
+        
+        wait.until(EC.invisibility_of_element_located((By.ID, "search-modal")))
+        print("Modal fechou. Verificando resultado...")
+
+        try:
+            short_wait = WebDriverWait(driver, 2)
+            img_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='1'][data-col='1'] img")
+            short_wait.until(EC.visibility_of_element_located(img_locator))
+            print("✅ RESULTADO JOGADA 4: ACERTO (Imagem apareceu na célula)")
+        except Exception:
+            status_box = driver.find_element(By.ID, "game-status-box")
+            assert "error-message" in status_box.get_attribute("class")
+            print(f"⚠️ RESULTADO JOGADA 4: ERRO (Gêneros não bateram. Msg: '{status_box.text}')")
+            
+    except Exception as e:
+        print(f"XXX FALHA GRAVE NA [Jogada 4]: {e}")
+        try:
+            driver.find_element(By.CSS_SELECTOR, "#search-modal-close-btn").click()
+        except:
+            pass
+        time.sleep(1)
 
 
+    if jogada_1_sucesso:
+        print("\n--- Jogada 5: Testando clique em célula preenchida (Stardew Valley @ 0,0) ---")
+        try:
+            cell_0_0_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='0'][data-col='0']")
+            cell_0_0 = wait.until(EC.presence_of_element_located(cell_0_0_locator))
+
+            img_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='0'][data-col='0'] img")
+            wait.until(EC.visibility_of_element_located(img_locator))
+            print("Célula (0,0) já contém Stardew Valley. Clicando nela...")
+
+            cell_0_0.click()
+            print("Clicou na célula (0,0) preenchida.")
+
+            try:
+                short_wait = WebDriverWait(driver, 2) 
+                short_wait.until(EC.visibility_of_element_located((By.ID, "search-modal")))
+                print("XXX RESULTADO JOGADA 5: FALHA (Modal abriu indevidamente)")
+                driver.find_element(By.CSS_SELECTOR, "#search-modal-close-btn").click()
+            except Exception:
+                print("✅ RESULTADO JOGADA 5: SUCESSO (Modal não abriu, como esperado)")
+                
+        except Exception as e:
+            print(f"XXX FALHA GRAVE NA [Jogada 5]: {e}")
+    else:
+        print("\n--- Jogada 5: PULADA (Jogada 1 falhou, célula (0,0) está vazia) ---")
+
+
+    print("\n--- Jogada 6: 'Stardew Valley' na célula (2,0) (Abaixo da Jogada 3) ---")
+    try:
+        cell_2_0_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='2'][data-col='0']")
+        cell_2_0 = wait.until(EC.element_to_be_clickable(cell_2_0_locator))
+        cell_2_0.click()
+
+        wait.until(EC.visibility_of_element_located((By.ID, "search-modal")))
+        genres_text = driver.find_element(By.ID, "modal-genres-text").text
+        print(f"Célula (2,0) requer: {genres_text}")
+        
+        input_field = driver.find_element(By.ID, "game-search-input")
+        input_field.clear() 
+        input_field.send_keys("Stardew Valley")
+        
+        search_result_li = (By.CSS_SELECTOR, "#search-results-list li.search-result-item")
+        first_result = wait.until(EC.element_to_be_clickable(search_result_li))
+        
+        result_text = first_result.text
+        print(f"Primeiro resultado encontrado: '{result_text}'. Clicando nele...")
+        first_result.click()
+        
+        wait.until(EC.invisibility_of_element_located((By.ID, "search-modal")))
+        print("Modal fechou. Verificando resultado...")
+
+        try:
+            short_wait = WebDriverWait(driver, 2)
+            img_locator = (By.CSS_SELECTOR, "div.game-slot[data-row='2'][data-col='0'] img")
+            short_wait.until(EC.visibility_of_element_located(img_locator))
+            print("✅ RESULTADO JOGADA 6: ACERTO (Imagem apareceu na célula)")
+        except Exception:
+            status_box = driver.find_element(By.ID, "game-status-box")
+            assert "error-message" in status_box.get_attribute("class")
+            print(f"⚠️ RESULTADO JOGADA 6: ERRO (Gêneros não bateram. Msg: '{status_box.text}')")
+            
+    except Exception as e:
+        print(f"XXX FALHA GRAVE NA [Jogada 6]: {e}")
+        try:
+            driver.find_element(By.CSS_SELECTOR, "#search-modal-close-btn").click()
+        except:
+            pass
+        time.sleep(1)
+        
     print("\n>>> Teste Completo da UI do Steam Tac Toe: SUCESSO")
     print("--- Finalizando Teste Completo da UI do Steam Tac Toe ---")
     time.sleep(DELAY_PARA_VER)
