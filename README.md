@@ -74,8 +74,9 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <li>Quadro da Sprint 03 atualizado refletindo a entrega.✅</li>
 <li><a href="https://lcsbayma.pythonanywhere.com/">Link do site JoyScore</a></li>
 <li><a href="https://docs.google.com/document/d/1cLlLR55E9F2QSTH3upHOF6-ahyTImWCMaRnRvmUL4mg/edit?tab=t.0">Relatório de programação em par </a></li>
-<li><a href="https://youtu.be/kTHmLCWRDTc">Vídeo de execução da Pipeline (JoyScore)</a></li>
 <li><a href="https://youtu.be/5hL2SDaS-tk">Vídeo da implementação de novas funcionalidades</a></li>
+<li><a href="https://youtu.be/kTHmLCWRDTc">Vídeo de execução da Pipeline (JoyScore)</a></li>
+<li><a href="https://youtu.be/nBxyN8onRkY">Vídeo dos testes E2E (JoyScore)</a></li>
 </ul>
 <p align="center">
 <img src="images/Sprint_3_backlog.jpeg" alt="Sprint 3 do JIRA" width="1500"/>
