@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameStatusBox = document.getElementById('game-status-box');
     const resortearBtn = document.getElementById('resortear-btn');
     const settingsBtn = document.getElementById('settings-btn');
-    const skipTurnBtn = document.getElementById('skip-turn-btn'); // NOVO
+    const skipTurnBtn = document.getElementById('skip-turn-btn');
     const nextRoundBtn = document.getElementById('next-round-btn');
 
     // --- Seletores do Modal de Busca ---
@@ -30,13 +30,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeSlot = null;
     let searchTimeout;
     let currentPlayer = 'team_red';
-    let p1Score = 0;
-    let p2Score = 0;
     let gameOver = false;
     let movesMade = 0;
     let boardState = [ [null, null, null], [null, null, null], [null, null, null] ];
 
-    // --- Lógica de Status (Erro, Turno, Vitória) ---
+    // --- Carregar pontuação salva (para não resetar ao resortear temas) ---
+    let p1Score = parseInt(localStorage.getItem('p1Score')) || 0;
+    let p2Score = parseInt(localStorage.getItem('p2Score')) || 0;
+    p1ScoreDisplay.textContent = p1Score;
+    p2ScoreDisplay.textContent = p2Score;
+
+    // --- Lógica de Status ---
     const showError = (message) => {
         gameStatusBox.textContent = message; 
         gameStatusBox.classList.add('error-message');
@@ -59,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- Lógica do Jogo (Vitória, Empate, Reinício) ---
+    // --- Lógica do Jogo ---
     const checkWinCondition = (player) => {
         for (let i = 0; i < 3; i++) {
             if (boardState[i][0] === player && boardState[i][1] === player && boardState[i][2] === player) return true;
@@ -76,11 +80,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (winner === 'team_red') {
             p1Score++;
             p1ScoreDisplay.textContent = p1Score;
-            gameStatusBox.textContent = "P1 VENCEU!";
-            gameStatusBox.classList.add('win-message', 'win-p1');
         } else {
             p2Score++;
             p2ScoreDisplay.textContent = p2Score;
+        }
+
+        // salvar no localStorage
+        localStorage.setItem('p1Score', p1Score);
+        localStorage.setItem('p2Score', p2Score);
+
+        if (winner === 'team_red') {
+            gameStatusBox.textContent = "P1 VENCEU!";
+            gameStatusBox.classList.add('win-message', 'win-p1');
+        } else {
             gameStatusBox.textContent = "P2 VENCEU!";
             gameStatusBox.classList.add('win-message', 'win-p2');
         }
@@ -112,11 +124,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleActionButtons = (isGameOver) => {
         resortearBtn.style.display = isGameOver ? 'none' : 'block';
         settingsBtn.style.display = isGameOver ? 'none' : 'block';
-        skipTurnBtn.style.display = isGameOver ? 'none' : 'block'; // ATUALIZADO
+        skipTurnBtn.style.display = isGameOver ? 'none' : 'block';
         nextRoundBtn.style.display = isGameOver ? 'block' : 'none';
     };
 
-    // --- Lógica do Modal de Busca ---
+    // --- Modal de Busca ---
     const openSearchModal = (slot) => {
         hideStatusMessages();
         activeSlot = slot;
@@ -136,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         searchResultsList.innerHTML = '';
     };
 
-    // --- Lógica do Modal de Configurações ---
+    // --- Modal de Configurações ---
     const openSettingsModal = () => {
         const allThemes = JSON.parse(document.getElementById('all-themes-data').textContent);
         const currentThemes = JSON.parse(document.getElementById('current-themes-data').textContent);
@@ -182,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = `${window.location.pathname}?temas=${themesParam}`;
     };
 
-    // --- Comunicação com a API e atualização do Tabuleiro ---
+    // --- API ---
     const fetchGames = async (query) => {
         if (query.length < 3) { searchResultsList.innerHTML = ''; return; }
         searchResultsList.innerHTML = '<li>Buscando...</li>';
@@ -266,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- Utilitários e Listeners ---
+    // --- Utilitários ---
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -282,19 +294,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return cookieValue;
     }
 
+    // --- Listeners ---
     gameSlots.forEach(slot => {
         slot.addEventListener('click', () => {
             if (!slot.classList.contains('played') && !gameOver) {
                 openSearchModal(slot);
-            }else if (slot.classList.contains('played') && !gameOver) {
-            showError('Essa casa já foi preenchida!');
-
-            setTimeout(() => {
-                if (!gameOver) {
-                    hideStatusMessages();
-                }
-            }, 3000);
-        }
+            } else if (slot.classList.contains('played') && !gameOver) {
+                showError('Essa casa já foi preenchida!');
+                setTimeout(() => {
+                    if (!gameOver) hideStatusMessages();
+                }, 3000);
+            }
         });
     });
 
@@ -304,14 +314,17 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => fetchGames(searchInput.value), 300);
     });
+
+    // --- CORRIGIDO: Resortear temas sem perder placar ---
     resortearBtn.addEventListener('click', () => {
         const urlParams = new URLSearchParams(window.location.search);
-        window.location.href = urlParams.has('temas') ? `${window.location.pathname}?${urlParams.toString()}` : window.location.pathname;
+        const newUrl = urlParams.has('temas') ? `${window.location.pathname}?${urlParams.toString()}` : window.location.pathname;
+        window.location.href = newUrl;
     });
-    
-    // NOVO LISTENER PARA PULAR A VEZ
+
+    // --- Botão de pular turno ---
     skipTurnBtn.addEventListener('click', () => {
-        if (gameOver) return; // Não faz nada se o jogo acabou
+        if (gameOver) return;
         currentPlayer = (currentPlayer === 'team_red') ? 'team_blue' : 'team_red';
         updateTurnIndicator();
     });
@@ -321,6 +334,15 @@ document.addEventListener('DOMContentLoaded', () => {
     settingsModal.addEventListener('click', (event) => { if (event.target === settingsModal) closeSettingsModal(); });
     saveSettingsBtn.addEventListener('click', saveSettings);
     nextRoundBtn.addEventListener('click', startNewRound);
+
+    // --- Resetar placar ao sair da página ---
+    window.addEventListener('beforeunload', (event) => {
+        const leavingGamePage = !window.location.pathname.includes('steam-tac-toe');
+        if (leavingGamePage) {
+            localStorage.removeItem('p1Score');
+            localStorage.removeItem('p2Score');
+        }
+    });
 
     // --- Inicialização ---
     updateTurnIndicator();

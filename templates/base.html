@@ -13,9 +13,7 @@
     
     <style>
         .header {
-            /* Garante que o cabeçalho possa ter uma camada de prioridade */
             position: relative; 
-            /* Define uma camada alta, colocando-o na frente de outros elementos */
             z-index: 1000; 
         }
     </style>
@@ -95,14 +93,11 @@
             if (theme === 'light') {
                 body.setAttribute('data-theme', 'light');
                 lightThemeStyle.disabled = false;
-                
                 if (themeIcon) themeIcon.className = 'fas fa-moon'; 
                 if (themeText) themeText.textContent = 'Modo Escuro'; 
-                
             } else {
                 body.setAttribute('data-theme', 'dark');
                 lightThemeStyle.disabled = true;
-                
                 if (themeIcon) themeIcon.className = 'fas fa-sun'; 
                 if (themeText) themeText.textContent = 'Modo Branco'; 
             }
@@ -112,6 +107,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'dark'; 
             applyTheme(savedTheme);
+        });
+    </script>
+
+   
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.location.pathname.includes('steam-tac-toe')) {
+                localStorage.removeItem('p1Score');
+                localStorage.removeItem('p2Score');
+            }
         });
     </script>
     
