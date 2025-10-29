@@ -100,6 +100,8 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 </ul>
 </details>
 
+---
+
 ## 👥 Equipe de Desenvolvimento 
 
 Agradecimentos especiais a todas as pessoas que contribuíram com este projeto 💜
@@ -110,4 +112,3 @@ Agradecimentos especiais a todas as pessoas que contribuíram com este projeto �
 * **Mateus Lins Farias** - [@mateuslinsf](https://github.com/mateuslinsf)
 * **Pedro David Oliveira Baia** - [@Pedrodavidob](https://github.com/Pedrodavidob)
 * **Pedro Moreira** - [@PedroMoreira18](https://github.com/PedroMoreira18)
-  
