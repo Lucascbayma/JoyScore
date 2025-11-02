@@ -72,12 +72,12 @@ main {
 
 .cover {
     width: 300px; 
-    height: 430px; 
+    flex-shrink: 0; 
 }
 
 .cover img {
   width: 100%;
-  height: 100%;
+  height: 430px; 
   object-fit: cover;
   background: var(--cor-fundo-bloco);
   border-radius: 12px;
@@ -335,10 +335,6 @@ main {
     height: auto;
   }
 
-  .cover img {
-      height: auto;
-  }
-
   .game-info {
     width: 100%;
     padding: 0 10px;
@@ -360,19 +356,209 @@ main {
 }
 
 .add-btn.added {
-
   background: #4CAF50; 
   transition: none; 
 }
 
 
 .add-btn.added:hover {
-
   background: #45a049; 
 }
 
 
 .add-btn i.fa-check {
-
   font-size: 1.5rem; 
+}
+
+
+.jornada-container {
+    background-color: var(--cor-fundo-bloco);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px; 
+    width: 100%;
+    position: relative; 
+}
+
+/* --- Estado de Exibição --- */
+.jornada-display h3 {
+    color: var(--cor-texto-forte);
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.jornada-stat {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.jornada-stat strong {
+    color: var(--cor-texto-principal);
+}
+
+.jornada-stat span {
+    color: var(--cor-destaque-roxo);
+    font-weight: bold;
+}
+
+.jornada-progresso {
+    margin-top: 15px;
+}
+
+.progresso-label {
+    font-size: 0.9rem;
+    color: var(--cor-texto-principal);
+    margin-bottom: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.progresso-barra-fundo {
+    width: 100%;
+    height: 12px;
+    background-color: #1a1a1a;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progresso-barra-preenchimento {
+    height: 100%;
+    background-color: var(--cor-destaque-dourado);
+    border-radius: 6px;
+    transition: width 0.4s ease;
+}
+
+.jornada-edit-btn {
+    background: none;
+    border: 1px solid var(--cor-destaque-roxo-hover);
+    color: var(--cor-destaque-roxo-hover);
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: block;
+    margin: 20px auto 0;
+    transition: background 0.3s, color 0.3s;
+}
+
+.jornada-edit-btn:hover {
+    background: var(--cor-destaque-roxo-hover);
+    color: var(--cor-texto-forte);
+}
+
+
+/* --- Estado de Formulário --- */
+.jornada-form-wrapper {
+    position: relative;
+}
+
+.jornada-form-wrapper h3 {
+    color: var(--cor-texto-forte);
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.jornada-form-campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.jornada-form-campo label {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--cor-texto-principal);
+    margin-bottom: 5px;
+}
+
+.jornada-form-campo input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    
+    background-color: #222; 
+    color: var(--cor-texto-principal); 
+    border: 1px solid #555; 
+    
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.jornada-form-campo input[type="number"]::-webkit-outer-spin-button,
+.jornada-form-campo input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+
+.submit-jornada {
+    background: var(--cor-destaque-roxo);
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background 0.3s;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.submit-jornada:hover {
+    background: var(--cor-destaque-roxo-hover);
+}
+
+.jornada-close-btn {
+    position: absolute;
+    top: -10px;
+    right: -5px;
+    background: none;
+    border: none;
+    color: var(--cor-texto-principal);
+    font-size: 1.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.jornada-close-btn:hover {
+    color: var(--cor-destaque-dourado);
+}
+
+/* ========================================= */
+/* === ESTILOS MENSAGENS (Django Messages) === */
+/* ========================================= */
+.messages {
+    width: 100%;
+    margin-bottom: 20px; 
+}
+
+.messages p {
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 0; 
+    border-radius: 5px;
+    font-weight: bold;
+}
+.messages .message-success {
+    background-color: #dff0d8;
+    color: #3c763d;
+}
+.messages .message-error {
+    background-color: #f2dede;
+    color: #a94442;
+}
+.messages .message-warning {
+    background-color: #fcf8e3;
+    color: #8a6d3b;
+}
+.messages .message-info {
+    background-color: #d9edf7;
+    color: #31708f;
 }

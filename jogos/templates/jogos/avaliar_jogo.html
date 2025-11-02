@@ -13,7 +13,76 @@
     
     <div class="cover">
         <img src="{{jogo.background_image}}" alt="Capa do Jogo" id="game-cover">
-    </div>
+
+        <div class="jornada-container">
+            
+            <div class="jornada-display" {% if not jornada_existente %}style="display: none;"{% endif %}>
+                <h3>Minha Jornada Gamer</h3>
+                {% if jornada_existente %}
+                    <div class="jornada-stat">
+                        <strong>Horas Jogadas:</strong>
+                        <span>{{ jornada_existente.horas_jogadas }}h</span>
+                    </div>
+                    <div class="jornada-stat">
+                        <strong>Progresso de Troféus:</strong>
+                        <span>{{ jornada_existente.trofeus_conquistados }} / {{ jornada_existente.trofeus_totais }}</span>
+                    </div>
+                    
+                    <div class="jornada-progresso">
+                        <div class="progresso-label">
+                            Platina: {{ jornada_existente.porcentagem_conclusao }}%
+                        </div>
+                        <div class="progresso-barra-fundo">
+                            <div class="progresso-barra-preenchimento" style="width: {{ jornada_existente.porcentagem_conclusao }}%;"></div>
+                        </div>
+                    </div>
+                    <button type="button" class="jornada-edit-btn" id="jornada-edit-btn">Editar</button>
+                
+                {% endif %}
+            </div>
+
+            <div class="jornada-form-wrapper" {% if jornada_existente %}style="display: none;"{% endif %}>
+                
+                {% if not jornada_existente %}
+                    <h3>Minha Jornada Gamer</h3>
+                {% endif %}
+
+                {% if jornada_existente %}
+                    <button type="button" class="jornada-close-btn" id="jornada-close-btn">×</button>
+                {% endif %}
+                
+                <form class="jornada-form" method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="jornada-form-campo">
+                        <label for="horas_jogadas">Quantas horas você jogou?</label>
+                        <input type="number" name="horas_jogadas" id="horas_jogadas" 
+                               value="{{ jornada_existente.horas_jogadas|default:0 }}" 
+                               placeholder="Ex: 120" min="0">
+                    </div>
+                    
+                    <div class="jornada-form-campo">
+                        <label for="trofeus_totais">Quantos troféus o jogo tem no total?</label>
+                        <input type="number" name="trofeus_totais" id="trofeus_totais" 
+                               value="{{ jornada_existente.trofeus_totais|default:0 }}" 
+                               placeholder="Ex: 50" min="0">
+                    </div>
+
+                    <div class="jornada-form-campo">
+                        <label for="trofeus_conquistados">Quantos troféus você conquistou?</label>
+                        <input type="number" name="trofeus_conquistados" id="trofeus_conquistados" 
+                               value="{{ jornada_existente.trofeus_conquistados|default:0 }}" 
+                               placeholder="Ex: 35" min="0">
+                    </div>
+                    
+                    <button type="submit" name="acao" value="salvar_jornada" class="submit-jornada">
+                        Salvar Jornada
+                    </button>
+                </form>
+            </div>
+
+        </div>
+        </div>
 
     <div class="game-info">
         
@@ -49,11 +118,7 @@
             {% if messages %}
             <div class="messages">
                 {% for message in messages %}
-                    {% if 'removido' in message|lower or 'adicionado' in message|lower or 'sucesso' in message|lower %}
-                        <p style="color: green; text-align: center;">{{ message }}</p>
-                    {% else %}
-                        <p style="color: red; text-align: center;">{{ message }}</p>
-                    {% endif %}
+                    <p class="message-{{ message.tags }}">{{ message }}</p>
                 {% endfor %}
             </div>
             {% endif %}
@@ -93,7 +158,7 @@
                     >{{avaliacao_existente.comentario|default:''}}</textarea>
                 </div>
                 
-                <button type="submit" name="acao" value="salvar" class="submit-rating">Salvar Avaliação</button>
+                <button type="submit" name="acao" value="salvar_avaliacao" class="submit-rating">Salvar Avaliação</button>
 
             </form>
         </section>
@@ -104,4 +169,26 @@
 {% endblock content %}
 
 {% block extra_scripts %}
-    {% endblock %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const displayBlock = document.querySelector('.jornada-display');
+            const formWrapper = document.querySelector('.jornada-form-wrapper');
+            const editBtn = document.getElementById('jornada-edit-btn');
+            const closeBtn = document.getElementById('jornada-close-btn');
+
+            if (editBtn) {
+                editBtn.addEventListener('click', function() {
+                    displayBlock.style.display = 'none';
+                    formWrapper.style.display = 'block';
+                });
+            }
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    displayBlock.style.display = 'block';
+                    formWrapper.style.display = 'none';
+                });
+            }
+        });
+    </script>
+{% endblock %}
