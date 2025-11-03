@@ -17,7 +17,8 @@ import os
 import subprocess
 import logging
 import dateutil.parser 
-from django.core.exceptions import ValidationError # Importado para validação
+from django.core.exceptions import ValidationError 
+from django.urls import reverse # Importamos o reverse para montar a URL
 
 RAWG_API_KEY = settings.API_KEY
 RAWG_BASE_URL = "https://api.rawg.io/api"
@@ -74,7 +75,6 @@ def logout_view(request):
     auth_logout(request)
     return redirect('jogos:login')
 
-# --- VIEW 'AVALIAR' ATUALIZADA ---
 @login_required
 def avaliar(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
@@ -85,6 +85,9 @@ def avaliar(request, jogo_id):
     jornada_existente = None
     if esta_na_biblioteca:
         jornada_existente = JornadaGamer.objects.filter(usuario=request.user, jogo=jogo).first()
+
+    # [MUDANÇA AQUI] Criamos a URL base com a âncora
+    url_com_ancora = reverse('jogos:avaliar', args=[jogo.id]) + '#jornada-container'
 
     if request.method == 'POST':
         acao = request.POST.get('acao') 
@@ -103,6 +106,7 @@ def avaliar(request, jogo_id):
                 defaults={'nota': nota, 'comentario': comentario}
             )
             messages.success(request, 'Sua avaliação foi salva com sucesso!')
+            # Redirecionamento da avaliação (pode manter normal ou adicionar #rating-section)
             return redirect('jogos:avaliar', jogo_id=jogo.id)
         
         elif acao == 'salvar_jornada':
@@ -117,7 +121,7 @@ def avaliar(request, jogo_id):
                 
                 if horas_int < 0 or totais_int < 0 or conquistados_int < 0:
                    messages.error(request, 'Os valores não podem ser negativos.')
-                   return redirect('jogos:avaliar', jogo_id=jogo.id)
+                   return redirect(url_com_ancora) # [MUDANÇA AQUI]
 
                 JornadaGamer.objects.update_or_create(
                     usuario=request.user,
@@ -132,11 +136,14 @@ def avaliar(request, jogo_id):
 
             except ValidationError as e:
                 messages.error(request, e.message)
+                return redirect(url_com_ancora) # [MUDANÇA AQUI]
             
             except (ValueError, TypeError):
                 messages.error(request, 'Por favor, preencha todos os campos da jornada com números válidos.')
+                return redirect(url_com_ancora) # [MUDANÇA AQUI]
             
-            return redirect('jogos:avaliar', jogo_id=jogo.id)
+            # Redireciona para a URL com a âncora após o sucesso
+            return redirect(url_com_ancora) # [MUDANÇA AQUI]
 
     context = {
         'jogo': jogo, 
@@ -209,7 +216,6 @@ def buscar_jogos(request):
     context = {'jogos': jogos, 'pesquisa': pesquisa}
     return render(request, 'jogos/buscar_jogos.html', context)
 
-# --- VIEW 'ADICIONAR_BIBLIOTECA' ATUALIZADA ---
 @login_required
 def adicionar_biblioteca(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
@@ -218,7 +224,6 @@ def adicionar_biblioteca(request, jogo_id):
     if registro_biblioteca:
         registro_biblioteca.delete()
         
-        # Apaga a jornada quando o jogo é removido
         jornada = JornadaGamer.objects.filter(usuario=request.user, jogo=jogo).first()
         if jornada:
             jornada.delete()
@@ -320,7 +325,7 @@ def autocomplete_search(request):
     jogos_encontrados = Jogo.objects.filter(titulo__icontains=query).order_by('titulo')[:4]
     results_list = []
     for jogo in jogos_encontrados:
-        results_list.append({ "id": jogo.id, "name": jogo.titulo, "released": jogo.ano_lancamento.isoformat() if jogo.ano_lancamento else None, "background_image": jogo.background_image, })
+        results_list.append({ "id": jogo.id, "name": jogo.titulo, "released": jogo.ano_lancamento.isoformat() if jogo.ano_ancamento else None, "background_image": jogo.background_image, })
     return JsonResponse({'results': results_list})
 
 @login_required
