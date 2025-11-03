@@ -14,6 +14,7 @@
     <div class="cover">
         <img src="{{jogo.background_image}}" alt="Capa do Jogo" id="game-cover">
 
+        {% if esta_na_biblioteca %}
         <div class="jornada-container">
             
             <div class="jornada-display" {% if not jornada_existente %}style="display: none;"{% endif %}>
@@ -33,7 +34,18 @@
                             Platina: {{ jornada_existente.porcentagem_conclusao }}%
                         </div>
                         <div class="progresso-barra-fundo">
-                            <div class="progresso-barra-preenchimento" style="width: {{ jornada_existente.porcentagem_conclusao }}%;"></div>
+                            {% with perc=jornada_existente.porcentagem_conclusao %}
+                            <div 
+                                class="progresso-barra-preenchimento 
+                                {% if perc <= 25 %}
+                                    cor-vermelha
+                                {% elif perc == 100 %}
+                                    cor-verde
+                                {% endif %}
+                                " 
+                                style="width: {{ perc }}%;">
+                            </div>
+                            {% endwith %}
                         </div>
                     </div>
                     <button type="button" class="jornada-edit-btn" id="jornada-edit-btn">Editar</button>
@@ -82,7 +94,7 @@
             </div>
 
         </div>
-        </div>
+        {% endif %} </div>
 
     <div class="game-info">
         
@@ -163,7 +175,7 @@
             </form>
         </section>
         
-      </div>
+    </div>
     </section>
 
 {% endblock content %}

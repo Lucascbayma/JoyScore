@@ -1,23 +1,17 @@
-# jogos/models.py
-
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
-# Imports para criar o Profile automaticamente
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.core.exceptions import ValidationError # Importado para validação
 
 class Jogo(models.Model):
-    # --- INÍCIO DA ALTERAÇÃO ---
-    # Adicionamos este campo para ser a "ponte" com a API
     rawg_id = models.IntegerField(
         unique=True, 
         null=True, 
         blank=True, 
         help_text="ID do jogo na API RAWG"
     )
-    # --- FIM DA ALTERAÇÃO ---
-    
     titulo = models.CharField(max_length=200, unique=True)
     desenvolvedor = models.CharField(max_length=200, blank=True)
     ano_lancamento = models.DateField(blank=True,null=True)
@@ -35,7 +29,6 @@ class Avaliar(models.Model):
     comentario = models.CharField(max_length=1000, blank=True)
 
     def __str__(self):
-        # Correção de um pequeno erro no f-string (era self.Buscar.titulo)
         return f"Avaliação do jogo {self.Jogo.titulo} por {self.usuario.username} - {self.nota} estrelas"
     
 
@@ -44,36 +37,63 @@ class Add_Biblioteca(models.Model):
     jogo = models.ForeignKey(Jogo, on_delete=models.CASCADE)
     data_adicionado = models.DateTimeField(auto_now_add=True)
 
-    class Meta: # Correção: 'class verificar' deve ser 'class Meta'
+    class Meta:
         unique_together = ('usuario', 'jogo')
 
     def __str__(self):
         return f"{self.jogo.titulo} foi adicionado na sua biblioteca!"
 
-class Profile(models.Model):
-    # Cria uma ligação um-para-um com o modelo de usuário padrão do Django.
-    # Se um usuário for deletado, seu perfil também será.
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+# --- NOVO MODELO: JORNADA GAMER ---
+class JornadaGamer(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name="jornadas")
+    jogo = models.ForeignKey(Jogo, on_delete=models.CASCADE, related_name="jornadas")
     
-    # Usamos um JSONField para guardar uma lista de nomes de gêneros. É flexível e perfeito para isso.
-    # Exemplo de como os dados serão salvos: ['Action', 'RPG', 'Indie']
+    horas_jogadas = models.PositiveIntegerField(default=0, verbose_name="Horas Jogadas")
+    trofeus_totais = models.PositiveIntegerField(default=0, verbose_name="Total de Troféus")
+    trofeus_conquistados = models.PositiveIntegerField(default=0, verbose_name="Troféus Conquistados")
+
+    class Meta:
+        # Garante que um usuário só pode ter UMA jornada por jogo
+        unique_together = ('usuario', 'jogo')
+
+    def __str__(self):
+        return f"Jornada de {self.usuario.username} em {self.jogo.titulo}"
+
+    @property
+    def porcentagem_conclusao(self):
+        # Calcula a porcentagem para o template
+        if self.trofeus_totais == 0:
+            return 0
+        
+        porcentagem = (self.trofeus_conquistados / self.trofeus_totais) * 100
+        return round(porcentagem)
+    
+    def clean(self):
+        # Validação de regras
+        if self.trofeus_conquistados > self.trofeus_totais:
+            raise ValidationError('O número de troféus conquistados não pode ser maior que o total.')
+
+    def save(self, *args, **kwargs):
+        self.clean() # Roda a validação antes de salvar
+        super().save(*args, **kwargs)
+
+# --- FIM DO NOVO MODELO ---
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     generos_favoritos = models.JSONField(default=list, blank=True)
 
     def __str__(self):
         return f'Perfil de {self.user.username}'
 
-# Esta função mágica (signal) cria um Profile automaticamente
-# toda vez que um novo Usuário é criado no seu sistema.
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
 
-# Esta função salva o Profile toda vez que o User é salvo.
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     try:
         instance.profile.save()
     except Profile.DoesNotExist:
-        # Lida com o caso de usuários existentes antes da criação do Profile
         Profile.objects.create(user=instance)

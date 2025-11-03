@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-
 :root {
   --cor-fundo-principal: #1a1a1a;
   --cor-fundo-header: #212121;
@@ -24,7 +23,6 @@ body {
   color: var(--cor-texto-principal);
   font-family: 'Roboto', sans-serif;
 }
-
 
 header {
   width: 100%;
@@ -56,7 +54,6 @@ header {
   color: var(--cor-destaque-dourado);
   margin-left: 15px; 
 }
-
 
 main {
   width: 90%; 
@@ -103,7 +100,6 @@ main {
     margin-bottom: 5px;
 }
 
-
 .game-info {
   flex: 1; 
   display: flex;
@@ -122,12 +118,9 @@ main {
   color: var(--cor-texto-forte);
 }
 
-
 .add-btn {
-
   display: block; 
   position: relative;
-  
   background: var(--cor-destaque-roxo);
   color: #fff;
   font-size: 1.5rem; 
@@ -144,7 +137,6 @@ main {
   background: var(--cor-destaque-roxo-hover);
 }
 
-
 .add-btn i {
     position: absolute;
     top: 50%;
@@ -153,7 +145,6 @@ main {
     line-height: 1; 
     display: block; 
 }
-
 
 .details {
   margin: 20px 0;
@@ -167,7 +158,6 @@ main {
   display: inline;
   margin-right: 5px;
 }
-
 
 .details dd { 
   color: var(--cor-destaque-roxo); 
@@ -184,8 +174,6 @@ main {
     margin: 0;
 }
 
-
-
 .description h2 {
     font-size: 1.5rem;
     margin-bottom: 10px;
@@ -201,7 +189,6 @@ main {
   min-height: 120px;
   border: 1px solid #2c2c3e;
 }
-
 
 .rating-section {
   text-align: center;
@@ -226,7 +213,6 @@ main {
 }
 
 .rating {
-
   display: flex;
   justify-content: center;
   flex-direction: row-reverse; 
@@ -249,12 +235,10 @@ main {
 }
 
 .rating input[type="radio"] {
-
   display: none;
 }
 
 .rating .star {
-
   font-size: 2.5rem; 
   color: #777;
   cursor: pointer;
@@ -262,15 +246,12 @@ main {
   line-height: 1; 
 }
 
-
 .rating .star:hover,
 .rating input[type="radio"]:hover ~ .star,
 .rating input[type="radio"]:checked ~ .star {
   color: var(--cor-destaque-dourado); 
   transform: scale(1.1);
 }
-
-
 
 .submit-rating {
   background: var(--cor-destaque-roxo);
@@ -322,7 +303,6 @@ main {
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-
 @media (max-width: 850px) {
   .game-container {
     flex-direction: column; 
@@ -360,16 +340,13 @@ main {
   transition: none; 
 }
 
-
 .add-btn.added:hover {
   background: #45a049; 
 }
 
-
 .add-btn i.fa-check {
   font-size: 1.5rem; 
 }
-
 
 .jornada-container {
     background-color: var(--cor-fundo-bloco);
@@ -424,31 +401,46 @@ main {
     overflow: hidden;
 }
 
+/* --- [MUDANÇA AQUI] Estilo base da barra de progresso --- */
 .progresso-barra-preenchimento {
     height: 100%;
-    background-color: var(--cor-destaque-dourado);
+    background-color: var(--cor-destaque-dourado); /* Laranja/Dourado (Padrão 26-99%) */
     border-radius: 6px;
-    transition: width 0.4s ease;
+    transition: width 0.4s ease, background-color 0.4s ease; /* Transição suave de cor */
 }
 
+/* --- [NOVO] Classe para cor vermelha (<= 25%) --- */
+.progresso-barra-preenchimento.cor-vermelha {
+    background-color: #d9534f;
+}
+
+/* --- [NOVO] Classe para cor verde (100%) --- */
+.progresso-barra-preenchimento.cor-verde {
+    background-color: #5cb85c; 
+}
+
+/* --- [MUDANÇA AQUI] Botão "Editar" agora tem o mesmo estilo do "Salvar" --- */
 .jornada-edit-btn {
-    background: none;
-    border: 1px solid var(--cor-destaque-roxo-hover);
-    color: var(--cor-destaque-roxo-hover);
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    border-radius: 6px;
+    background: var(--cor-destaque-roxo);
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    font-size: 1rem;
+    border-radius: 8px;
     cursor: pointer;
-    display: block;
+    font-weight: 700;
+    transition: background 0.3s;
+    width: 100%;
     margin: 20px auto 0;
-    transition: background 0.3s, color 0.3s;
+    display: block;
+    box-sizing: border-box;
+    text-align: center;
 }
 
 .jornada-edit-btn:hover {
     background: var(--cor-destaque-roxo-hover);
-    color: var(--cor-texto-forte);
+    color: white; /* Garante que o texto fique branco no hover */
 }
-
 
 /* --- Estado de Formulário --- */
 .jornada-form-wrapper {
@@ -478,11 +470,9 @@ main {
 .jornada-form-campo input[type="number"] {
     width: 100%;
     padding: 10px;
-    
     background-color: #222; 
     color: var(--cor-texto-principal); 
     border: 1px solid #555; 
-    
     border-radius: 6px;
     font-family: inherit;
     font-size: 1rem;
@@ -493,8 +483,6 @@ main {
     -webkit-appearance: none;
     margin: 0;
 }
-
-
 
 .submit-jornada {
     background: var(--cor-destaque-roxo);

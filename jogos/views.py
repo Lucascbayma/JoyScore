@@ -1,15 +1,14 @@
-# jogos/views.py
-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from .models import Jogo, Add_Biblioteca, Avaliar, Profile
+# Modelos importados, incluindo o novo JornadaGamer
+from .models import Jogo, Add_Biblioteca, Avaliar, Profile, JornadaGamer
 from django.http import HttpResponse, JsonResponse
 import requests
 from django.conf import settings
 from django.views.decorators.http import require_GET
 import math 
-import random # Mantemos o import do random
+import random 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
@@ -17,7 +16,8 @@ from django.views.decorators.csrf import csrf_exempt
 import os
 import subprocess
 import logging
-import dateutil.parser # <-- IMPORT NECESSÁRIO PARA CONVERTER DATA DA API
+import dateutil.parser 
+from django.core.exceptions import ValidationError # Importado para validação
 
 RAWG_API_KEY = settings.API_KEY
 RAWG_BASE_URL = "https://api.rawg.io/api"
@@ -74,47 +74,92 @@ def logout_view(request):
     auth_logout(request)
     return redirect('jogos:login')
 
+# --- VIEW 'AVALIAR' ATUALIZADA ---
 @login_required
 def avaliar(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
+    
     esta_na_biblioteca = Add_Biblioteca.objects.filter(usuario=request.user, jogo=jogo).exists()
     avaliacao_existente = Avaliar.objects.filter(usuario=request.user, Jogo=jogo).first()
+    
+    jornada_existente = None
+    if esta_na_biblioteca:
+        jornada_existente = JornadaGamer.objects.filter(usuario=request.user, jogo=jogo).first()
+
     if request.method == 'POST':
-        nota = request.POST.get('nota')
-        comentario = request.POST.get('comentario')
-        if not nota:
-            messages.error(request, 'Você precisa selecionar pelo menos uma estrela para avaliar.')
+        acao = request.POST.get('acao') 
+
+        if acao == 'salvar_avaliacao':
+            nota = request.POST.get('nota')
+            comentario = request.POST.get('comentario')
+            
+            if not nota:
+                messages.error(request, 'Você precisa selecionar pelo menos uma estrela para avaliar.')
+                return redirect('jogos:avaliar', jogo_id=jogo.id)
+            
+            Avaliar.objects.update_or_create(
+                usuario=request.user, 
+                Jogo=jogo, 
+                defaults={'nota': nota, 'comentario': comentario}
+            )
+            messages.success(request, 'Sua avaliação foi salva com sucesso!')
             return redirect('jogos:avaliar', jogo_id=jogo.id)
-        Avaliar.objects.update_or_create(usuario=request.user, Jogo=jogo, defaults={'nota': nota, 'comentario': comentario})
-        messages.success(request, 'Sua avaliação foi salva com sucesso!')
-        return redirect('jogos:avaliar', jogo_id=jogo.id)
-    context = {'jogo': jogo, 'avaliacao_existente': avaliacao_existente, 'esta_na_biblioteca': esta_na_biblioteca }
+        
+        elif acao == 'salvar_jornada':
+            try:
+                horas = request.POST.get('horas_jogadas')
+                totais = request.POST.get('trofeus_totais')
+                conquistados = request.POST.get('trofeus_conquistados')
+
+                horas_int = int(horas)
+                totais_int = int(totais)
+                conquistados_int = int(conquistados)
+                
+                if horas_int < 0 or totais_int < 0 or conquistados_int < 0:
+                   messages.error(request, 'Os valores não podem ser negativos.')
+                   return redirect('jogos:avaliar', jogo_id=jogo.id)
+
+                JornadaGamer.objects.update_or_create(
+                    usuario=request.user,
+                    jogo=jogo,
+                    defaults={
+                        'horas_jogadas': horas_int,
+                        'trofeus_totais': totais_int,
+                        'trofeus_conquistados': conquistados_int
+                    }
+                )
+                messages.success(request, 'Sua Jornada Gamer foi salva!')
+
+            except ValidationError as e:
+                messages.error(request, e.message)
+            
+            except (ValueError, TypeError):
+                messages.error(request, 'Por favor, preencha todos os campos da jornada com números válidos.')
+            
+            return redirect('jogos:avaliar', jogo_id=jogo.id)
+
+    context = {
+        'jogo': jogo, 
+        'avaliacao_existente': avaliacao_existente, 
+        'esta_na_biblioteca': esta_na_biblioteca,
+        'jornada_existente': jornada_existente
+    }
+    
     return render(request, 'jogos/avaliar_jogo.html', context)
 
-# --- INÍCIO DA ALTERAÇÃO (NOVA VIEW "PONTE") ---
 
 @login_required
 def redirecionar_para_avaliacao(request, rawg_id):
-    """
-    Esta view age como uma "ponte". 
-    1. Recebe um ID da API RAWG.
-    2. Verifica se o jogo já existe no banco de dados local (usando 'rawg_id').
-    3. Se não existe, busca na API RAWG e cria o jogo localmente.
-    4. Redireciona o usuário para a página 'avaliar' padrão com o ID local do jogo.
-    """
     try:
-        # 1. Tenta encontrar o jogo no banco local pelo rawg_id
         jogo = Jogo.objects.get(rawg_id=rawg_id)
     
     except Jogo.DoesNotExist:
-        # 2. Se não encontrar, busca na API RAWG para criar
         game_details_url = f"{RAWG_BASE_URL}/games/{rawg_id}?key={RAWG_API_KEY}"
         try:
             response = requests.get(game_details_url)
             response.raise_for_status()
             data = response.json()
 
-            # Pega os dados da API
             titulo = data.get('name')
             devs = data.get('developers', [])
             desenvolvedor = ", ".join([d.get('name') for d in devs]) if devs else ""
@@ -123,16 +168,13 @@ def redirecionar_para_avaliacao(request, rawg_id):
             release_date_obj = None
             if release_date_str:
                 try:
-                    # Converte a string 'YYYY-MM-DD' para um objeto date
                     release_date_obj = dateutil.parser.parse(release_date_str).date()
                 except ValueError:
-                    release_date_obj = None # Ignora se a data for inválida
+                    release_date_obj = None
 
             genres = data.get('genres', [])
             genero = genres[0].get('name', "") if genres else ""
             
-            # 3. Cria o jogo no banco local
-            # Usamos get_or_create pelo título para evitar duplicatas
             jogo, created = Jogo.objects.get_or_create(
                 titulo=titulo,
                 defaults={
@@ -145,7 +187,6 @@ def redirecionar_para_avaliacao(request, rawg_id):
                 }
             )
             
-            # Se o jogo foi 'pego' (created=False) mas não tinha o rawg_id, atualiza.
             if not created and not jogo.rawg_id:
                 jogo.rawg_id = rawg_id
                 jogo.save()
@@ -154,15 +195,10 @@ def redirecionar_para_avaliacao(request, rawg_id):
             messages.error(request, "Não foi possível buscar os detalhes do jogo na API. Tente novamente.")
             return redirect('jogos:filtrar_por_genero')
         except Exception as e:
-            # Captura erro se o título já existir (unique=True)
             messages.error(request, f"Ocorreu um erro ao salvar o jogo: {e}.")
             return redirect('jogos:filtrar_por_genero')
 
-    # 4. Redireciona para a página de avaliação normal com o ID LOCAL
     return redirect('jogos:avaliar', jogo_id=jogo.id)
-
-# --- FIM DA ALTERAÇÃO ---
-
 
 @login_required
 def buscar_jogos(request):
@@ -173,16 +209,25 @@ def buscar_jogos(request):
     context = {'jogos': jogos, 'pesquisa': pesquisa}
     return render(request, 'jogos/buscar_jogos.html', context)
 
+# --- VIEW 'ADICIONAR_BIBLIOTECA' ATUALIZADA ---
 @login_required
 def adicionar_biblioteca(request, jogo_id):
     jogo = get_object_or_404(Jogo, pk=jogo_id)
     registro_biblioteca = Add_Biblioteca.objects.filter(usuario=request.user, jogo=jogo).first()
+    
     if registro_biblioteca:
         registro_biblioteca.delete()
+        
+        # Apaga a jornada quando o jogo é removido
+        jornada = JornadaGamer.objects.filter(usuario=request.user, jogo=jogo).first()
+        if jornada:
+            jornada.delete()
+            
         messages.success(request, f'O jogo "{jogo.titulo}" foi removido da sua biblioteca.')
     else:
         Add_Biblioteca.objects.create(usuario=request.user, jogo=jogo)
         messages.success(request, f'O jogo "{jogo.titulo}" foi adicionado à sua biblioteca.')
+        
     return redirect('jogos:avaliar', jogo_id=jogo.id)
 
 @login_required
