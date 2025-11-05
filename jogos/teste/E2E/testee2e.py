@@ -316,46 +316,124 @@ def rodar_teste_clicar_jogo(driver, wait):
         print("--- Finalizando Teste de Clicar no Jogo (Elden Ring) ---")
 
 
-def rodar_teste_clicar_botao_mais(driver, wait):
-    print("\n--- Iniciando Teste de Clique no Botão '+' (Elden Ring) ---")
+import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
+
+DELAY_PARA_VER = 1.5 
+
+def rodar_teste_adicionar_e_gerenciar_jornada(driver, wait):
+    print("\n--- Iniciando Teste E2E de Adicionar Jogo e Gerenciar Jornada ---")
+    
+    form_wrapper = (By.CLASS_NAME, "jornada-form-wrapper")
+    display_view = (By.CLASS_NAME, "jornada-display") 
+    
+    input_horas = (By.ID, "horas_jogadas")
+    input_trofeus_conquistados = (By.ID, "trofeus_conquistados")
+    input_trofeus_totais = (By.ID, "trofeus_totais")
+    
+    btn_salvar_jornada = (By.CSS_SELECTOR, "button.submit-jornada")
+    btn_editar_jornada = (By.ID, "jornada-edit-btn") 
+    
+    botao_mais_locator = (By.CSS_SELECTOR, "a.add-btn[aria-label*='Elden Ring']")
+    
+    display_horas = (By.XPATH, "//div[contains(@class, 'jornada-stat')][contains(., 'Horas Jogadas')]")
+    display_trofeus = (By.XPATH, "//div[contains(@class, 'jornada-stat')][contains(., 'Progresso de Troféus')]")
+    display_platina = (By.XPATH, "//div[contains(@class, 'jornada-stat')][contains(., 'Platina')]")
+    
+    msg_erro_jornada = (By.ID, "erro-jornada") 
+
     try:
-        print("Verificando se estamos na página do Elden Ring...")
-        assert "Elden Ring" in driver.page_source
+        print("\n--- Cenário 0: Verificando se o jogo NÃO está na biblioteca...")
+        short_wait = WebDriverWait(driver, 3) 
+        try:
+            short_wait.until(EC.invisibility_of_element_located(form_wrapper))
+            print("✅ Verificado: Formulário da jornada não está visível.")
+        except TimeoutException:
+            print("XXX FALHA: O formulário da jornada já está visível.")
+            raise Exception("Estado inicial inválido: jogo já está na biblioteca.")
+        
+        botao_mais = wait.until(EC.visibility_of_element_located(botao_mais_locator))
+        print("✅ Verificado: Botão '+' está visível.")
 
-        print("Localizando o botão '+' no DOM...")
-        botao_mais_locator = (By.CSS_SELECTOR, "a.add-btn[aria-label*='Elden Ring']")
-        botao_mais = wait.until(
-            EC.presence_of_element_located(botao_mais_locator)
-        )
-        print("Elemento localizado.")
 
+        print("\n--- Ação: Adicionando jogo à biblioteca...")
         driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", botao_mais)
-        print("Rolando a tela para o botão...")
-
         time.sleep(1.5) 
-
-        print("Clicando no botão...")
         driver.execute_script("arguments[0].click();", botao_mais)
         print("🟣 Botão '+' clicado com sucesso!")
 
-        try:
-            short_wait = WebDriverWait(driver, 5) 
-            short_wait.until(
-                EC.visibility_of_element_located(
-                    (By.XPATH, "//*[contains(text(), 'adicionado à sua biblioteca') or contains(text(), 'Remover da biblioteca')]")
-                )
-            )
-            print("✅ Mensagem de confirmação detectada!")
-        except Exception:
-            print("⚠️ Nenhuma mensagem de confirmação visível, mas o clique foi executado.")
 
-        print(">>> Teste do Botão '+': SUCESSO")
+        print("Verificando se o formulário da jornada apareceu...")
+        wait.until(EC.visibility_of_element_located(form_wrapper))
+        print("✅ Verificado: Formulário da jornada agora está visível.")
+        time.sleep(1.0)
+
+
+        print("\n--- Cenário 1: Registrando nova jornada (25h, 10/50)...")
+        
+        wait.until(EC.visibility_of_element_located(input_horas)).send_keys("25")
+        wait.until(EC.visibility_of_element_located(input_trofeus_totais)).send_keys("50")
+        wait.until(EC.visibility_of_element_located(input_trofeus_conquistados)).send_keys("10")
+        
+        driver.find_element(*btn_salvar_jornada).click()
+        print("Clicou em 'Salvar Jornada'.")
+        
+        wait.until(EC.visibility_of_element_located(btn_editar_jornada))
+        print("Verificando progresso (Cenário 1)...")
+        wait.until(EC.text_to_be_present_in_element(display_horas, "25h"))
+        wait.until(EC.text_to_be_present_in_element(display_trofeus, "10 / 50"))
+        wait.until(EC.text_to_be_present_in_element(display_platina, "20%"))
+        print("✅ Cenário 1: SUCESSO (25h, 10/50, 20%)")
+
+
+        print("\n--- Cenário 2: Editando jornada existente (40/50)...")
+        
+        driver.find_element(*btn_editar_jornada).click()
+        print("Clicou em 'Editar'.")
+        
+        input_conquistados_elem = wait.until(EC.visibility_of_element_located(input_trofeus_conquistados))
+        input_conquistados_elem.clear()
+        input_conquistados_elem.send_keys("40")
+        
+        driver.find_element(*btn_salvar_jornada).click()
+        print("Clicou em 'Salvar Jornada' (editando).")
+
+        wait.until(EC.visibility_of_element_located(btn_editar_jornada))
+        print("Verificando progresso (Cenário 2)...")
+        wait.until(EC.text_to_be_present_in_element(display_trofeus, "40 / 50"))
+        wait.until(EC.text_to_be_present_in_element(display_platina, "80%"))
+        print("✅ Cenário 2: SUCESSO (40/50, 80%)")
+
+
+        print("\n--- Cenário 3: Testando troféus inválidos (51/50)...")
+        
+        driver.find_element(*btn_editar_jornada).click()
+        print("Clicou em 'Editar'.")
+        
+        input_conquistados_elem = wait.until(EC.visibility_of_element_located(input_trofeus_conquistados))
+        input_conquistados_elem.clear()
+        input_conquistados_elem.send_keys("51") 
+        
+        driver.find_element(*btn_salvar_jornada).click()
+        print("Clicou em 'Salvar Jornada' (com erro).")
+
+        print("Verificando mensagem de erro (Cenário 3)...")
+        error_message = wait.until(EC.visibility_of_element_located(msg_erro_jornada))
+        
+        assert "limite" in error_message.text.lower() or "inválido" in error_message.text.lower()
+        print("✅ Cenário 3: SUCESSO (Mensagem de erro exibida)")
+
+        print("\n>>> Teste E2E (Adicionar e Gerenciar Jornada): SUCESSO GERAL")
 
     except Exception as e:
-        print("XXX Teste do Botão '+': FALHOU XXX")
+        print(f"XXX Teste E2E (Adicionar e Gerenciar Jornada): FALHOU XXX")
         print(f"Erro: {e}")
+        time.sleep(2)
     finally:
-        print("--- Finalizando Teste do Botão '+' ---")
+        print("--- Finalizando Teste E2E (Adicionar e Gerenciar Jornada) ---")
 
 
 def rodar_teste_dar_nota_e_comentar(driver, wait):
@@ -1096,7 +1174,7 @@ if __name__ == "__main__":
             rodar_teste_aplicar_filtro(driver, wait)
             rodar_teste_voltar_home(driver, wait)
             rodar_teste_clicar_jogo(driver, wait)
-            rodar_teste_clicar_botao_mais(driver, wait)
+            rodar_teste_adicionar_e_gerenciar_jornada(driver, wait)
             rodar_teste_dar_nota_e_comentar(driver, wait) 
             rodar_teste_ir_para_biblioteca(driver, wait) 
             rodar_teste_modificar_avaliacao_biblioteca(driver, wait)
