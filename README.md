@@ -89,17 +89,19 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 
 <details><summary><h3><b>Sprint 4</b></h3></summary>
 <ul>
-<li>Implementação das histórias restantes.</li>
+<li>Implementação das histórias restantes.✅</li>
 <li>Ambiente de versionamento atuante.</li>
 <li>Deployment das novas histórias.</li>
-<li>Uso do Issue/bug tracker.</li>
+<li>Uso do Issue/bug tracker.✅</li>
 <li>Testes de Sistema E2E automatizados.</li>
 <li>CI/CD com build e deployment automatizado.</li>
-<li>Atualização sobre o uso da programação em pares.</li>
-<li>Quadro da Sprint 04 atualizado refletindo a entrega.</li>
+<li>Atualização sobre o uso da programação em pares.✅</li>
+<li>Quadro da Sprint 04 atualizado refletindo a entrega.✅</li>
+<li><a href="https://docs.google.com/document/d/1cLlLR55E9F2QSTH3upHOF6-ahyTImWCMaRnRvmUL4mg/edit?tab=t.0">Relatório de programação em par atualizado </a></li>
 </ul>
 <p align="center">
 <img src="images/backlog_sprint_04.png" alt="Sprint 4 do JIRA" width="1500"/>
+
 </details>
 
 ---
