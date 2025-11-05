@@ -98,6 +98,8 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <li>Atualização sobre o uso da programação em pares.</li>
 <li>Quadro da Sprint 04 atualizado refletindo a entrega.</li>
 </ul>
+<p align="center">
+<img src="images/backlog_sprint_04.png" alt="Sprint 4 do JIRA" width="1500"/>
 </details>
 
 ---
