@@ -301,7 +301,7 @@ def home(request):
     jogos_shooter = Jogo.objects.filter( titulo__in=titulos_shooter ).order_by('titulo')
     titulos_playstation = [ "Astro Bot", "The Last of Us", "The Last of Us Part II", "Uncharted 4: A Thief's End", "God of War", "God of War: Ragnarök", "Ghost of Tsushima", "Marvel's Spider-Man", "Horizon Zero Dawn", "Bloodborne" ]
     jogos_playstation = Jogo.objects.filter(titulo__in=titulos_playstation).order_by('titulo')
-    titulos_nintendo = [ "Super Smash Bros. Ultimate", "Super Mario Odyssey", "Animal Crossing: New Horizons", "Little Nightmares", "The Binding of Isaac", "The Legend of Zelda: Breath of the Wild", "Pokémon: Let's Go, Pikachu! and Eevee!", "Mario Kart 8", ]
+    titulos_nintendo = [ "Super Smash Bros. Ultimate", "Super Mario Odyssey", "Animal Crossing: New Horizons", "Little Nightmares", "The Binding of Isaac: Rebirth", "The Legend of Zelda: Breath of the Wild", "Pokémon: Let's Go, Pikachu! and Eevee!", "Mario Kart 8", ]
     jogos_nintendo = Jogo.objects.filter(titulo__in=titulos_nintendo).order_by('titulo')
     
     context = { 
