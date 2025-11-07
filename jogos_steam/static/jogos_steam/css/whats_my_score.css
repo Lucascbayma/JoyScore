@@ -1,211 +1,197 @@
-/* Estilos Específicos para What's My Score */
+body {
 
-/* Base do Container */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+    background-color: #222; 
+    color: #eee;
+    margin: 0;
+    padding: 20px;
+}
+
 .score-game-container {
-    /* Aumentamos a largura máxima para dar mais espaço */
-    max-width: 900px; 
-    margin: 40px auto;
-    padding: 30px; /* Aumentamos o padding */
-    background-color: #2c2c2c; 
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    color: #f0f0f0;
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
     text-align: center;
+
+    background-color: #333; 
+    padding: 25px;
+    border-radius: 12px; 
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
 }
 
 .game-title {
-    font-size: 2.2rem;
-    color: #8e24aa; 
+
+    color: #9c27b0; 
+    font-size: 2.5rem;
+    margin-top: 0;
     margin-bottom: 20px;
-    font-weight: 700;
 }
 
-/* Placar */
 .score-board {
     display: flex;
     justify-content: center;
-    gap: 40px;
+    gap: 50px;
     margin-bottom: 25px;
 }
 
 .score-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: center;
 }
 
 .score-label {
+
     font-size: 0.9rem;
     color: #aaa;
-    font-weight: 500;
+    display: block;
+    text-transform: uppercase;
 }
 
 .score-value {
-    font-size: 1.8rem;
+
+    font-size: 2.5rem;
     font-weight: bold;
-    color: #f0f0f0;
-    line-height: 1.2;
+    color: white;
+    line-height: 1.1;
 }
 
-/* Área de Mensagem de Resultado */
-.result-message {
-    min-height: 25px; 
-    margin-bottom: 20px;
-    font-size: 1.2rem;
-    font-weight: bold;
-}
 
-.result-message.success {
-    color: #4CAF50; 
-}
-
-.result-message.error {
-    color: #F44336; 
-}
-
-/* Área de Comparação de Jogos */
-.game-card-area {
-    /* Ajustado para layout de coluna no mobile, mas mantendo flex */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    padding: 20px 0;
-}
 
 #comparison-display {
     display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Alinha pelo topo (nomes dos jogos) */
-    width: 100%;
-    margin-bottom: 30px;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 25px;
 }
 
 .game-card {
-    flex-basis: 45%;
+    width: 40%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center; /* Centraliza nome do jogo */
-    padding: 0 10px; /* Adiciona padding lateral para respiro */
+    gap: 10px;
 }
 
 .game-name {
+
     font-size: 1.1rem;
-    height: 40px; 
-    overflow: hidden;
-    margin-bottom: 10px;
+    font-weight: 600; 
+    height: 2.5em; 
+    color: #eee;
 }
 
 .game-image {
-    width: 100%;
-    /* Manter a proporção retangular */
-    height: 150px; 
-    object-fit: cover;
+
     border-radius: 8px;
-    border: 2px solid #555;
-    /* Faz a imagem ocupar a largura do container do card */
-    max-width: 250px; 
+    width: 100%; /* Imagem responsiva */
+ 
 }
 
 .vs-label {
-    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; 
+    background-color: #9c27b0; 
+    color: white;
     font-weight: bold;
-    color: #8e24aa;
-    margin: 50px 10px 0 10px; /* Ajusta a posição vertical do VS */
+    font-size: 1.2rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    flex-shrink: 0; 
 }
 
-/* Caixa de Nota Metacritic */
 .score-box {
-    width: 70px; /* Aumentado ligeiramente */
-    height: 70px; 
-    line-height: 70px;
-    border-radius: 8px;
-    margin-top: 15px;
-    font-size: 1.6rem; 
-    font-weight: 700;
-    text-align: center;
-    background-color: #4a4a4a; 
-    border: 3px solid transparent;
+    width: 65px;
+    height: 65px;
+    border-radius: 8px; 
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    font-size: 1.9rem;
+    font-weight: bold;
+    margin-top: 5px;
 }
 
 .score-visible {
-    border-color: #6a1b9a; 
-    color: #fff;
+
+    background-color: #9c27b0;
+    color: white;
 }
 
 .score-hidden {
-    color: #aaa;
-    border-style: dashed;
-    border-color: #555; 
+
+    background-color: #555;
+    color: #bbb;
 }
 
-/* Área de Pergunta e Botões (Posicionamento da Pergunta Abaixo) */
-#game-question-area {
-    /* Garante que esta seção fique abaixo dos jogos */
-    width: 100%;
-    margin-top: 0;
-}
+
 
 .question-text {
-    font-size: 1.2rem;
-    margin-top: 0; /* Remove a margem superior que estava empurrando */
-    margin-bottom: 20px; 
-    color: #ccc;
+    font-size: 1.1rem;
+    margin: 20px 0;
 }
 
 .answer-buttons {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    margin-top: 20px;
+    gap: 15px;
+    margin-top: 15px;
 }
 
+
 .answer-btn {
-    padding: 12px 25px;
-    font-size: 1.1rem;
-    font-weight: bold;
+
     border: none;
-    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 12px 24px;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    width: 45%; 
+    text-transform: uppercase;
+ 
+    border-radius: 8px;
+
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.answer-btn:hover {
+    /* 3. Efeito de hover */
+    filter: brightness(90%);
+    transform: scale(1.02);
 }
 
 .btn-higher {
-    background-color: #4CAF50; 
-    color: #1a1a1a;
-}
 
-.btn-higher:hover {
-    background-color: #66BB6A;
-    transform: scale(1.03);
+    background-color: #28a745; 
 }
 
 .btn-lower {
-    background-color: #F44336; 
-    color: #1a1a1a;
+
+    background-color: #dc3545; 
 }
 
-.btn-lower:hover {
-    background-color: #E57373;
-    transform: scale(1.03);
+#result-message {
+    margin: 15px 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    height: 1.5em; 
 }
 
-/* Estado de Carregamento/Desabilitado */
-.game-card-area.loading #loading-message {
-    display: block;
-    font-size: 1.5rem;
-    color: #8e24aa;
-    padding: 100px 0;
+.result-message.correct {
+    color: #28a745; 
 }
 
-.game-card-area.loading #comparison-display,
-.game-card-area.loading #game-question-area {
-    display: none !important;
+.result-message.incorrect {
+    color: #dc3545;
 }
 
-.game-card-area:not(.loading) #loading-message {
-    display: none;
+#loading-message {
+    font-size: 1.2rem;
+    color: #aaa;
+    padding: 50px 0;
 }
