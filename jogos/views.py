@@ -322,10 +322,21 @@ def autocomplete_search(request):
     query = request.GET.get('q')
     if not query:
         return JsonResponse({'results': []})
+    
     jogos_encontrados = Jogo.objects.filter(titulo__icontains=query).order_by('titulo')[:4]
+    
     results_list = []
     for jogo in jogos_encontrados:
-        results_list.append({ "id": jogo.id, "name": jogo.titulo, "released": jogo.ano_lancamento.isoformat() if jogo.ano_ancamento else None, "background_image": jogo.background_image, })
+        # ⚠️ CORREÇÃO: Usando 'jogo.ano_lancamento' em vez de 'jogo.ano_ancamento'
+        release_date = jogo.ano_lancamento.isoformat() if jogo.ano_lancamento else None
+        
+        results_list.append({
+            "id": jogo.id, 
+            "name": jogo.titulo, 
+            "released": release_date, 
+            "background_image": jogo.background_image, 
+        })
+        
     return JsonResponse({'results': results_list})
 
 @login_required
