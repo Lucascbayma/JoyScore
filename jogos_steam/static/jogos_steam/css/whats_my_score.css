@@ -1,7 +1,5 @@
 body {
-
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-
     background-color: #222; 
     color: #eee;
     margin: 0;
@@ -10,18 +8,16 @@ body {
 
 .score-game-container {
     width: 90%;
-    max-width: 800px;
+    max-width: 900px; 
     margin: 20px auto;
     text-align: center;
-
     background-color: #333; 
     padding: 25px;
-    border-radius: 12px; 
+    border-radius: 12px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
 }
 
 .game-title {
-
     color: #9c27b0; 
     font-size: 2.5rem;
     margin-top: 0;
@@ -40,7 +36,6 @@ body {
 }
 
 .score-label {
-
     font-size: 0.9rem;
     color: #aaa;
     display: block;
@@ -48,14 +43,11 @@ body {
 }
 
 .score-value {
-
     font-size: 2.5rem;
     font-weight: bold;
     color: white;
     line-height: 1.1;
 }
-
-
 
 #comparison-display {
     display: flex;
@@ -73,63 +65,52 @@ body {
 }
 
 .game-name {
-
     font-size: 1.1rem;
-    font-weight: 600; 
-    height: 2.5em; 
+    font-weight: 600;
+    height: 2.5em;
     color: #eee;
 }
 
 .game-image {
-
     border-radius: 8px;
-    width: 100%; /* Imagem responsiva */
- 
+    width: 100%;
 }
 
 .vs-label {
     width: 50px;
     height: 50px;
-    border-radius: 50%; 
-    background-color: #9c27b0; 
+    border-radius: 50%;
+    background-color: #9c27b0;
     color: white;
     font-weight: bold;
     font-size: 1.2rem;
-
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    flex-shrink: 0; 
+    flex-shrink: 0;
 }
 
 .score-box {
     width: 65px;
     height: 65px;
-    border-radius: 8px; 
-    
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    
     font-size: 1.9rem;
     font-weight: bold;
     margin-top: 5px;
 }
 
 .score-visible {
-
     background-color: #9c27b0;
     color: white;
 }
 
 .score-hidden {
-
     background-color: #555;
     color: #bbb;
 }
-
-
 
 .question-text {
     font-size: 1.1rem;
@@ -143,9 +124,7 @@ body {
     margin-top: 15px;
 }
 
-
 .answer-btn {
-
     border: none;
     color: white;
     font-size: 1rem;
@@ -153,25 +132,20 @@ body {
     padding: 12px 24px;
     cursor: pointer;
     text-transform: uppercase;
- 
     border-radius: 8px;
-
     transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 .answer-btn:hover {
-    /* 3. Efeito de hover */
     filter: brightness(90%);
     transform: scale(1.02);
 }
 
 .btn-higher {
-
     background-color: #28a745; 
 }
 
 .btn-lower {
-
     background-color: #dc3545; 
 }
 
@@ -179,11 +153,11 @@ body {
     margin: 15px 0;
     font-size: 1.2rem;
     font-weight: bold;
-    height: 1.5em; 
+    height: 1.5em;
 }
 
 .result-message.correct {
-    color: #28a745; 
+    color: #28a745;
 }
 
 .result-message.incorrect {
