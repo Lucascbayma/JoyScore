@@ -57,6 +57,7 @@
                     <li><a href="{% url 'jogos:home' %}">Início</a></li>
                     <li><a href="{% url 'jogos:minha_biblioteca' %}">Biblioteca</a></li>
                     <li><a href="{% url 'jogos_steam:steam_tac_toe' %}">Steam Tac Toe</a></li>
+                    <li><a href="{% url 'jogos_steam:whats_my_score' %}">What's My Score</a></li> 
                     <li><a href="{% url 'jogos:configuracoes_conta' %}">Configurações de Conta</a></li>
                 </ul>
             </nav>
@@ -110,7 +111,7 @@
         });
     </script>
 
-   
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (!window.location.pathname.includes('steam-tac-toe')) {
