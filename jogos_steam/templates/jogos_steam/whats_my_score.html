@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'jogos_steam/css/whats_my_score.css' %}">
+{% endblock %}
+
+{% block title %}What's My Score - JoyScore{% endblock %}
+
+{% block content %}
+<div class="score-game-container">
+    <h1 class="game-title">What's My Score?</h1>
+    
+    <div class="score-board">
+        <div class="score-item">
+            <span class="score-label">MAIOR STREAK</span>
+            <span class="score-value" id="max-streak">0</span>
+        </div>
+        <div class="score-item">
+            <span class="score-label">STREAK ATUAL</span>
+            <span class="score-value" id="current-streak">0</span>
+        </div>
+    </div>
+    
+    <div id="result-message" class="result-message"></div>
+
+    <div id="game-card-area" class="game-card-area loading">
+        <p id="loading-message"></p> 
+        
+        <div id="comparison-display" style="display: none;">
+            <div class="game-card game-left">
+                <p class="game-name" id="game1-name"></p>
+                <img id="game1-image" class="game-image" src="" alt="Imagem do Jogo 1">
+                <div class="score-box score-visible" id="game1-score-box">
+                    <span id="game1-score"></span>
+                </div>
+            </div>
+
+            <div class="vs-label">VS</div>
+
+            <div class="game-card game-right">
+                <p class="game-name" id="game2-name"></p>
+                <img id="game2-image" class="game-image" src="" alt="Imagem do Jogo 2">
+                <div class="score-box score-hidden" id="game2-score-box">
+                    <span id="game2-score">?</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-question-area" style="display: none;">
+            <p class="question-text">
+                A nota Metacritic de <strong id="question-game1-name"></strong> é:
+            </p>
+
+            <div class="answer-buttons">
+                <button id="btn-higher" class="answer-btn btn-higher"></button>
+                <button id="btn-lower" class="answer-btn btn-lower"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'jogos_steam/js/whats_my_score.js' %}"></script>
+{% endblock %}
