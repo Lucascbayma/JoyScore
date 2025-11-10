@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } else {
             updateScores(false); 
-            resultMessage.textContent = `Que pena! A nota correta era ${currentGameState.game2.correct_metascore}. Novo jogo em 5 segundos.`;
+            resultMessage.textContent = `Que pena! A nota do outro jogo era ${currentGameState.game2.correct_metascore}. Novo jogo em 5 segundos.`;
             resultMessage.classList.add('error');
             
             // MODO INICIAL (Totalmente novos)
