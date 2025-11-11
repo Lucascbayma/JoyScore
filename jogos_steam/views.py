@@ -19,7 +19,9 @@ ALL_AVAILABLE_THEMES = [
     "Free to Play", "Early Access", "Massively Multiplayer", "Co-op"
 ]
 
-# LISTA FIXA DE 100 APPIDS DE ALTA QUALIDADE
+# --- FONTE DE DADOS 1: "WHAT'S MY SCORE" (Lista Curada) ---
+# Lista de 100 AppIDs usada APENAS para o sorteio do "What's My Score".
+
 HIGH_RATED_APPIDS = [
     620, 292030, 1245620, 105600, 892970, 379430, 730, 1174180, 230410, 386210, 
     550, 4000, 3830, 20920, 22370, 41000, 48700, 57095, 61767, 200710, 203160, 
@@ -34,10 +36,39 @@ HIGH_RATED_APPIDS = [
     412020, 49520, 578080, 698780, 774880, 920210, 1118310, 1289380, 1203620, 1449850 
 ]
 
-STEAM_APPS = [{'appid': appid, 'name': str(appid)} for appid in HIGH_RATED_APPIDS]
-print(f"\n[STEAM API - FINAL] {len(STEAM_APPS)} AppIDs de ALTA QUALIDADE carregados (Servidor Instantâneo).", file=sys.stderr, flush=True)
+WMS_APP_POOL = [{'appid': appid, 'name': str(appid)} for appid in HIGH_RATED_APPIDS]
+print(f"\n[WMS API] {len(WMS_APP_POOL)} AppIDs de ALTA QUALIDADE carregados para 'What's My Score'.", file=sys.stderr, flush=True)
 
-# --- Views e APIs do Steam Tac Toe (MANTIDAS) ---
+
+# --- FONTE DE DADOS 2: "STEAM TAC TOE" (Lista Completa da API) ---
+# Esta variável global guardará TODOS os jogos da Steam para a busca.
+# Usada APENAS pelo "Steam Tac Toe".
+FULL_STEAM_APP_LIST = []
+
+def load_steam_app_list():
+    """
+    Busca a lista completa de AppIDs e Nomes da Steam.
+    Chamada APENAS UMA VEZ quando o servidor inicia.
+    """
+    global FULL_STEAM_APP_LIST
+    url = "https://api.steampowered.com/ISteamApps/GetAppList/v2/"
+    
+    try:
+        response = requests.get(url, timeout=15)
+        response.raise_for_status()
+        data = response.json()
+        
+        FULL_STEAM_APP_LIST = data.get('applist', {}).get('apps', [])
+        
+        if FULL_STEAM_APP_LIST:
+            print(f"\n[STEAM TAC TOE API] SUCESSO! {len(FULL_STEAM_APP_LIST)} jogos carregados da API da Steam para a busca.", file=sys.stderr, flush=True)
+        else:
+            print("\n[STEAM TAC TOE API] ERRO! A API da Steam não retornou nenhum jogo.", file=sys.stderr, flush=True)
+            
+    except requests.exceptions.RequestException as e:
+        print(f"\n[STEAM TAC TOE API] FALHA AO CARREGAR A LISTA DE JOGOS: {e}", file=sys.stderr, flush=True)
+
+# --- Views e APIs do Steam Tac Toe (Independente) ---
 
 def steam_tac_toe_view(request):
     """Renderiza a página principal do jogo Steam Tac Toe."""
@@ -68,12 +99,20 @@ def steam_tac_toe_view(request):
 
 
 def search_steam_games_api(request):
-    """API para buscar jogos pelo nome a partir da lista pré-carregada."""
+    """API para buscar jogos pelo nome a partir da lista COMPLETA da Steam."""
     query = request.GET.get('q', '').lower()
     if not query or len(query) < 3: 
         return JsonResponse({'games': []})
     
-    results = [app for app in STEAM_APPS if query in app.get('name', '').lower()]
+    if not FULL_STEAM_APP_LIST:
+        return JsonResponse({'games': [], 'error': 'A lista de jogos da Steam não está carregada no servidor.'}, status=503)
+        
+    # Busca na lista completa (milhares de jogos)
+    results = [
+        app for app in FULL_STEAM_APP_LIST 
+        if query in app.get('name', '').lower()
+    ]
+    
     return JsonResponse({'games': results[:10]})
 
 def validate_game_move_api(request):
@@ -131,7 +170,7 @@ def validate_game_move_api(request):
     return JsonResponse({'success': False, 'message': 'Método inválido.'}, status=405)
 
 
-# --- Funções do NOVO JOGO: WHAT'S MY SCORE ---
+# --- Funções do "WHAT'S MY SCORE" (Independente) ---
 
 def get_game_details_and_metascore(appid):
     """Busca os detalhes do jogo, incluindo o Metascore (nota Metacritic)."""
@@ -150,7 +189,6 @@ def get_game_details_and_metascore(appid):
             
         game_data = data[str(appid)]['data']
         
-        # Filtro de nota: Metacritic >= 70
         metacritic = game_data.get('metacritic')
         
         if metacritic:
@@ -166,29 +204,30 @@ def get_game_details_and_metascore(appid):
         return None 
         
     except requests.exceptions.RequestException as e:
-        print(f"[STEAM API - DEBUG] ERRO CONEXÃO Detalhes: AppID {appid}. Mensagem: {e}", file=sys.stderr, flush=True)
+        print(f"[WMS API - DEBUG] ERRO CONEXÃO Detalhes: AppID {appid}. Mensagem: {e}", file=sys.stderr, flush=True)
         return None
     except KeyError:
         return None
 
 
 def get_one_unique_high_rated_game(exclude_appids):
-    """Tenta encontrar UM jogo com Metacritic >= 70, excluindo os AppIDs fornecidos."""
+    """Tenta encontrar UM jogo com Metacritic >= 70, da lista curada (WMS_APP_POOL)."""
     
     attempts = 0
     MAX_ATTEMPTS = 500 
     
     attempted_appids = set(exclude_appids) 
     
-    if not STEAM_APPS:
+    if not WMS_APP_POOL:
         return None
         
-    print(f"[STEAM API - DEBUG] 2. Iniciando busca por 1 novo jogo (Excluindo: {len(exclude_appids)} AppIDs)...", file=sys.stderr, flush=True)
+    print(f"[WMS API - DEBUG] 2. Iniciando busca por 1 novo jogo (Excluindo: {len(exclude_appids)} AppIDs)...", file=sys.stderr, flush=True)
 
-    available_apps = [app for app in STEAM_APPS if app.get('appid') not in attempted_appids]
+    # Busca apenas na lista curada de 100 jogos
+    available_apps = [app for app in WMS_APP_POOL if app.get('appid') not in attempted_appids]
     
     if not available_apps:
-        print("[STEAM API - DEBUG] SUCESSO! 100 jogos foram usados. O pool será REINICIADO.", file=sys.stderr, flush=True)
+        print("[WMS API - DEBUG] SUCESSO! 100 jogos foram usados. O pool será REINICIADO.", file=sys.stderr, flush=True)
         return None 
         
     while attempts < MAX_ATTEMPTS:
@@ -205,10 +244,10 @@ def get_one_unique_high_rated_game(exclude_appids):
         game_details = get_game_details_and_metascore(appid)
         
         if game_details:
-            print(f"[STEAM API - DEBUG] Encontrado Jogo: {game_details['name']} (Tentativa: {attempts})", file=sys.stderr, flush=True)
+            print(f"[WMS API - DEBUG] Encontrado Jogo: {game_details['name']} (Tentativa: {attempts})", file=sys.stderr, flush=True)
             return game_details
         
-    print(f"[STEAM API - DEBUG] FALHA! Nenhum jogo qualificado encontrado em {attempts} tentativas.", file=sys.stderr, flush=True)
+    print(f"[WMS API - DEBUG] FALHA! Nenhum jogo qualificado encontrado em {attempts} tentativas.", file=sys.stderr, flush=True)
     return None 
 
 def get_two_unique_high_rated_games():
@@ -222,7 +261,6 @@ def get_two_unique_high_rated_games():
     MAX_INNER_ATTEMPTS = 15
     
     while not game2 and attempts < MAX_INNER_ATTEMPTS:
-        # ⚠️ CORREÇÃO DO NOME DO PARÂMETRO
         game2_candidate = get_one_unique_high_rated_game(exclude_appids=[game1['appid']])
         
         if game2_candidate and game2_candidate['metascore'] != game1['metascore']:
@@ -233,32 +271,29 @@ def get_two_unique_high_rated_games():
     return game1, game2 
 
 
-# View para renderizar a página do jogo (MANTIDA)
+# View para renderizar a página do jogo
 def whats_my_score_view(request):
     """Renderiza a página principal do jogo What's My Score."""
     return render(request, 'jogos_steam/whats_my_score.html')
 
-# A view que irá buscar os dados via AJAX e enviá-los de volta (LÓGICA DE ROTAÇÃO)
+# API que retorna os dados para o "What's My Score"
 def get_metacritic_games_api(request):
     """Endpoint API que retorna jogos para o What's My Score."""
     if request.method != 'GET':
         return JsonResponse({'success': False, 'message': 'Método inválido.'}, status=405)
         
-    if not STEAM_APPS:
+    if not WMS_APP_POOL:
         return JsonResponse({'success': False, 'message': 'Erro de Inicialização: A lista de 100 AppIDs de teste está vazia.'}, status=503)
     
-    # --- Lógica de Rotação (Se houver parâmetros de exclusão) ---
     exclude_ids_str = request.GET.get('exclude_appids', '')
     
-    # 1. Modo de Rotação (carregar apenas 1 novo jogo)
+    # 1. Modo de Rotação (carregar 1 novo jogo)
     if exclude_ids_str:
         try:
             exclude_ids = [int(x.strip()) for x in exclude_ids_str.split(',') if x.strip()]
         except ValueError:
             return JsonResponse({'success': False, 'message': 'Parâmetros de AppID inválidos.'}, status=400)
 
-        # Busca apenas um novo jogo (o game2)
-        # ⚠️ CORREÇÃO DO NOME DO PARÂMETRO
         new_game = get_one_unique_high_rated_game(exclude_appids=exclude_ids)
         
         if new_game:
@@ -269,7 +304,8 @@ def get_metacritic_games_api(request):
                     'name': new_game['name'],
                     'image_url': new_game['image_url'],
                     'appid': new_game['appid'],
-                    'correct_metascore': new_game['metascore'], 
+                    # ⬇️--- CORREÇÃO DO ERRO DE DIGITAÇÃO ---⬇️
+                    'correct_metascore': new_game['metascore'],
                 }
             }
             return JsonResponse(response_data)
@@ -302,3 +338,9 @@ def get_metacritic_games_api(request):
             return JsonResponse(response_data)
         else:
             return JsonResponse({'success': False, 'message': 'O jogo não pôde ser carregado. Não foram encontrados dois jogos qualificados com notas diferentes.'})
+
+
+# --- INICIALIZAÇÃO DO SERVIDOR ---
+# Carrega a lista completa de jogos da Steam (para o Tac Toe)
+# Isso é executado UMA VEZ quando o Django inicia.
+load_steam_app_list()
