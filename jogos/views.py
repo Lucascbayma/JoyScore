@@ -390,6 +390,25 @@ def configuracoes_conta(request):
     context = {'all_genres': all_genres, 'profile': profile }
     return render(request, 'jogos/configuracoes.html', context)
 
+
+# ⬇️ --- NOVA VIEW ADICIONADA AQUI --- ⬇️
+@login_required
+def avaliacoes_comunidade(request):
+    """
+    Mostra as 10 avaliações mais recentes de todos os usuários.
+    """
+    # Busca as 10 últimas avaliações
+    # Usa select_related() para otimizar a busca,
+    # trazendo dados do Usuário e do Jogo na mesma consulta
+    avaliacoes_recentes = Avaliar.objects.select_related('usuario', 'Jogo').order_by('-data_da_avaliacao')[:10]
+    
+    context = {
+        'recentes': avaliacoes_recentes
+    }
+    return render(request, 'jogos/avaliacoes_comunidade.html', context)
+# ⬆️ --- FIM DA NOVA VIEW --- ⬆️
+
+
 logger = logging.getLogger(__name__)
 
 REPO_PATH = '/home/LcsBayma/joyscore/'
