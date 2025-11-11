@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Avaliações da Comunidade - JoyScore{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'jogos/css/biblioteca.css' %}"> 
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+    <section class="content-section">
+        <h2 class="section-title">AVALIAÇÕES RECENTES DA COMUNIDADE</h2>
+
+        {% if recentes %}
+            <div class="review-list-container">
+                {% for avaliacao in recentes %}
+                    <div class="review-card">
+                        
+                        <div class="review-header">
+                            <h3 class="review-game-title">
+                                <a href="{% url 'jogos:avaliar' avaliacao.Jogo.id %}">
+                                    {{ avaliacao.Jogo.titulo }}
+                                </a>
+                            </h3>
+                            <span class="review-stars">
+                                {{ avaliacao.nota }} / 5 
+                                <i class="fas fa-star" style="color: #f0e14a;"></i> </span>
+                        </div>
+
+                        {% if avaliacao.comentario %}
+                            <blockquote class="review-comment">
+                                "{{ avaliacao.comentario }}"
+                            </blockquote>
+                        {% else %}
+                            <blockquote class="review-comment-empty">
+                                O usuário não deixou um comentário.
+                            </blockquote>
+                        {% endif %}
+
+                        <div class="review-footer">
+                            <span class="review-author">
+                                Por: <strong>{{ avaliacao.usuario.username }}</strong>
+                            </span>
+                            <span class="review-date">
+                                {{ avaliacao.data_da_avaliacao|date:"d/m/Y \à\s H:i" }}
+                            </span>
+                        </div>
+
+                    </div> {% endfor %}
+            </div>
+        {% else %}
+            <p>Nenhuma avaliação foi feita pela comunidade ainda.</p>
+        {% endif %}
+        
+    </section>
+</main>
+
+<style>
+.review-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.review-card {
+    /* Usando suas variáveis de cor do 'style.css' */
+    background-color: var(--cor-fundo-transicao, #2a2a2a);
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    /* Para telas pequenas */
+    flex-wrap: wrap; 
+    gap: 10px;
+}
+
+.review-game-title a {
+    color: var(--cor-texto, #f0f0f0);
+    text-decoration: none;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+.review-game-title a:hover {
+    color: var(--cor-destaque-primaria, #6a1b9a);
+}
+
+.review-stars {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--cor-destaque-secundaria, #6a1b9a);
+    background-color: rgba(0,0,0,0.2);
+    padding: 5px 10px;
+    border-radius: 5px;
+    flex-shrink: 0; /* Impede que diminua */
+}
+
+.review-comment {
+    font-size: 1.1rem;
+    color: var(--cor-texto, #e4e4e4);
+    font-style: italic;
+    line-height: 1.6;
+    margin: 15px 0;
+    /* Garante que o texto quebre */
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
+}
+
+.review-comment-empty {
+    font-size: 1rem;
+    color: var(--cor-cinza-claro, #a0a0a0);
+    font-style: italic;
+    margin: 15px 0;
+}
+
+.review-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--cor-cinza-claro, #a0a0a0);
+    padding-top: 15px;
+    border-top: 1px solid #444;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.review-author strong {
+    color: var(--cor-texto, #e4e4e4);
+}
+</style>
+{% endblock %}
