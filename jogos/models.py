@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError # Importado para validação
+from django.utils import timezone # ⬅️ --- ADICIONE ESTE IMPORT ---
 
 class Jogo(models.Model):
     rawg_id = models.IntegerField(
@@ -28,8 +29,19 @@ class Avaliar(models.Model):
     nota = models.IntegerField(validators= [MinValueValidator(1),MaxValueValidator(5)]) 
     comentario = models.CharField(max_length=1000, blank=True)
 
+    # ⬇️ --- LINHA ALTERADA --- ⬇️
+    data_da_avaliacao = models.DateTimeField(default=timezone.now)
+    # ⬆️ --- FIM DA ALTERAÇÃO --- ⬆️
+
     def __str__(self):
         return f"Avaliação do jogo {self.Jogo.titulo} por {self.usuario.username} - {self.nota} estrelas"
+    
+    class Meta:
+        # É uma boa prática ordenar por data, da mais nova para a mais antiga
+        ordering = ['-data_da_avaliacao']
+        
+        # Garante que um usuário só pode avaliar um jogo uma vez
+        unique_together = ('usuario', 'Jogo') 
     
 
 class Add_Biblioteca(models.Model):
