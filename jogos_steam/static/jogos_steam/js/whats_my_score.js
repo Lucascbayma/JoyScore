@@ -79,10 +79,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let fetchUrl = API_ENDPOINT;
 
-        // Se for rotação, envia a lista de jogos excluídos (AppIDs)
+        // Se for rotação, envia a lista de jogos excluídos (AppIDs) E a nota do jogo atual
         if (mode === 'rotation' && currentGameState) {
             const excludeList = usedAppIds.join(',');
-            fetchUrl += `?exclude_appids=${excludeList}`;
+            
+            // ⬇️ --- ALTERAÇÃO AQUI --- ⬇️
+            // Pega a nota do Jogo 2 (que acabou de ser revelado e vai para a esquerda)
+            // para que a API não retorne um novo jogo com a mesma nota.
+            const scoreToExclude = currentGameState.game2.correct_metascore; 
+            
+            fetchUrl += `?exclude_appids=${excludeList}&current_score=${scoreToExclude}`;
+            // ⬆️ --- FIM DA ALTERAÇÃO --- ⬆️
+
         }
         
         fetch(fetchUrl)
@@ -130,7 +138,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('loading-message').textContent = data.message || "Erro desconhecido. Recarregando...";
                     gameCardArea.classList.remove('loading');
                     disableButtons(true);
-                    setTimeout(() => loadNewGame('initial'), 5000); 
+                    
+                    // Se o erro for sobre "não encontrar jogo com nota diferente", 
+                    // apenas reinicia o jogo para o usuário não ficar preso.
+                    if (data.message.includes("nota diferente")) {
+                         // Apenas espera 5s e recomeça do zero
+                         setTimeout(() => loadNewGame('initial'), 5000); 
+                    } else {
+                        // Se for outro erro (ex: 100 jogos), reinicia o pool
+                        usedAppIds = []; // Zera o pool
+                        setTimeout(() => loadNewGame('initial'), 5000); 
+                    }
                 }
             })
             .catch(error => {
@@ -211,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // ⚠️ CORREÇÃO 2: Lógica de Resposta: Jogo 1 é MAIOR que Jogo 2?
         const isHigher = game1Score > game2Score; 
-        const isCorrect = (choice === 'higher' && isHigher) || (choice === 'lower' && !isHigher);
+        const isCorrect = (choice === 'higher' && isHigher) || (choice ==='lower' && !isHigher);
         
         revealAnswer(isCorrect);
     }

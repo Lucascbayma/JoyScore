@@ -210,8 +210,12 @@ def get_game_details_and_metascore(appid):
         return None
 
 
-def get_one_unique_high_rated_game(exclude_appids):
-    """Tenta encontrar UM jogo com Metacritic >= 70, da lista curada (WMS_APP_POOL)."""
+# ⬇️ --- FUNÇÃO ALTERADA --- ⬇️
+def get_one_unique_high_rated_game(exclude_appids, score_to_exclude=0):
+    """
+    Tenta encontrar UM jogo com Metacritic >= 70, 
+    excluindo os AppIDs E a nota fornecida.
+    """
     
     attempts = 0
     MAX_ATTEMPTS = 500 
@@ -221,7 +225,7 @@ def get_one_unique_high_rated_game(exclude_appids):
     if not WMS_APP_POOL:
         return None
         
-    print(f"[WMS API - DEBUG] 2. Iniciando busca por 1 novo jogo (Excluindo: {len(exclude_appids)} AppIDs)...", file=sys.stderr, flush=True)
+    print(f"[WMS API - DEBUG] 2. Iniciando busca por 1 novo jogo (Excluindo: {len(exclude_appids)} AppIDs e Score: {score_to_exclude})...", file=sys.stderr, flush=True)
 
     # Busca apenas na lista curada de 100 jogos
     available_apps = [app for app in WMS_APP_POOL if app.get('appid') not in attempted_appids]
@@ -243,16 +247,27 @@ def get_one_unique_high_rated_game(exclude_appids):
             
         game_details = get_game_details_and_metascore(appid)
         
+        # ⬇️ --- LÓGICA DE VERIFICAÇÃO ADICIONADA --- ⬇️
         if game_details:
-            print(f"[WMS API - DEBUG] Encontrado Jogo: {game_details['name']} (Tentativa: {attempts})", file=sys.stderr, flush=True)
-            return game_details
+            # Se score_to_exclude for 0 (default/inicial), ignora a checagem.
+            # Se for > 0 (rotação), checa se a nota é DIFERENTE.
+            if score_to_exclude == 0 or game_details['metascore'] != score_to_exclude:
+                print(f"[WMS API - DEBUG] Encontrado Jogo: {game_details['name']} (Tentativa: {attempts})", file=sys.stderr, flush=True)
+                return game_details
+            else:
+                # Encontrou um jogo, mas tem a mesma nota. Continua tentando.
+                print(f"[WMS API - DEBUG] Jogo pulado (mesma nota): {game_details['name']} ({game_details['metascore']})", file=sys.stderr, flush=True)
+        # ⬆️ --- FIM DA ALTERAÇÃO --- ⬆️
         
     print(f"[WMS API - DEBUG] FALHA! Nenhum jogo qualificado encontrado em {attempts} tentativas.", file=sys.stderr, flush=True)
     return None 
 
+# ⬇️ --- FUNÇÃO ALTERADA --- ⬇️
 def get_two_unique_high_rated_games():
     """Busca os dois primeiros jogos, garantindo notas diferentes."""
-    game1 = get_one_unique_high_rated_game(exclude_appids=[])
+    
+    # 1. Pega o primeiro jogo (sem restrição de nota)
+    game1 = get_one_unique_high_rated_game(exclude_appids=[], score_to_exclude=0)
     if not game1:
         return None, None
         
@@ -261,9 +276,15 @@ def get_two_unique_high_rated_games():
     MAX_INNER_ATTEMPTS = 15
     
     while not game2 and attempts < MAX_INNER_ATTEMPTS:
-        game2_candidate = get_one_unique_high_rated_game(exclude_appids=[game1['appid']])
+        # 2. Pega o segundo jogo, passando a nota do game1 para ser excluída
+        game2_candidate = get_one_unique_high_rated_game(
+            exclude_appids=[game1['appid']], 
+            score_to_exclude=game1['metascore']
+        )
         
-        if game2_candidate and game2_candidate['metascore'] != game1['metascore']:
+        # A lógica de "nota diferente" agora é feita dentro da
+        # get_one_unique_high_rated_game.
+        if game2_candidate:
             game2 = game2_candidate
         
         attempts += 1
@@ -276,6 +297,7 @@ def whats_my_score_view(request):
     """Renderiza a página principal do jogo What's My Score."""
     return render(request, 'jogos_steam/whats_my_score.html')
 
+# ⬇️ --- FUNÇÃO ALTERADA --- ⬇️
 # API que retorna os dados para o "What's My Score"
 def get_metacritic_games_api(request):
     """Endpoint API que retorna jogos para o What's My Score."""
@@ -289,12 +311,21 @@ def get_metacritic_games_api(request):
     
     # 1. Modo de Rotação (carregar 1 novo jogo)
     if exclude_ids_str:
+        # ⬇️ --- LÓGICA ADICIONADA PARA LER A NOTA ATUAL --- ⬇️
+        current_score_str = request.GET.get('current_score', '0')
+        
         try:
             exclude_ids = [int(x.strip()) for x in exclude_ids_str.split(',') if x.strip()]
+            current_score = int(current_score_str)
         except ValueError:
-            return JsonResponse({'success': False, 'message': 'Parâmetros de AppID inválidos.'}, status=400)
+            return JsonResponse({'success': False, 'message': 'Parâmetros de AppID ou Score inválidos.'}, status=400)
+        # ⬆️ --- FIM DA ADIÇÃO --- ⬆️
 
-        new_game = get_one_unique_high_rated_game(exclude_appids=exclude_ids)
+        # Passa a nota atual (score_to_exclude) para a função de busca
+        new_game = get_one_unique_high_rated_game(
+            exclude_appids=exclude_ids, 
+            score_to_exclude=current_score
+        )
         
         if new_game:
             response_data = {
@@ -304,13 +335,14 @@ def get_metacritic_games_api(request):
                     'name': new_game['name'],
                     'image_url': new_game['image_url'],
                     'appid': new_game['appid'],
-                    # ⬇️--- CORREÇÃO DO ERRO DE DIGITAÇÃO ---⬇️
                     'correct_metascore': new_game['metascore'],
                 }
             }
             return JsonResponse(response_data)
         else:
-            return JsonResponse({'success': False, 'message': 'Parabéns, você usou todos os 100 jogos! Recarregue para reiniciar o pool.'})
+            # Mensagem de erro caso não encontre um jogo com nota DIFERENTE
+            msg = 'Parabéns, você usou todos os 100 jogos!' if len(exclude_ids) >= len(WMS_APP_POOL) else 'Não foi possível encontrar um novo jogo com nota diferente. Tente de novo.'
+            return JsonResponse({'success': False, 'message': msg})
 
     # 2. Modo de Inicialização (carregar 2 novos jogos)
     else:
