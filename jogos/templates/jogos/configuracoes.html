@@ -5,6 +5,7 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'jogos/css/configuracoes.css' %}">
+    <link rel="stylesheet" href="{% static 'jogos/css/biblioteca.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -15,16 +16,46 @@
         </div>
 
         <div class="config-card profile-info">
-            <h3 class="card-title">Informações do Usuário</h3>
-            <p class="user-display">
-                Bem-vindo, <span class="username-highlight">{{ user.username }}</span>.
-            </p>
+            <div class="preferences-header">
+                <h3 class="card-title">Informações do Usuário</h3>
+                <button type="button" class="edit-button" data-modal-target="avatar-modal">
+                    Alterar Avatar
+                </button>
+            </div>
+
+            <div class="profile-body">
+                <img src="{% if profile.avatar %}{% static profile.avatar %}{% else %}{% static 'jogos/imagens/avatar1.png' %}{% endif %}" alt="Avatar do usuário" class="profile-avatar">
+                <p class="user-display">
+                    Bem-vindo, <span class="username-highlight">{{ user.username }}</span>.
+                </p>
+            </div>
+        </div>
+        <div class="config-card">
+            <div class="preferences-header">
+                <h3 class="card-title">Seu Jogo Favorito</h3>
+                <button type="button" class="edit-button" data-modal-target="game-modal">
+                    {% if profile.jogo_favorito %}Alterar Jogo{% else %}Adicionar Jogo{% endif %}
+                </button>
+            </div>
+            
+            {% if profile.jogo_favorito %}
+                <div class="favorite-game-container">
+                    <a href="{% url 'jogos:avaliar' profile.jogo_favorito.id %}" class="card-link">
+                        <div class="card">
+                            <img src="{{ profile.jogo_favorito.background_image }}" alt="{{ profile.jogo_favorito.titulo }}"> 
+                            <div class="card-info">
+                                <div class="card-title">{{ profile.jogo_favorito.titulo }}</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% else %}
+                <p class="preference-instructions">Você ainda não selecionou um jogo favorito.</p>
+            {% endif %}
         </div>
 
         <div class="config-card genre-preferences-card">
-            
             {% if profile.generos_favoritos and not 'edit' in request.GET %}
-                
                 <div class="preferences-header">
                     <h3 class="card-title">Seus Gêneros Favoritos</h3>
                     <a href="?edit=true" class="edit-button">Alterar Preferências</a>
@@ -34,11 +65,11 @@
                         <span class="genre-tag">{{ genre_name }}</span>
                     {% endfor %}
                 </div>
-
             {% else %}
-
                 <form method="POST" action="{% url 'jogos:configuracoes_conta' %}">
                     {% csrf_token %}
+                    <input type="hidden" name="form_type" value="genres">
+
                     <h3 class="card-title">Gêneros Favoritos</h3>
                     <p class="preference-instructions">Selecione os gêneros que você mais gosta.</p>
                     
@@ -53,7 +84,6 @@
                     </div>
                     <button type="submit" class="save-button" id="save-prefs-button" disabled>Salvar Preferências</button>
                 </form>
-
             {% endif %}
         </div>
         
@@ -67,6 +97,68 @@
         
     </section>
 </main>
+
+<div class="modal-overlay" id="avatar-modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4>Selecione seu Avatar</h4>
+            <button type="button" class="close-button" data-modal-close="avatar-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form method="POST" action="{% url 'jogos:configuracoes_conta' %}" id="avatar-form">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="avatar">
+                
+                <div class="avatar-selection-grid">
+                    {% for avatar_path in predefined_avatars %}
+                    <div class="avatar-option">
+                        <input type="radio" name="avatar_path" value="{{ avatar_path }}" id="avatar-{{ forloop.counter }}"
+                               {% if profile.avatar == avatar_path %}checked{% endif %}
+                               {% if not profile.avatar and forloop.first %}checked{% endif %}
+                        >
+                        <label for="avatar-{{ forloop.counter }}">
+                            <img src="{% static avatar_path %}" alt="Avatar {{ forloop.counter }}">
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <button type="submit" class="save-button" id="save-avatar-button">Salvar Avatar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="game-modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4>Selecione seu Jogo Favorito</h4>
+            <button type="button" class="close-button" data-modal-close="game-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="header-search modal-search">
+                <input type="text" id="fav-game-search-input" class="search-input-modal" placeholder="Pesquisar jogo...">
+                <div id="fav-game-autocomplete-results"></div>
+            </div>
+
+            <form method="POST" action="{% url 'jogos:configuracoes_conta' %}" id="fav-game-form">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="favorite_game">
+                <input type="hidden" name="jogo_id" id="selected-game-id">
+            </form>
+            
+            {% if profile.jogo_favorito %}
+            <form method="POST" action="{% url 'jogos:configuracoes_conta' %}" id="remove-fav-game-form">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="favorite_game">
+                <input type="hidden" name="jogo_id" value="remove">
+                <button type="submit" class="remove-button">Remover Jogo Favorito</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_scripts %}
@@ -75,30 +167,116 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveButton = document.getElementById('save-prefs-button');
     const checkboxes = document.querySelectorAll('.genre-checkbox');
 
-    // Função que verifica o estado dos checkboxes e atualiza o botão
     function updateButtonState() {
-        // Conta quantos checkboxes estão marcados
         const checkedCount = document.querySelectorAll('.genre-checkbox:checked').length;
-        
-        // Se a contagem for 0, desabilita o botão. Caso contrário, habilita.
-        if (checkedCount === 0) {
-            saveButton.disabled = true;
-        } else {
-            saveButton.disabled = false;
+        if (saveButton) {
+            saveButton.disabled = checkedCount === 0;
         }
     }
 
-    // Adiciona um "ouvinte" a cada checkbox.
-    // Toda vez que um for clicado, a função updateButtonState é chamada.
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', updateButtonState);
     });
 
-    // Chama a função uma vez no início para definir o estado inicial correto do botão.
-    // Isso garante que se o usuário já tiver preferências salvas, o botão comece habilitado.
     if(saveButton) {
         updateButtonState();
     }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- Lógica dos Modais ---
+    const modalButtons = document.querySelectorAll('[data-modal-target]');
+    const closeButtons = document.querySelectorAll('[data-modal-close]');
+    
+    modalButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modalId = button.getAttribute('data-modal-target');
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+                if (modalId === 'game-modal') {
+                    document.getElementById('fav-game-search-input').focus();
+                }
+            }
+        });
+    });
+
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modalId = button.getAttribute('data-modal-close');
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.style.display = 'none';
+            }
+        });
+    });
+
+    // --- Lógica do Autocomplete do Jogo Favorito ---
+    const searchInput = document.getElementById('fav-game-search-input');
+    const resultsContainer = document.getElementById('fav-game-autocomplete-results');
+    const gameForm = document.getElementById('fav-game-form');
+    const hiddenInput = document.getElementById('selected-game-id');
+    
+    const apiUrl = "{% url 'jogos:api_autocomplete' %}"; 
+
+    let debounceTimer;
+
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
+        resultsContainer.innerHTML = ''; 
+
+        if (query.length < 3) {
+            return;
+        }
+
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            fetch(`${apiUrl}?q=${query}&source=api`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.results && data.results.length > 0) {
+                        data.results.forEach(game => {
+                            const item = document.createElement('div');
+                            item.className = 'autocomplete-item'; 
+                            
+                            const img = document.createElement('img');
+                            img.src = game.background_image || "{% static 'jogos/imagens/placeholder.png' %}";
+                            img.className = 'autocomplete-img';
+                            
+                            const name = document.createElement('span');
+                            name.textContent = game.name;
+                            
+                            item.appendChild(img);
+                            item.appendChild(name);
+                            
+                            item.addEventListener('click', () => {
+                                hiddenInput.value = game.id; 
+                                gameForm.submit();
+                            });
+                            
+                            resultsContainer.appendChild(item);
+                        });
+                    } else {
+                        resultsContainer.innerHTML = '<div class="autocomplete-item error">Nenhum jogo encontrado.</div>';
+                    }
+                })
+                .catch(err => {
+                    resultsContainer.innerHTML = '<div class="autocomplete-item error">Erro ao buscar.</div>';
+                });
+        }, 300); 
+    });
+
 });
 </script>
 {% endblock %}

@@ -353,3 +353,68 @@ footer {
     box-shadow: 0 6px 20px rgba(0,0,0,0.15);
     transition: all 0.2s ease-out;
 }
+
+.messages-container {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+    /* Impede que o 'x' seja selecionado como texto */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.message {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    border: 1px solid;
+    margin-bottom: 10px;
+}
+
+/* Cor de sucesso (verde) */
+.message.success {
+    background-color: #1a4a3c; /* Fundo verde escuro */
+    color: #a3e9d2; /* Texto verde claro */
+    border-color: #278f6c;
+}
+
+/* Cor de erro (vermelho) */
+.message.error {
+    background-color: #4a1a1a; /* Fundo vermelho escuro */
+    color: #e9a3a3; /* Texto vermelho claro */
+    border-color: #8f2727;
+}
+
+/* Cor de aviso (amarelo) - como a do IntegrityError */
+.message.warning {
+    background-color: #4a3c1a; /* Fundo amarelo escuro */
+    color: #e9d2a3; /* Texto amarelo claro */
+    border-color: #8f6c27;
+}
+
+/* Cor de informação (azul) */
+.message.info {
+    background-color: #1a3c4a; /* Fundo azul escuro */
+    color: #a3d2e9; /* Texto azul claro */
+    border-color: #276c8f;
+}
+
+/* Botão de fechar (o 'x') */
+.close-message-btn {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    margin-left: 15px;
+    transition: color 0.2s ease;
+}
+
+.close-message-btn:hover {
+    color: #fff;
+}

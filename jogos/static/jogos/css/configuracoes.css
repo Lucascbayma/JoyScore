@@ -16,14 +16,46 @@
     padding-bottom: 5px;
 }
 
-.profile-info .user-display {
+/* --- SEÇÃO DE PERFIL (AVATAR) --- */
+.profile-body {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 15px; 
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid #8e24aa;
+    object-fit: cover;
+}
+
+.profile-body .user-display {
     font-size: 1.2rem;
-    margin-bottom: 10px;
+    margin-bottom: 0;
 }
 
 .username-highlight {
     font-weight: 700;
     color: #f0f0f0;
+}
+
+/* --- SEÇÃO JOGO FAVORITO --- */
+.favorite-game-container {
+    max-width: 300px; 
+}
+.favorite-game-container .card {
+    width: 100%; 
+    height: 180px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+.favorite-game-container .card-title {
+    font-size: 1rem; 
+    color: #8e24aa;
+    margin-bottom: 0;
+    border-bottom: none;
 }
 
 .info-text {
@@ -57,7 +89,6 @@
     cursor: pointer;
 }
 
-/* Estilo compartilhado para os labels e as tags de exibição */
 .genre-item-config label, .genre-tag {
     display: block;
     padding: 8px 15px;
@@ -75,16 +106,14 @@
     border-color: #6a1b9a;
 }
 
-/* Estilo para quando um gênero está selecionado/salvo */
 .genre-item-config input[type="checkbox"]:checked + label, .genre-tag {
     background-color: #6a1b9a;
     border-color: #8e24aa;
     color: #fff;
     font-weight: 700;
-    cursor: default; /* Remove o cursor de ponteiro para as tags de exibição */
+    cursor: default; 
 }
 
-/* Estilo do botão quando está DESABILITADO */
 .save-button[disabled] {
     cursor: not-allowed;
     background-color: #444;
@@ -92,7 +121,6 @@
     border: 1px solid #555;
 }
 
-/* >>>>> NOVO ESTILO: Botão de Salvar quando está HABILITADO <<<<< */
 .save-button:not([disabled]) {
     cursor: pointer;
     background-color: #6a1b9a;
@@ -111,9 +139,16 @@
     font-size: 1rem;
     font-weight: 500;
     border-radius: 5px;
+    width: 100%; 
+    margin-top: 20px; 
+    
+    /* Remove o comportamento de "arrastar"/seleção de texto */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Internet Explorer/Edge */
+    user-select: none;         /* Padrão */
 }
 
-/* >>>>> NOVO ESTILO: Botão de Alterar <<<<< */
 .edit-button {
     padding: 10px 20px;
     font-size: 1rem;
@@ -124,6 +159,7 @@
     color: white;
     border: 1px solid #8e24aa;
     transition: background-color 0.2s, transform 0.2s;
+    cursor: pointer; 
 }
 
 .edit-button:hover {
@@ -131,7 +167,6 @@
     transform: scale(1.03);
 }
 
-/* >>>>> NOVO ESTILO: Cabeçalho para o modo de visualização <<<<< */
 .preferences-header {
     display: flex;
     justify-content: space-between;
@@ -140,7 +175,7 @@
 }
 
 .preferences-header .card-title {
-    margin-bottom: 0; /* Remove a margem do título quando está no header */
+    margin-bottom: 0; 
     border-bottom: none;
     padding-bottom: 0;
 }
@@ -174,6 +209,200 @@
     transform: scale(1.03);
 }
 
+/* ⬇️ --- ESTILOS DOS MODAIS --- ⬇️ */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #212121;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.modal-header h4 {
+    font-size: 1.5rem;
+    color: #f0f0f0;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-body {
+    /* ⬇️ --- ALTERAÇÃO AQUI --- ⬇️ */
+    /* Remove AMBAS as barras de rolagem */
+    overflow: hidden;
+    /* ⬆️ --- FIM DA ALTERAÇÃO --- ⬆️ */
+}
+
+/* Grid de Seleção de Avatar */
+.avatar-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 15px;
+}
+
+.avatar-option {
+    position: relative;
+}
+
+.avatar-option input[type="radio"] {
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.avatar-option label {
+    display: block;
+    cursor: pointer;
+    border: 3px solid transparent;
+    border-radius: 50%;
+    transition: border-color 0.2s ease;
+}
+
+.avatar-option img {
+    width: 100%;
+    height: auto;
+    border-radius: 50%;
+    display: block;
+}
+
+.avatar-option input[type="radio"]:checked + label {
+    border-color: #6a1b9a;
+}
+
+/* Busca de Jogo no Modal */
+.modal-search {
+    width: 100%;
+    margin-bottom: 15px;
+    position: relative; 
+}
+
+.search-input-modal { 
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #4a4a4a;
+    border-radius: 5px;
+    background-color: #333333;
+    color: #f0f0f0;
+    font-size: 1rem;
+    box-sizing: border-box; 
+}
+
+.search-input-modal::placeholder {
+    color: #888;
+}
+
+.search-input-modal:focus {
+    outline: none;
+    border-color: #6a1b9a;
+    box-shadow: 0 0 0 2px rgba(136, 37, 170, 0.4);
+}
+
+#fav-game-autocomplete-results {
+    position: absolute; 
+    top: 100%; 
+    left: 0;
+    right: 0;
+    z-index: 1001; 
+    max-height: 300px; 
+    border-radius: 0 0 8px 8px;
+    border: 1px solid #4a4a4a;
+    background: #333333;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.autocomplete-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #444;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-item:hover {
+    background-color: #4a4a4a;
+}
+
+.autocomplete-img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 3px;
+    margin-right: 10px;
+}
+
+.autocomplete-item span {
+    color: #f0f0f0;
+    font-size: 0.95rem;
+}
+
+.autocomplete-item.error {
+    color: #aaa;
+    font-style: italic;
+    text-align: center;
+    justify-content: center;
+}
+
+/* Botão de Remover Jogo */
+.remove-button {
+    background-color: #a11b1b;
+    color: white;
+    border: 1px solid #c0392b;
+    width: 100%;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.2s ease;
+}
+.remove-button:hover {
+    background-color: #c0392b;
+}
+
+/* ⬆️ --- FIM DOS ESTILOS DOS MODAIS --- ⬆️ */
+
+
 /* --- Estilos para o Tema Claro --- */
 body[data-theme="light"] .config-card {
     background-color: #f8f9fa;
@@ -199,4 +428,39 @@ body[data-theme="light"] .genre-tag {
     background-color: #e9ecef;
     color: #121212;
     border: 1px solid #ccc;
+}
+
+/* Tema claro para modais */
+body[data-theme="light"] .modal-content {
+    background-color: #f8f9fa;
+}
+body[data-theme="light"] .modal-header {
+    border-bottom: 1px solid #dee2e6;
+}
+body[data-theme="light"] .modal-header h4 {
+    color: #121212;
+}
+body[data-theme="light"] .close-button {
+    color: #555;
+}
+body[data-theme="light"] #fav-game-autocomplete-results {
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+body[data-theme="light"] .search-input-modal {
+    background-color: #fff;
+    color: #121212;
+    border-color: #ccc;
+}
+body[data-theme="light"] .search-input-modal::placeholder {
+    color: #999;
+}
+body[data-theme="light"] .autocomplete-item {
+    border-bottom: 1px solid #eee;
+}
+body[data-theme="light"] .autocomplete-item:hover {
+    background-color: #f0f0f0;
+}
+body[data-theme="light"] .autocomplete-item span {
+    color: #121212;
 }

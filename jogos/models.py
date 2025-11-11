@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError # Importado para validação
-from django.utils import timezone # ⬅️ --- ADICIONE ESTE IMPORT ---
+from django.utils import timezone # ⬅️ Import já existente
 
 class Jogo(models.Model):
     rawg_id = models.IntegerField(
@@ -28,19 +28,13 @@ class Avaliar(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     nota = models.IntegerField(validators= [MinValueValidator(1),MaxValueValidator(5)]) 
     comentario = models.CharField(max_length=1000, blank=True)
-
-    # ⬇️ --- LINHA ALTERADA --- ⬇️
     data_da_avaliacao = models.DateTimeField(default=timezone.now)
-    # ⬆️ --- FIM DA ALTERAÇÃO --- ⬆️
 
     def __str__(self):
         return f"Avaliação do jogo {self.Jogo.titulo} por {self.usuario.username} - {self.nota} estrelas"
     
     class Meta:
-        # É uma boa prática ordenar por data, da mais nova para a mais antiga
         ordering = ['-data_da_avaliacao']
-        
-        # Garante que um usuário só pode avaliar um jogo uma vez
         unique_together = ('usuario', 'Jogo') 
     
 
@@ -65,7 +59,6 @@ class JornadaGamer(models.Model):
     trofeus_conquistados = models.PositiveIntegerField(default=0, verbose_name="Troféus Conquistados")
 
     class Meta:
-        # Garante que um usuário só pode ter UMA jornada por jogo
         unique_together = ('usuario', 'jogo')
 
     def __str__(self):
@@ -73,20 +66,17 @@ class JornadaGamer(models.Model):
 
     @property
     def porcentagem_conclusao(self):
-        # Calcula a porcentagem para o template
         if self.trofeus_totais == 0:
             return 0
-        
         porcentagem = (self.trofeus_conquistados / self.trofeus_totais) * 100
         return round(porcentagem)
     
     def clean(self):
-        # Validação de regras
         if self.trofeus_conquistados > self.trofeus_totais:
             raise ValidationError('O número de troféus conquistados não pode ser maior que o total.')
 
     def save(self, *args, **kwargs):
-        self.clean() # Roda a validação antes de salvar
+        self.clean()
         super().save(*args, **kwargs)
 
 # --- FIM DO NOVO MODELO ---
@@ -94,6 +84,11 @@ class JornadaGamer(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     generos_favoritos = models.JSONField(default=list, blank=True)
+
+    # ⬇️ --- CAMPOS ADICIONADOS --- ⬇️
+    avatar = models.CharField(max_length=255, blank=True, null=True, help_text="Caminho para o avatar predefinido")
+    jogo_favorito = models.ForeignKey(Jogo, on_delete=models.SET_NULL, null=True, blank=True, related_name="perfis_favoritos")
+    # ⬆️ --- FIM DA ADIÇÃO --- ⬆️
 
     def __str__(self):
         return f'Perfil de {self.user.username}'

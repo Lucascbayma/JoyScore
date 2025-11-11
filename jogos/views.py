@@ -19,6 +19,9 @@ import logging
 import dateutil.parser 
 from django.core.exceptions import ValidationError 
 from django.urls import reverse # Importamos o reverse para montar a URL
+from django.utils import timezone # Import para o default da data
+from datetime import timedelta 
+from django.db import IntegrityError # ⬅️ --- IMPORT ADICIONADO ---
 
 RAWG_API_KEY = settings.API_KEY
 RAWG_BASE_URL = "https://api.rawg.io/api"
@@ -86,7 +89,6 @@ def avaliar(request, jogo_id):
     if esta_na_biblioteca:
         jornada_existente = JornadaGamer.objects.filter(usuario=request.user, jogo=jogo).first()
 
-    # [MUDANÇA AQUI] Criamos a URL base com a âncora
     url_com_ancora = reverse('jogos:avaliar', args=[jogo.id]) + '#jornada-container'
 
     if request.method == 'POST':
@@ -106,7 +108,6 @@ def avaliar(request, jogo_id):
                 defaults={'nota': nota, 'comentario': comentario}
             )
             messages.success(request, 'Sua avaliação foi salva com sucesso!')
-            # Redirecionamento da avaliação (pode manter normal ou adicionar #rating-section)
             return redirect('jogos:avaliar', jogo_id=jogo.id)
         
         elif acao == 'salvar_jornada':
@@ -121,7 +122,7 @@ def avaliar(request, jogo_id):
                 
                 if horas_int < 0 or totais_int < 0 or conquistados_int < 0:
                    messages.error(request, 'Os valores não podem ser negativos.')
-                   return redirect(url_com_ancora) # [MUDANÇA AQUI]
+                   return redirect(url_com_ancora) 
 
                 JornadaGamer.objects.update_or_create(
                     usuario=request.user,
@@ -136,14 +137,13 @@ def avaliar(request, jogo_id):
 
             except ValidationError as e:
                 messages.error(request, e.message)
-                return redirect(url_com_ancora) # [MUDANÇA AQUI]
+                return redirect(url_com_ancora) 
             
             except (ValueError, TypeError):
                 messages.error(request, 'Por favor, preencha todos os campos da jornada com números válidos.')
-                return redirect(url_com_ancora) # [MUDANÇA AQUI]
+                return redirect(url_com_ancora) 
             
-            # Redireciona para a URL com a âncora após o sucesso
-            return redirect(url_com_ancora) # [MUDANÇA AQUI]
+            return redirect(url_com_ancora) 
 
     context = {
         'jogo': jogo, 
@@ -182,21 +182,28 @@ def redirecionar_para_avaliacao(request, rawg_id):
             genres = data.get('genres', [])
             genero = genres[0].get('name', "") if genres else ""
             
-            jogo, created = Jogo.objects.get_or_create(
-                titulo=titulo,
-                defaults={
-                    'rawg_id': rawg_id,
-                    'desenvolvedor': desenvolvedor,
-                    'ano_lancamento': release_date_obj,
-                    'genero': genero,
-                    'background_image': data.get('background_image'),
-                    'descricao': data.get('description_raw', '')
-                }
-            )
-            
-            if not created and not jogo.rawg_id:
+            # ⬇️ --- LÓGICA DE CRIAÇÃO ATUALIZADA --- ⬇️
+            try:
+                # Tenta criar com rawg_id E titulo
+                jogo, created = Jogo.objects.get_or_create(
+                    rawg_id=rawg_id,
+                    titulo=titulo,
+                    defaults={
+                        'desenvolvedor': desenvolvedor,
+                        'ano_lancamento': release_date_obj,
+                        'genero': genero,
+                        'background_image': data.get('background_image'),
+                        'descricao': data.get('description_raw', '')
+                    }
+                )
+            except IntegrityError:
+                # Se falhar (IntegrityError), significa que o TÍTULO já existe.
+                # Então, buscamos pelo título e atualizamos o rawg_id.
+                jogo = Jogo.objects.get(titulo=titulo)
                 jogo.rawg_id = rawg_id
+                jogo.background_image = data.get('background_image')
                 jogo.save()
+            # ⬆️ --- FIM DA ATUALIZAÇÃO --- ⬆️
         
         except requests.RequestException:
             messages.error(request, "Não foi possível buscar os detalhes do jogo na API. Tente novamente.")
@@ -319,25 +326,53 @@ def home(request):
 
 @require_GET
 def autocomplete_search(request):
+    """
+    Busca de jogos ATUALIZADA.
+    Busca na API RAWG para o modal de jogo favorito.
+    Busca no BD local para a barra de busca antiga da home.
+    """
     query = request.GET.get('q')
-    if not query:
+    # Novo parâmetro para diferenciar as buscas
+    source = request.GET.get('source', 'local') 
+
+    if not query or len(query) < 3:
         return JsonResponse({'results': []})
     
-    jogos_encontrados = Jogo.objects.filter(titulo__icontains=query).order_by('titulo')[:4]
-    
     results_list = []
-    for jogo in jogos_encontrados:
-        # ⚠️ CORREÇÃO: Usando 'jogo.ano_lancamento' em vez de 'jogo.ano_ancamento'
-        release_date = jogo.ano_lancamento.isoformat() if jogo.ano_lancamento else None
-        
-        results_list.append({
-            "id": jogo.id, 
-            "name": jogo.titulo, 
-            "released": release_date, 
-            "background_image": jogo.background_image, 
-        })
-        
+    
+    if source == 'api':
+        # --- Lógica para o MODAL (busca na API RAWG) ---
+        api_url = f"{RAWG_BASE_URL}/games?key={RAWG_API_KEY}&search={query}&page_size=5"
+        try:
+            response = requests.get(api_url)
+            response.raise_for_status()
+            data = response.json()
+            
+            for game in data.get('results', []):
+                results_list.append({
+                    "id": game.get('id'), # Envia o RAWG ID
+                    "name": game.get('name'), 
+                    "released": game.get('released'), 
+                    "background_image": game.get('background_image'), 
+                })
+            
+        except requests.RequestException as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    else:
+        # --- Lógica ANTIGA (busca no BD local para a home) ---
+        jogos_encontrados = Jogo.objects.filter(titulo__icontains=query).order_by('titulo')[:4]
+        for jogo in jogos_encontrados:
+            release_date = jogo.ano_lancamento.isoformat() if jogo.ano_lancamento else None
+            results_list.append({
+                "id": jogo.id, # Envia o ID local
+                "name": jogo.titulo, 
+                "released": release_date, 
+                "background_image": jogo.background_image, 
+            })
+            
     return JsonResponse({'results': results_list})
+
 
 @login_required
 def filtrar_por_genero(request):
@@ -378,35 +413,134 @@ def filtrar_por_genero(request):
     context = {'all_genres': all_genres, 'games_page': games_page, 'selected_genres_ids': selected_genres_ids, 'search_error': search_error, 'form_submitted': form_submitted, 'genres_query_string': genres_query_string, }
     return render(request, 'jogos/filtrar.html', context)
 
+# ⬇️ --- VIEW 'configuracoes_conta' ATUALIZADA --- ⬇️
+
+# Lista de avatares predefinidos (caminhos a partir de 'static/')
+PREDEFINED_AVATARS = [
+    "jogos/imagens/avatar1.png",
+    "jogos/imagens/avatar2.png",
+    "jogos/imagens/avatar3.png",
+    "jogos/imagens/avatar4.png",
+]
+
 @login_required
 def configuracoes_conta(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
+    
     if request.method == 'POST':
-        generos_selecionados = request.POST.getlist('genres')
-        profile.generos_favoritos = generos_selecionados
-        profile.save()
+        # Identifica qual formulário foi enviado
+        form_type = request.POST.get('form_type')
+
+        # 1. Lidando com a mudança de Gêneros
+        if form_type == 'genres':
+            generos_selecionados = request.POST.getlist('genres')
+            profile.generos_favoritos = generos_selecionados
+            profile.save()
+            messages.success(request, 'Gêneros favoritos atualizados!')
+        
+        # 2. Lidando com a mudança de Avatar
+        elif form_type == 'avatar':
+            avatar_selecionado = request.POST.get('avatar_path')
+            if avatar_selecionado in PREDEFINED_AVATARS:
+                profile.avatar = avatar_selecionado
+                profile.save()
+                messages.success(request, 'Avatar atualizado!')
+            else:
+                messages.error(request, 'Avatar inválido.')
+
+        # 3. Lidando com a mudança de Jogo Favorito
+        elif form_type == 'favorite_game':
+            jogo_rawg_id = request.POST.get('jogo_id')
+            
+            if jogo_rawg_id == "remove":
+                profile.jogo_favorito = None
+                profile.save()
+                messages.success(request, 'Jogo favorito removido.')
+                return redirect('jogos:configuracoes_conta')
+
+            try:
+                # 1. Tenta buscar pelo rawg_id
+                jogo = Jogo.objects.get(rawg_id=jogo_rawg_id)
+            except Jogo.DoesNotExist:
+                # 2. Se não achar, busca na API
+                game_details_url = f"{RAWG_BASE_URL}/games/{jogo_rawg_id}?key={RAWG_API_KEY}"
+                try:
+                    response = requests.get(game_details_url)
+                    response.raise_for_status()
+                    data = response.json()
+                    
+                    api_titulo = data.get('name')
+                    
+                    release_date_str = data.get('released')
+                    release_date_obj = None
+                    if release_date_str:
+                        try:
+                            release_date_obj = dateutil.parser.parse(release_date_str).date()
+                        except ValueError:
+                            release_date_obj = None
+
+                    genres = data.get('genres', [])
+                    genero = genres[0].get('name', "") if genres else ""
+                    devs = data.get('developers', [])
+                    desenvolvedor = ", ".join([d.get('name') for d in devs]) if devs else ""
+                    
+                    # 3. ⬇️ --- LÓGICA DE CORREÇÃO DO ERRO --- ⬇️
+                    try:
+                        # Tenta criar o jogo com rawg_id
+                        jogo, created = Jogo.objects.get_or_create(
+                            rawg_id=jogo_rawg_id,
+                            defaults={
+                                'titulo': api_titulo,
+                                'desenvolvedor': desenvolvedor,
+                                'ano_lancamento': release_date_obj,
+                                'genero': genero,
+                                'background_image': data.get('background_image'),
+                                'descricao': data.get('description_raw', '')
+                            }
+                        )
+                    except IntegrityError:
+                        # Se der erro de TÍTULO ÚNICO, é o nosso bug.
+                        # Buscamos pelo título e atualizamos o rawg_id.
+                        messages.warning(request, f'"{api_titulo}" já existia, atualizando dados...')
+                        jogo = Jogo.objects.get(titulo=api_titulo)
+                        jogo.rawg_id = jogo_rawg_id
+                        jogo.background_image = data.get('background_image')
+                        jogo.desenvolvedor = desenvolvedor
+                        jogo.save()
+                    # ⬆️ --- FIM DA CORREÇÃO --- ⬆️
+
+                except requests.RequestException:
+                    messages.error(request, "Não foi possível buscar os detalhes do jogo na API.")
+                    return redirect('jogos:configuracoes_conta')
+            
+            # 4. Define o jogo como favorito
+            profile.jogo_favorito = jogo
+            profile.save()
+            messages.success(request, f'"{jogo.titulo}" foi definido como seu jogo favorito!')
+            
         return redirect('jogos:configuracoes_conta')
+
+    # Lógica GET (carregamento da página)
     all_genres = _get_all_genres(request)
-    context = {'all_genres': all_genres, 'profile': profile }
+    context = {
+        'all_genres': all_genres, 
+        'profile': profile,
+        'predefined_avatars': PREDEFINED_AVATARS, # Envia a lista de avatares
+    }
     return render(request, 'jogos/configuracoes.html', context)
 
 
-# ⬇️ --- NOVA VIEW ADICIONADA AQUI --- ⬇️
 @login_required
 def avaliacoes_comunidade(request):
     """
     Mostra as 10 avaliações mais recentes de todos os usuários.
     """
-    # Busca as 10 últimas avaliações
-    # Usa select_related() para otimizar a busca,
-    # trazendo dados do Usuário e do Jogo na mesma consulta
     avaliacoes_recentes = Avaliar.objects.select_related('usuario', 'Jogo').order_by('-data_da_avaliacao')[:10]
     
     context = {
         'recentes': avaliacoes_recentes
     }
     return render(request, 'jogos/avaliacoes_comunidade.html', context)
-# ⬆️ --- FIM DA NOVA VIEW --- ⬆️
 
 
 logger = logging.getLogger(__name__)

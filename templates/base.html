@@ -56,7 +56,6 @@
                 <ul>
                     <li><a href="{% url 'jogos:home' %}">Início</a></li>
                     <li><a href="{% url 'jogos:minha_biblioteca' %}">Biblioteca</a></li>
-                    
                     <li><a href="{% url 'jogos:avaliacoes_comunidade' %}">Avaliações da Comunidade</a></li>
                     <li><a href="{% url 'jogos_steam:steam_tac_toe' %}">Steam Tac Toe</a></li>
                     <li><a href="{% url 'jogos_steam:whats_my_score' %}">What's My Score</a></li> 
@@ -67,6 +66,17 @@
     </header>
 
     <main class="main-content">
+        
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">
+                        {{ message }}
+                        <span class="close-message-btn" onclick="this.parentElement.style.display='none'">&times;</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         {% block content %}
         {% endblock %}
     </main>
