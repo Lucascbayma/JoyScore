@@ -10,32 +10,28 @@
 {% block content %}
 <main class="main-content">
 
-    {% if user.is_authenticated and jogos %} 
+    {% if user.is_authenticated %} 
         <section class="content-section"> 
             <h2 class="section-title">MINHA BIBLIOTECA DE JOGOS:</h2>
             
-            <ul class="game-list">
-                {% for jogo in jogos %}
-                <a href="{% url 'jogos:avaliar' jogo.id %}" class="game-item-link">
-                    <li class="game-item">
-                        <img src="{{ jogo.background_image }}" 
-                             alt="Capa do Jogo {{ jogo.titulo }}" 
-                             class="game-cover-img">
-                        <span class="game-title">{{ jogo.titulo }}</span>
-                    </li>
-                </a>
-                {% empty %}
+            {% if jogos %}
+                <div class="game-list">
+                    {% for jogo in jogos %}
+                        <a href="{% url 'jogos:avaliar' jogo.id %}" class="card-link">
+                            <div class="card">
+                                <img src="{{ jogo.background_image }}" alt="Capa do Jogo {{ jogo.titulo }}"> 
+                                <div class="card-info">
+                                    <div class="card-title">{{ jogo.titulo }}</div>
+                                    </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
                 <p>Sua biblioteca está vazia. Adicione jogos!</p>
-                {% endfor %}
-            </ul>
+            {% endif %}
         </section>
 
-    {% elif user.is_authenticated %}
-        <section class="content-section">
-            <h2 class="section-title">MINHA BIBLIOTECA DE JOGOS:</h2>
-            <p>Sua biblioteca está vazia. Adicione jogos!</p>
-        </section>
-        
     {% else %}
         <section class="content-section">
             <h2 class="section-title">BIBLIOTECA DE JOGOS:</h2>
