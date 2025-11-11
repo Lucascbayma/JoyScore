@@ -1,24 +1,26 @@
-name: Django CI/CD Gratuito
+name: Django CI/CD - Webhook
 
 on:
   push:
     branches:
-      - main # Roda quando há push na branch principal
+      - main
   pull_request:
     branches:
-      - main # Roda quando há pull request para a branch principal
+      - main
 
 jobs:
   # 1. Job de Integração Contínua (CI - Testes)
   ci:
     runs-on: ubuntu-latest
-    # Mova o env para cá, para afetar todos os passos que rodam Python
+    
+    # Define o PYTHONPATH para que o Django encontre os módulos do projeto
     env:
       PYTHONPATH: ${{ github.workspace }}
       
     steps:
     - uses: actions/checkout@v4
 
+    # Instala o git no runner (necessário para alguns comandos ou para a estrutura)
     - name: Install system dependencies (git)
       run: sudo apt-get update && sudo apt-get install -y git
       
@@ -27,25 +29,24 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: DEBUG - Show requirements.txt content
-      run: cat requirements.txt
-
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         
     - name: Run Tests
-      # O PYTHONPATH já está definido acima.
-      # Apenas rodamos os testes
-      run: python manage.py test
+      # Garante que os testes rodem sem erro de SECRET_KEY
+      run: |
+        export SECRET_KEY='ci-secret-key-para-testes'
+        python manage.py test
       
   # 2. Job de Deployment (CD) - Roda somente se o CI for SUCESSO
   cd:
     needs: ci
     runs-on: ubuntu-latest
+    
+    # Este estágio apenas dispara o Webhook, que é o código Django no servidor
     steps:
-    # Passo 1: Dispara o Webhook (Força o Git Pull, Migrações, Collect Static no PA)
     - name: Trigger PythonAnywhere Webhook for Deployment
       run: |
         curl -X POST \
