@@ -1,5 +1,3 @@
-# jogos/urls.py
-
 from django.urls import path
 from . import views
 
@@ -20,5 +18,8 @@ urlpatterns = [
     path('api/search/', views.autocomplete_search, name='api_autocomplete'),
 
     path('avaliar/api/<int:rawg_id>/', views.redirecionar_para_avaliacao, name='avaliar_from_rawg'),
-    # --- FIM DA ALTERAÇÃO ---
+    
+  
+    path('comunidade/', views.avaliacoes_comunidade, name='avaliacoes_comunidade'),
+   
 ]
