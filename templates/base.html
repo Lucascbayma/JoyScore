@@ -46,6 +46,16 @@
         </div>
         {% endif %}
         <div class="right-section">
+            
+            {% if request.resolver_match.url_name == 'home' and user.is_authenticated %}
+                <a href="{% url 'jogos:configuracoes_conta' %}" class="header-avatar-link">
+                    {% if profile.avatar %}
+                        <img src="{% static profile.avatar %}" alt="Avatar" class="header-avatar-img">
+                    {% else %}
+                        <img src="{% static 'jogos/imagens/avatar1.png' %}" alt="Avatar Padrão" class="header-avatar-img">
+                    {% endif %}
+                </a>
+            {% endif %}
             <input type="checkbox" id="menu-toggle" hidden>
             <label for="menu-toggle" class="hamburger">
                 <div></div>

@@ -21,7 +21,7 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse # Importamos o reverse para montar a URL
 from django.utils import timezone # Import para o default da data
 from datetime import timedelta 
-from django.db import IntegrityError # ⬅️ --- IMPORT ADICIONADO ---
+from django.db import IntegrityError # Import para o erro de Jogo Favorito
 
 RAWG_API_KEY = settings.API_KEY
 RAWG_BASE_URL = "https://api.rawg.io/api"
@@ -182,9 +182,7 @@ def redirecionar_para_avaliacao(request, rawg_id):
             genres = data.get('genres', [])
             genero = genres[0].get('name', "") if genres else ""
             
-            # ⬇️ --- LÓGICA DE CRIAÇÃO ATUALIZADA --- ⬇️
             try:
-                # Tenta criar com rawg_id E titulo
                 jogo, created = Jogo.objects.get_or_create(
                     rawg_id=rawg_id,
                     titulo=titulo,
@@ -197,13 +195,10 @@ def redirecionar_para_avaliacao(request, rawg_id):
                     }
                 )
             except IntegrityError:
-                # Se falhar (IntegrityError), significa que o TÍTULO já existe.
-                # Então, buscamos pelo título e atualizamos o rawg_id.
                 jogo = Jogo.objects.get(titulo=titulo)
                 jogo.rawg_id = rawg_id
                 jogo.background_image = data.get('background_image')
                 jogo.save()
-            # ⬆️ --- FIM DA ATUALIZAÇÃO --- ⬆️
         
         except requests.RequestException:
             messages.error(request, "Não foi possível buscar os detalhes do jogo na API. Tente novamente.")
@@ -254,11 +249,18 @@ def home(request):
     
     jogos_recomendados = []
     
+    # ⬇️ --- ALTERAÇÃO AQUI --- ⬇️
+    profile = None # Inicia o profile como None
     if request.user.is_authenticated:
         try:
-            random.seed(request.user.id)
-
+            # Tenta buscar o profile
             profile = request.user.profile
+        except Profile.DoesNotExist:
+            # Se não existir (caso raro), cria um
+            profile = Profile.objects.create(user=request.user)
+        
+        try:
+            random.seed(request.user.id)
             generos_favoritos = profile.generos_favoritos
             
             if generos_favoritos:
@@ -292,7 +294,9 @@ def home(request):
                     jogos_recomendados.extend(fallback_list[:restantes])
 
         except Profile.DoesNotExist:
+             # Isso agora é pego pelo try/except principal
             pass
+    # ⬆️ --- FIM DA ALTERAÇÃO --- ⬆️
 
     titulos_populares = [ "The Witcher 3: Wild Hunt", "Red Dead Redemption 2", "Grand Theft Auto V", "Hollow Knight", "Portal 2", "Minecraft", "God of War", "Elden Ring", "Fortnite Battle Royale", "The Legend of Zelda: Breath of the Wild", ]
     jogos_populares = Jogo.objects.filter( titulo__in=titulos_populares ).order_by('titulo')
@@ -321,6 +325,7 @@ def home(request):
         'jogos_shooter': jogos_shooter,
         'jogos_playstation': jogos_playstation,
         'jogos_nintendo': jogos_nintendo,
+        'profile': profile, # ⬅️ --- ADICIONADO O PROFILE AO CONTEXTO ---
     }
     return render(request, 'jogos/home.html', context)
 
@@ -332,7 +337,6 @@ def autocomplete_search(request):
     Busca no BD local para a barra de busca antiga da home.
     """
     query = request.GET.get('q')
-    # Novo parâmetro para diferenciar as buscas
     source = request.GET.get('source', 'local') 
 
     if not query or len(query) < 3:
@@ -341,7 +345,6 @@ def autocomplete_search(request):
     results_list = []
     
     if source == 'api':
-        # --- Lógica para o MODAL (busca na API RAWG) ---
         api_url = f"{RAWG_BASE_URL}/games?key={RAWG_API_KEY}&search={query}&page_size=5"
         try:
             response = requests.get(api_url)
@@ -350,7 +353,7 @@ def autocomplete_search(request):
             
             for game in data.get('results', []):
                 results_list.append({
-                    "id": game.get('id'), # Envia o RAWG ID
+                    "id": game.get('id'), 
                     "name": game.get('name'), 
                     "released": game.get('released'), 
                     "background_image": game.get('background_image'), 
@@ -360,12 +363,11 @@ def autocomplete_search(request):
             return JsonResponse({'error': str(e)}, status=500)
     
     else:
-        # --- Lógica ANTIGA (busca no BD local para a home) ---
         jogos_encontrados = Jogo.objects.filter(titulo__icontains=query).order_by('titulo')[:4]
         for jogo in jogos_encontrados:
             release_date = jogo.ano_lancamento.isoformat() if jogo.ano_lancamento else None
             results_list.append({
-                "id": jogo.id, # Envia o ID local
+                "id": jogo.id, 
                 "name": jogo.titulo, 
                 "released": release_date, 
                 "background_image": jogo.background_image, 
@@ -413,9 +415,6 @@ def filtrar_por_genero(request):
     context = {'all_genres': all_genres, 'games_page': games_page, 'selected_genres_ids': selected_genres_ids, 'search_error': search_error, 'form_submitted': form_submitted, 'genres_query_string': genres_query_string, }
     return render(request, 'jogos/filtrar.html', context)
 
-# ⬇️ --- VIEW 'configuracoes_conta' ATUALIZADA --- ⬇️
-
-# Lista de avatares predefinidos (caminhos a partir de 'static/')
 PREDEFINED_AVATARS = [
     "jogos/imagens/avatar1.png",
     "jogos/imagens/avatar2.png",
@@ -428,17 +427,14 @@ def configuracoes_conta(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
     
     if request.method == 'POST':
-        # Identifica qual formulário foi enviado
         form_type = request.POST.get('form_type')
 
-        # 1. Lidando com a mudança de Gêneros
         if form_type == 'genres':
             generos_selecionados = request.POST.getlist('genres')
             profile.generos_favoritos = generos_selecionados
             profile.save()
             messages.success(request, 'Gêneros favoritos atualizados!')
         
-        # 2. Lidando com a mudança de Avatar
         elif form_type == 'avatar':
             avatar_selecionado = request.POST.get('avatar_path')
             if avatar_selecionado in PREDEFINED_AVATARS:
@@ -448,7 +444,6 @@ def configuracoes_conta(request):
             else:
                 messages.error(request, 'Avatar inválido.')
 
-        # 3. Lidando com a mudança de Jogo Favorito
         elif form_type == 'favorite_game':
             jogo_rawg_id = request.POST.get('jogo_id')
             
@@ -459,10 +454,8 @@ def configuracoes_conta(request):
                 return redirect('jogos:configuracoes_conta')
 
             try:
-                # 1. Tenta buscar pelo rawg_id
                 jogo = Jogo.objects.get(rawg_id=jogo_rawg_id)
             except Jogo.DoesNotExist:
-                # 2. Se não achar, busca na API
                 game_details_url = f"{RAWG_BASE_URL}/games/{jogo_rawg_id}?key={RAWG_API_KEY}"
                 try:
                     response = requests.get(game_details_url)
@@ -484,9 +477,7 @@ def configuracoes_conta(request):
                     devs = data.get('developers', [])
                     desenvolvedor = ", ".join([d.get('name') for d in devs]) if devs else ""
                     
-                    # 3. ⬇️ --- LÓGICA DE CORREÇÃO DO ERRO --- ⬇️
                     try:
-                        # Tenta criar o jogo com rawg_id
                         jogo, created = Jogo.objects.get_or_create(
                             rawg_id=jogo_rawg_id,
                             defaults={
@@ -499,42 +490,34 @@ def configuracoes_conta(request):
                             }
                         )
                     except IntegrityError:
-                        # Se der erro de TÍTULO ÚNICO, é o nosso bug.
-                        # Buscamos pelo título e atualizamos o rawg_id.
                         messages.warning(request, f'"{api_titulo}" já existia, atualizando dados...')
                         jogo = Jogo.objects.get(titulo=api_titulo)
                         jogo.rawg_id = jogo_rawg_id
                         jogo.background_image = data.get('background_image')
                         jogo.desenvolvedor = desenvolvedor
                         jogo.save()
-                    # ⬆️ --- FIM DA CORREÇÃO --- ⬆️
 
                 except requests.RequestException:
                     messages.error(request, "Não foi possível buscar os detalhes do jogo na API.")
                     return redirect('jogos:configuracoes_conta')
             
-            # 4. Define o jogo como favorito
             profile.jogo_favorito = jogo
             profile.save()
             messages.success(request, f'"{jogo.titulo}" foi definido como seu jogo favorito!')
             
         return redirect('jogos:configuracoes_conta')
 
-    # Lógica GET (carregamento da página)
     all_genres = _get_all_genres(request)
     context = {
         'all_genres': all_genres, 
         'profile': profile,
-        'predefined_avatars': PREDEFINED_AVATARS, # Envia a lista de avatares
+        'predefined_avatars': PREDEFINED_AVATARS, 
     }
     return render(request, 'jogos/configuracoes.html', context)
 
 
 @login_required
 def avaliacoes_comunidade(request):
-    """
-    Mostra as 10 avaliações mais recentes de todos os usuários.
-    """
     avaliacoes_recentes = Avaliar.objects.select_related('usuario', 'Jogo').order_by('-data_da_avaliacao')[:10]
     
     context = {

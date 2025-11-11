@@ -72,6 +72,7 @@ html,Body {
   background: #333;
   padding: 15px;
   border-radius: 5px;
+  z-index: 1001; 
 }
 .menu ul {
   list-style: none;
@@ -345,7 +346,7 @@ footer {
 .card-link {
     text-decoration: none; 
     color: inherit;     
-    display: block;      
+    display: block;       
 }
 
 .card-link:hover .card {
@@ -354,11 +355,45 @@ footer {
     transition: all 0.2s ease-out;
 }
 
+
+/* =================================================== */
+/* CORREÇÃO DO CURSOR DE SELEÇÃO ("I") */
+/* =================================================== */
+
+a,
+button,
+.hamburger,
+.menu ul li,
+.card,
+.filter-toggle-button,
+.autocomplete-item {
+    -webkit-user-select: none; 
+    -moz-user-select: none;    
+    -ms-user-select: none;     
+    user-select: none;         
+    cursor: pointer; 
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+textarea {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+    cursor: text; 
+}
+
+/* =================================================== */
+/* ⬇️ --- ESTILOS DAS MENSAGENS DE FEEDBACK --- ⬇️ */
+/* =================================================== */
+
 .messages-container {
     list-style: none;
     padding: 0;
     margin-bottom: 20px;
-    /* Impede que o 'x' seja selecionado como texto */
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -377,35 +412,30 @@ footer {
     margin-bottom: 10px;
 }
 
-/* Cor de sucesso (verde) */
 .message.success {
-    background-color: #1a4a3c; /* Fundo verde escuro */
-    color: #a3e9d2; /* Texto verde claro */
+    background-color: #1a4a3c; 
+    color: #a3e9d2; 
     border-color: #278f6c;
 }
 
-/* Cor de erro (vermelho) */
 .message.error {
-    background-color: #4a1a1a; /* Fundo vermelho escuro */
-    color: #e9a3a3; /* Texto vermelho claro */
+    background-color: #4a1a1a; 
+    color: #e9a3a3; 
     border-color: #8f2727;
 }
 
-/* Cor de aviso (amarelo) - como a do IntegrityError */
 .message.warning {
-    background-color: #4a3c1a; /* Fundo amarelo escuro */
-    color: #e9d2a3; /* Texto amarelo claro */
+    background-color: #4a3c1a; 
+    color: #e9d2a3; 
     border-color: #8f6c27;
 }
 
-/* Cor de informação (azul) */
 .message.info {
-    background-color: #1a3c4a; /* Fundo azul escuro */
-    color: #a3d2e9; /* Texto azul claro */
+    background-color: #1a3c4a; 
+    color: #a3d2e9; 
     border-color: #276c8f;
 }
 
-/* Botão de fechar (o 'x') */
 .close-message-btn {
     font-size: 1.5rem;
     font-weight: bold;
@@ -417,4 +447,32 @@ footer {
 
 .close-message-btn:hover {
     color: #fff;
+}
+
+
+/* =================================================== */
+/* ⬇️ --- Avatar no Header (Home) --- ⬇️ */
+/* =================================================== */
+.header-avatar-link {
+    display: block;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    border: 2px solid #6a1b9a; /* Cor de destaque */
+    overflow: hidden;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    /* Adicionado para garantir que não seja "arrastável" */
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.header-avatar-link:hover {
+    transform: scale(1.1);
+    border-color: #8e24aa; /* Cor de destaque mais clara */
+}
+
+.header-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Garante que a imagem preencha o círculo */
 }
