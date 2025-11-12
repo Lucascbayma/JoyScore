@@ -15,7 +15,7 @@
             <h2 class="section-title">Configurações de Conta</h2>
         </div>
 
-        <div class="config-card profile-info">
+        <div class="config-card profile-info" id="perfil-info">
             <div class="preferences-header">
                 <h3 class="card-title">Informações do Usuário</h3>
                 <button type="button" class="edit-button" data-modal-target="avatar-modal">
@@ -30,7 +30,8 @@
                 </p>
             </div>
         </div>
-        <div class="config-card">
+
+        <div class="config-card" id="jogo-favorito">
             <div class="preferences-header">
                 <h3 class="card-title">Seu Jogo Favorito</h3>
                 <button type="button" class="edit-button" data-modal-target="game-modal">
@@ -54,11 +55,11 @@
             {% endif %}
         </div>
 
-        <div class="config-card genre-preferences-card">
+        <div class="config-card genre-preferences-card" id="generos-favoritos">
             {% if profile.generos_favoritos and not 'edit' in request.GET %}
                 <div class="preferences-header">
                     <h3 class="card-title">Seus Gêneros Favoritos</h3>
-                    <a href="?edit=true" class="edit-button">Alterar Preferências</a>
+                    <a href="?edit=true#generos-favoritos" class="edit-button">Alterar Preferências</a>
                 </div>
                 <div class="genre-container-display">
                     {% for genre_name in profile.generos_favoritos %}

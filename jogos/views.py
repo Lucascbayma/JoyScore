@@ -429,11 +429,21 @@ def configuracoes_conta(request):
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
+        # --- 👇 ALTERAÇÃO AQUI 👇 ---
+        # Define a URL base para o redirecionamento
+        redirect_url = reverse('jogos:configuracoes_conta')
+        # --- FIM DA ALTERAÇÃO ---
+
         if form_type == 'genres':
             generos_selecionados = request.POST.getlist('genres')
             profile.generos_favoritos = generos_selecionados
             profile.save()
             messages.success(request, 'Gêneros favoritos atualizados!')
+            
+            # --- 👇 ALTERAÇÃO AQUI 👇 ---
+            # Adiciona a âncora para a seção de gêneros
+            redirect_url += '#generos-favoritos'
+            # --- FIM DA ALTERAÇÃO ---
         
         elif form_type == 'avatar':
             avatar_selecionado = request.POST.get('avatar_path')
@@ -444,14 +454,27 @@ def configuracoes_conta(request):
             else:
                 messages.error(request, 'Avatar inválido.')
 
+            # --- 👇 ALTERAÇÃO AQUI 👇 ---
+            # Adiciona a âncora para a seção de perfil
+            redirect_url += '#perfil-info'
+            # --- FIM DA ALTERAÇÃO ---
+
         elif form_type == 'favorite_game':
+            # --- 👇 ALTERAÇÃO AQUI 👇 ---
+            # Adiciona a âncora para a seção de jogo favorito
+            redirect_url += '#jogo-favorito'
+            # --- FIM DA ALTERAÇÃO ---
+            
             jogo_rawg_id = request.POST.get('jogo_id')
             
             if jogo_rawg_id == "remove":
                 profile.jogo_favorito = None
                 profile.save()
                 messages.success(request, 'Jogo favorito removido.')
-                return redirect('jogos:configuracoes_conta')
+                
+                # --- 👇 ALTERAÇÃO AQUI 👇 ---
+                return redirect(redirect_url) # Usa a URL com âncora
+                # --- FIM DA ALTERAÇÃO ---
 
             try:
                 jogo = Jogo.objects.get(rawg_id=jogo_rawg_id)
@@ -499,13 +522,19 @@ def configuracoes_conta(request):
 
                 except requests.RequestException:
                     messages.error(request, "Não foi possível buscar os detalhes do jogo na API.")
-                    return redirect('jogos:configuracoes_conta')
+                    
+                    # --- 👇 ALTERAÇÃO AQUI 👇 ---
+                    return redirect(redirect_url) # Usa a URL com âncora
+                    # --- FIM DA ALTERAÇÃO ---
             
             profile.jogo_favorito = jogo
             profile.save()
             messages.success(request, f'"{jogo.titulo}" foi definido como seu jogo favorito!')
             
-        return redirect('jogos:configuracoes_conta')
+        # --- 👇 ALTERAÇÃO AQUI 👇 ---
+        # Redireciona para a URL final (com âncora)
+        return redirect(redirect_url)
+        # --- FIM DA ALTERAÇÃO ---
 
     all_genres = _get_all_genres(request)
     context = {
