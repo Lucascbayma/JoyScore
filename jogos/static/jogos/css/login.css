@@ -34,7 +34,7 @@ body {
     justify-content: center;
     max-width: 1000px; 
     width: 100%;
-    gap: 80px; 
+    gap: 40px; 
     padding: 20px; 
     flex-wrap: wrap; 
 }
@@ -91,6 +91,12 @@ input[type="text"] {
     font-size: 1rem;
     outline: none;
     transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="text"]:hover {
+    border-color: var(--cor-destaque-secundaria);
 }
 
 input::placeholder {
@@ -177,6 +183,7 @@ button:active {
     display: flex;
     justify-content: center;
     align-items: center;
+    order: -1; 
 }
 
 .project-logo {
