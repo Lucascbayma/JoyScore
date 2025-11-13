@@ -6,13 +6,11 @@ urlpatterns = [
     # Rota para o painel de administração do Django
     path('admin/', admin.site.urls),
 
-    # Rota para o seu novo app da Steam
-    # Qualquer URL que comece com /steam/ será gerenciada por ele
+    # Rota para o seu novo app da Steam (Mantenha como está, ou adicione namespace)
     path('steam/', include('jogos_steam.urls')),
 
-    # Rota para o seu app original (RAWG)
-    # O path '' diz ao Django que este app cuida da PÁGINA INICIAL e outras rotas
-    path('', include('jogos.urls')),
+    # CORREÇÃO: Adicionando o namespace 'jogos' para resolver o NoReverseMatch
+    path('', include(('jogos.urls', 'jogos'), namespace='jogos')), 
 
     # Adicionando o webhook na raiz
     path('webhook/github/', github_webhook, name='github_webhook'),
