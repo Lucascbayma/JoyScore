@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-# Modelos importados, incluindo o novo JornadaGamer
 from .models import Jogo, Add_Biblioteca, Avaliar, Profile, JornadaGamer
 from django.http import HttpResponse, JsonResponse
 import requests
@@ -22,6 +21,8 @@ from django.urls import reverse # Importamos o reverse para montar a URL
 from django.utils import timezone # Import para o default da data
 from datetime import timedelta 
 from django.db import IntegrityError # Import para o erro de Jogo Favorito
+from GitPython.repo import Repo # Movido para o topo para consistência (embora isolado abaixo)
+import sys # Import adicionado para debug
 
 RAWG_API_KEY = settings.API_KEY
 RAWG_BASE_URL = "https://api.rawg.io/api"
@@ -249,7 +250,6 @@ def home(request):
     
     jogos_recomendados = []
     
-    # ⬇️ --- ALTERAÇÃO AQUI --- ⬇️
     profile = None # Inicia o profile como None
     if request.user.is_authenticated:
         try:
@@ -557,26 +557,61 @@ def avaliacoes_comunidade(request):
 
 logger = logging.getLogger(__name__)
 
-REPO_PATH = '/home/LcsBayma/joyscore/'
+# --- VARIÁVEIS DE AMBIENTE DO PYTHONANYWHERE ---
+PA_USERNAME = 'LcsBayma'
+REPO_PATH = f'/home/{PA_USERNAME}/joyscore/'
 VENV_NAME = 'venv_joyscore'
+VENV_PATH = f'/home/{PA_USERNAME}/.virtualenvs/{VENV_NAME}/'
+PYTHON_PATH = f'{VENV_PATH}bin/python'
+PIP_PATH = f'{VENV_PATH}bin/pip'
+MANAGE_PY_PATH = f'{REPO_PATH}manage.py'
+WSGI_FILE_PATH = f'/var/www/{PA_USERNAME}_pythonanywhere_com_wsgi.py'
 
 @csrf_exempt
 def github_webhook(request):
+    # A importação do GitPython e Repo precisa ser feita aqui dentro do Webhook
+    # para evitar quebrar o CI.
+    try:
+        from GitPython.repo import Repo 
+    except ImportError:
+        # Se a biblioteca não estiver instalada (ex: durante o CI), retorna erro.
+        return HttpResponse('Erro: GitPython não instalado no ambiente do servidor.', status=500)
+
     if request.method == 'POST':
         try:
-            from GitPython.repo import Repo 
-            
-            REPO_PATH = '/home/LcsBayma/joyscore/'
-
+            # 1. Puxar o código mais recente
             repo = Repo(REPO_PATH)
             origin = repo.remotes.origin
-            origin.pull()
+            # Use 'fetch' e 'reset --hard' para garantir que o pull não falhe por arquivos conflitantes
+            origin.fetch()
+            repo.git.reset('--hard', f'origin/{repo.active_branch.name}')
+
+            # 2. Atualizar dependências (com o pip do VENV)
+            # Rodamos subprocess.run() com o interpretador correto.
+            subprocess.run([PIP_PATH, 'install', '-r', f'{REPO_PATH}requirements.txt'], check=True, cwd=REPO_PATH)
             
+            # 3. Rodar Migrações (com o Python do VENV)
+            subprocess.run([PYTHON_PATH, MANAGE_PY_PATH, 'migrate', '--noinput'], check=True, cwd=REPO_PATH)
+
+            # 4. Coletar Estáticos (com o Python do VENV)
+            subprocess.run([PYTHON_PATH, MANAGE_PY_PATH, 'collectstatic', '--noinput'], check=True, cwd=REPO_PATH)
+            
+            # 5. Finalmente, recarrega o Web App tocando o arquivo WSGI
+            os.utime(WSGI_FILE_PATH, None)
+            
+            # Retorna 200 para o GitHub (indicando sucesso do deploy)
             return HttpResponse('Deployment concluído!', status=200)
 
-        except ImportError:
-            return HttpResponse('Erro de importação de GitPython no servidor.', status=500)
+        except subprocess.CalledProcessError as e:
+            # Erro em qualquer subprocesso (pip, migrate, collectstatic)
+            error_message = f"Erro no subprocesso: {e.cmd}. Retorno: {e.returncode}. Saída: {e.stdout.decode()} Erro: {e.stderr.decode()}"
+            logger.error(error_message, exc_info=True)
+            return HttpResponse(f'Erro de subprocesso: {error_message}', status=500)
+            
         except Exception as e:
-            pass
+            # Erro em GitPython ou os.utime
+            error_message = f"Erro inesperado no Webhook: {e}"
+            logger.error(error_message, exc_info=True)
+            return HttpResponse(f'Erro no deploy: {error_message}', status=500)
 
     return HttpResponse('Método não permitido.', status=405)
