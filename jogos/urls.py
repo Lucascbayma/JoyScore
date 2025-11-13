@@ -18,7 +18,6 @@ urlpatterns = [
     path('adicionar/<int:jogo_id>/', views.adicionar_biblioteca, name='adicionar_biblioteca'),
     path('avaliar/<int:jogo_id>/', views.avaliar, name='avaliar'),
     path('api/search/', views.autocomplete_search, name='api_autocomplete'),
-
+    path('comunidade/avaliacoes/', views.avaliacoes_comunidade, name='avaliacoes_comunidade'),
     path('avaliar/api/<int:rawg_id>/', views.redirecionar_para_avaliacao, name='avaliar_from_rawg'),
-    # --- FIM DA ALTERAÇÃO ---
 ]
