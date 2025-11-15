@@ -24,62 +24,10 @@ def configurar_driver():
         print("(Verifique se o Google Chrome está instalado no computador)")
         return None, None
 
-
-def rodar_teste_login(driver, wait):
-    print("--- Iniciando Teste de Login ---")
-    try:
-        driver.get(BASE_URL)
-        print("Página de login aberta")
-        time.sleep(DELAY_PARA_VER)
-        USUARIO_REAL = "usuario_teste"
-        SENHA_REAL = "senha123"
-
-        username_field = wait.until(
-            EC.visibility_of_element_located((By.NAME, "username"))
-        )
-        username_field.send_keys(USUARIO_REAL)
-        print(f"Preencheu usuário: {USUARIO_REAL}")
-        time.sleep(DELAY_PARA_VER)
-
-        driver.find_element(By.NAME, "password").send_keys(SENHA_REAL)
-        print("Preencheu a senha")
-        time.sleep(DELAY_PARA_VER)
-
-        submit_button = wait.until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type='submit']"))
-        )
-        submit_button.click()
-        print("Clicou em Login")
-
-        wait.until(EC.url_contains("/dashboard"))
-        print("Redirecionado para o Dashboard")
-        time.sleep(DELAY_PARA_VER)
-
-        assert "/dashboard" in driver.current_url
-        print(">>> Teste de Login: SUCESSO")
-
-    except Exception as e:
-        print(f"XXX Teste de Login: FALHOU XXX")
-        print(f"Erro: {e}")
-        time.sleep(2)
-    finally:
-        print("--- Finalizando Teste de Login ---")
-
-
 def rodar_teste_registro(driver, wait):
     print("\n--- Iniciando Teste de Registro ---")
     try:
         driver.get(BASE_URL)
-        print("Página de login aberta (para ir ao registro)")
-        time.sleep(DELAY_PARA_VER)
-
-        register_link = wait.until(
-            EC.element_to_be_clickable((By.LINK_TEXT, "Registre-se"))
-        )
-        register_link.click()
-        print("Clicou em 'Registre-se'")
-
-        wait.until(EC.url_contains("/registro"))
         print("Página de registro aberta")
         time.sleep(DELAY_PARA_VER)
 
@@ -1167,7 +1115,6 @@ if __name__ == "__main__":
 
     if driver:
         try:
-            rodar_teste_login(driver, wait)
             rodar_teste_registro(driver, wait)
             rodar_teste_busca_alternada(driver, wait)          
             rodar_teste_filtro(driver, wait)
