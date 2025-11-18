@@ -7,10 +7,10 @@ import time
 import sys 
 import json 
 
-# --- Funções de Utilitário (MANTIDAS) ---
-
+# --- Funções de Utilitário ---
 def normalize_genre(genre_string):
-    """Converte uma string de gênero para um formato padronizado."""
+    # Remove espaços, hifens e deixa minúsculo para facilitar a comparação
+    # Ex: "Single-player" vira "singleplayer"
     return genre_string.lower().replace('-', '').replace(' ', '')
 
 ALL_AVAILABLE_THEMES = [
@@ -19,9 +19,23 @@ ALL_AVAILABLE_THEMES = [
     "Free to Play", "Early Access", "Massively Multiplayer", "Co-op"
 ]
 
-# --- FONTE DE DADOS 1: "WHAT'S MY SCORE" (Lista Curada) ---
-# Lista de 100 AppIDs usada APENAS para o sorteio do "What's My Score".
+# --- LISTA DE ELITE: JOGOS FAMOSOS ---
+TOP_FAMOUS_GAMES = [
+    {'appid': 730, 'name': 'Counter-Strike 2'}, {'appid': 570, 'name': 'Dota 2'},
+    {'appid': 271590, 'name': 'Grand Theft Auto V'}, {'appid': 1172470, 'name': 'Apex Legends'},
+    {'appid': 1245620, 'name': 'Elden Ring'}, {'appid': 1091500, 'name': 'Cyberpunk 2077'},
+    {'appid': 292030, 'name': 'The Witcher 3: Wild Hunt'}, {'appid': 1086940, 'name': 'Baldur\'s Gate 3'},
+    {'appid': 2215430, 'name': 'Ghost of Tsushima'}, {'appid': 413150, 'name': 'Stardew Valley'},
+    {'appid': 105600, 'name': 'Terraria'}, {'appid': 1174180, 'name': 'Red Dead Redemption 2'},
+    {'appid': 489830, 'name': 'The Elder Scrolls V: Skyrim'}, {'appid': 3096070, 'name': 'Ghost of Yotei'},
+    {'appid': 1145360, 'name': 'Hades'}, {'appid': 945360, 'name': 'Among Us'},
+    {'appid': 397540, 'name': 'Borderlands 3'}, {'appid': 239140, 'name': 'Dying Light'},
+    {'appid': 1623730, 'name': 'Palworld'}, {'appid': 553850, 'name': 'HELLDIVERS 2'},
+    {'appid': 230410, 'name': 'Warframe'}, {'appid': 359550, 'name': 'Rainbow Six Siege'},
+    {'appid': 252490, 'name': 'Rust'}, {'appid': 578080, 'name': 'PUBG: BATTLEGROUNDS'}
+]
 
+# --- FONTE DE DADOS 1: "WHAT'S MY SCORE" ---
 HIGH_RATED_APPIDS = [
     620, 292030, 1245620, 105600, 892970, 379430, 730, 1174180, 230410, 386210, 
     550, 4000, 3830, 20920, 22370, 41000, 48700, 57095, 61767, 200710, 203160, 
@@ -35,45 +49,17 @@ HIGH_RATED_APPIDS = [
     753640, 952060, 976730, 1097840, 11270, 211830, 218620, 289070, 319630, 367520, 
     412020, 49520, 578080, 698780, 774880, 920210, 1118310, 1289380, 1203620, 1449850 
 ]
-
 WMS_APP_POOL = [{'appid': appid, 'name': str(appid)} for appid in HIGH_RATED_APPIDS]
 print(f"\n[WMS API] {len(WMS_APP_POOL)} AppIDs de ALTA QUALIDADE carregados para 'What's My Score'.", file=sys.stderr, flush=True)
 
-
-# --- FONTE DE DADOS 2: "STEAM TAC TOE" (Lista Completa da API) ---
-# Esta variável global guardará TODOS os jogos da Steam para a busca.
-# Usada APENAS pelo "Steam Tac Toe".
-FULL_STEAM_APP_LIST = []
-
+# --- FONTE DE DADOS 2: "STEAM TAC TOE" ---
 def load_steam_app_list():
-    """
-    Busca a lista completa de AppIDs e Nomes da Steam.
-    Chamada APENAS UMA VEZ quando o servidor inicia.
-    """
-    global FULL_STEAM_APP_LIST
-    url = "https://api.steampowered.com/ISteamApps/GetAppList/v2/"
-    
-    try:
-        response = requests.get(url, timeout=15)
-        response.raise_for_status()
-        data = response.json()
-        
-        FULL_STEAM_APP_LIST = data.get('applist', {}).get('apps', [])
-        
-        if FULL_STEAM_APP_LIST:
-            print(f"\n[STEAM TAC TOE API] SUCESSO! {len(FULL_STEAM_APP_LIST)} jogos carregados da API da Steam para a busca.", file=sys.stderr, flush=True)
-        else:
-            print("\n[STEAM TAC TOE API] ERRO! A API da Steam não retornou nenhum jogo.", file=sys.stderr, flush=True)
-            
-    except requests.exceptions.RequestException as e:
-        print(f"\n[STEAM TAC TOE API] FALHA AO CARREGAR A LISTA DE JOGOS: {e}", file=sys.stderr, flush=True)
+    print("\n[STEAM TAC TOE] Pronto. Modo 'Live Search' (Store) ativado.", file=sys.stderr, flush=True)
 
-# --- Views e APIs do Steam Tac Toe (Independente) ---
+# --- Views ---
 
 def steam_tac_toe_view(request):
-    """Renderiza a página principal do jogo Steam Tac Toe."""
     custom_themes_str = request.GET.get('temas')
-    
     if custom_themes_str:
         custom_themes_list = [theme.strip() for theme in custom_themes_str.split(',')]
         valid_themes = [theme for theme in custom_themes_list if theme in ALL_AVAILABLE_THEMES]
@@ -83,7 +69,6 @@ def steam_tac_toe_view(request):
     
     num_to_sample = min(6, len(themes_to_use))
     generos_escolhidos = random.sample(themes_to_use, num_to_sample)
-    
     while len(generos_escolhidos) < 6:
         fallback_theme = random.choice(ALL_AVAILABLE_THEMES)
         if fallback_theme not in generos_escolhidos:
@@ -97,26 +82,45 @@ def steam_tac_toe_view(request):
     }
     return render(request, 'jogos_steam/steam_tac_toe.html', context)
 
-
 def search_steam_games_api(request):
-    """API para buscar jogos pelo nome a partir da lista COMPLETA da Steam."""
-    query = request.GET.get('q', '').lower()
-    if not query or len(query) < 3: 
+    """
+    Busca jogos e FABRICA a imagem correta para garantir que ela exista.
+    """
+    query = request.GET.get('q', '').strip().lower()
+    if not query or len(query) < 2: 
         return JsonResponse({'games': []})
     
-    if not FULL_STEAM_APP_LIST:
-        return JsonResponse({'games': [], 'error': 'A lista de jogos da Steam não está carregada no servidor.'}, status=503)
-        
-    # Busca na lista completa (milhares de jogos)
-    results = [
-        app for app in FULL_STEAM_APP_LIST 
-        if query in app.get('name', '').lower()
-    ]
+    results = []
     
+    # 1. Busca na Lista Local (Top Games)
+    for game in TOP_FAMOUS_GAMES:
+        if query in game['name'].lower():
+            img_url = f"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{game['appid']}/header.jpg"
+            results.append({'appid': game['appid'], 'name': game['name'], 'image': img_url})
+            
+    # 2. Busca na Loja (Para todo o resto)
+    url = f"https://store.steampowered.com/api/storesearch/?term={query}&l=portuguese&cc=BR"
+    
+    try:
+        response = requests.get(url, timeout=4)
+        if response.status_code == 200:
+            data = response.json()
+            items = data.get('items', [])
+            local_ids = {g['appid'] for g in results}
+            
+            for item in items:
+                if item['id'] not in local_ids:
+                    manual_image = f"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{item['id']}/header.jpg"
+                    results.append({'appid': item['id'], 'name': item['name'], 'image': manual_image})
+    except Exception:
+        pass 
+            
     return JsonResponse({'games': results[:10]})
 
 def validate_game_move_api(request):
-    """API para validar se um jogo pertence a dois gêneros específicos."""
+    """
+    Valida a jogada pedindo dados em INGLÊS para bater com a lista de temas.
+    """
     if request.method == 'POST':
         appid = request.POST.get('appid', '').strip()
         row_genre = request.POST.get('row_genre', '').strip()
@@ -125,254 +129,126 @@ def validate_game_move_api(request):
         if not all([appid, row_genre, col_genre]):
             return JsonResponse({'success': False, 'message': 'Dados incompletos.'}, status=400)
         
-        url = f"https://store.steampowered.com/api/appdetails?appids={appid}"
+        # [IMPORTANTE] l=english garante que "Single-player" venha como "Single-player"
+        # e não "Um jogador", para bater com a sua lista ALL_AVAILABLE_THEMES.
+        url = f"https://store.steampowered.com/api/appdetails?appids={appid}&l=english"
         
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+
         try:
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
+            response = requests.get(url, headers=headers, timeout=8)
             data = response.json()
 
-            if not data.get(appid) or not data[appid]['success']: 
-                return JsonResponse({'success': False, 'message': 'Não foi possível encontrar detalhes para este jogo.'})
+            if not data.get(str(appid)) or not data[str(appid)]['success']: 
+                return JsonResponse({'success': False, 'message': 'Erro ao verificar detalhes do jogo.'})
 
-            game_data = data[appid]['data']
+            game_data = data[str(appid)]['data']
             game_name = game_data.get('name', 'Este jogo')
+            image_url = game_data.get('header_image')
             
-            game_genres = [g['description'] for g in game_data.get('genres', [])]
-            game_categories = [c['description'] for c in game_data.get('categories', [])]
-            all_tags_from_api = game_genres + game_categories
+            # Coleta Gêneros e Categorias da API
+            # Categories é onde fica "Single-player", "Multi-player", "Co-op"
+            # Genres é onde fica "Action", "RPG", "Indie"
+            genres_api = [g['description'] for g in game_data.get('genres', [])]
+            categories_api = [c['description'] for c in game_data.get('categories', [])]
+            
+            all_tags = genres_api + categories_api
+            
+            # Normaliza tudo para comparação
+            norm_row = normalize_genre(row_genre)
+            norm_col = normalize_genre(col_genre)
+            all_norm_tags = {normalize_genre(tag) for tag in all_tags}
+            
+            # DEBUG: Mostra no terminal o que a Steam devolveu (em inglês)
+            print(f"\n[VALIDAÇÃO] Jogo: {game_name}", file=sys.stderr)
+            print(f"Tags Steam (EN): {all_tags}", file=sys.stderr)
+            print(f"Bingo Pede: {row_genre} & {col_genre}", file=sys.stderr)
 
-            normalized_row = normalize_genre(row_genre)
-            normalized_col = normalize_genre(col_genre)
-            all_normalized_tags = {normalize_genre(tag) for tag in all_tags_from_api}
-
-            if normalized_row in all_normalized_tags and normalized_col in all_normalized_tags:
-                return JsonResponse({'success': True, 'image_url': game_data.get('header_image')})
+            if norm_row in all_norm_tags and norm_col in all_norm_tags:
+                return JsonResponse({'success': True, 'image_url': image_url})
             else:
-                valid_genres_for_bingo = [
-                    theme for theme in ALL_AVAILABLE_THEMES 
-                    if normalize_genre(theme) in all_normalized_tags
-                ]
-
-                if not valid_genres_for_bingo:
-                    message = f"Não foi possível validar os gêneros de '{game_name}' com os temas do bingo."
-                else:
-                    genres_str = ', '.join(valid_genres_for_bingo)
-                    message = f"Jogada inválida! '{game_name}' não se encaixa em '{row_genre}' e '{col_genre}'. No bingo, os temas dele são: {genres_str}."
+                # Filtra apenas os gêneros que são válidos no Bingo para mostrar na mensagem
+                valid_matches = [t for t in ALL_AVAILABLE_THEMES if normalize_genre(t) in all_norm_tags]
                 
-                return JsonResponse({'success': False, 'message': message})
+                # Tradução amigável para a mensagem de erro (Opcional, mas legal)
+                error_msg = f"Jogada inválida! No bingo, '{game_name}' se encaixa em: {', '.join(valid_matches)}."
+                if not valid_matches:
+                    error_msg = f"'{game_name}' não possui os gêneros necessários cadastrados na Steam."
+                    
+                return JsonResponse({'success': False, 'message': error_msg})
 
-        except requests.exceptions.RequestException:
-            return JsonResponse({'success': False, 'message': 'Erro de conexão ao consultar a API da Steam.'}, status=500)
-        except KeyError:
-            return JsonResponse({'success': False, 'message': 'Erro ao processar a resposta da API da Steam.'}, status=500)
+        except Exception as e:
+            print(f"[ERRO VALIDAÇÃO] {e}", file=sys.stderr)
+            return JsonResponse({'success': False, 'message': 'Erro de conexão com a Steam.'}, status=500)
 
     return JsonResponse({'success': False, 'message': 'Método inválido.'}, status=405)
 
 
-# --- Funções do "WHAT'S MY SCORE" (Independente) ---
-
+# --- What's My Score (Intocado) ---
 def get_game_details_and_metascore(appid):
-    """Busca os detalhes do jogo, incluindo o Metascore (nota Metacritic)."""
     url = f"https://store.steampowered.com/api/appdetails?appids={appid}&cc=br&l=pt"
-    
-    # DELAY CRÍTICO: 2.0 SEGUNDOS
     time.sleep(2.0) 
-    
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()
         data = response.json()
-        
-        if not data.get(str(appid)) or not data[str(appid)]['success']:
-            return None
-            
+        if not data.get(str(appid)) or not data[str(appid)]['success']: return None
         game_data = data[str(appid)]['data']
-        
-        metacritic = game_data.get('metacritic')
-        
-        if metacritic:
-            metascore_value = metacritic.get('score', 0)
-            
-            if metascore_value >= 70:
-                return {
-                    'name': game_data.get('name'),
-                    'appid': appid,
-                    'metascore': metascore_value,
-                    'image_url': game_data.get('header_image'), 
-                }
+        meta = game_data.get('metacritic')
+        if meta and meta.get('score', 0) >= 70:
+            return {'name': game_data.get('name'), 'appid': appid, 'metascore': meta['score'], 'image_url': game_data.get('header_image')}
         return None 
-        
-    except requests.exceptions.RequestException as e:
-        print(f"[WMS API - DEBUG] ERRO CONEXÃO Detalhes: AppID {appid}. Mensagem: {e}", file=sys.stderr, flush=True)
-        return None
-    except KeyError:
-        return None
+    except Exception: return None
 
-
-# ⬇️ --- FUNÇÃO ALTERADA --- ⬇️
 def get_one_unique_high_rated_game(exclude_appids, score_to_exclude=0):
-    """
-    Tenta encontrar UM jogo com Metacritic >= 70, 
-    excluindo os AppIDs E a nota fornecida.
-    """
+    attempts, MAX_ATTEMPTS = 0, 500
+    attempted_appids = set(exclude_appids)
+    if not WMS_APP_POOL: return None
+    available = [app for app in WMS_APP_POOL if app.get('appid') not in attempted_appids]
+    if not available: return None
     
-    attempts = 0
-    MAX_ATTEMPTS = 500 
-    
-    attempted_appids = set(exclude_appids) 
-    
-    if not WMS_APP_POOL:
-        return None
-        
-    print(f"[WMS API - DEBUG] 2. Iniciando busca por 1 novo jogo (Excluindo: {len(exclude_appids)} AppIDs e Score: {score_to_exclude})...", file=sys.stderr, flush=True)
-
-    # Busca apenas na lista curada de 100 jogos
-    available_apps = [app for app in WMS_APP_POOL if app.get('appid') not in attempted_appids]
-    
-    if not available_apps:
-        print("[WMS API - DEBUG] SUCESSO! 100 jogos foram usados. O pool será REINICIADO.", file=sys.stderr, flush=True)
-        return None 
-        
     while attempts < MAX_ATTEMPTS:
         attempts += 1
-            
-        random_app = random.choice(available_apps)
-        appid = random_app.get('appid')
-
-        if not appid or appid in attempted_appids:
-            continue
-        
+        appid = random.choice(available).get('appid')
+        if not appid or appid in attempted_appids: continue
         attempted_appids.add(appid)
-            
-        game_details = get_game_details_and_metascore(appid)
-        
-        # ⬇️ --- LÓGICA DE VERIFICAÇÃO ADICIONADA --- ⬇️
-        if game_details:
-            # Se score_to_exclude for 0 (default/inicial), ignora a checagem.
-            # Se for > 0 (rotação), checa se a nota é DIFERENTE.
-            if score_to_exclude == 0 or game_details['metascore'] != score_to_exclude:
-                print(f"[WMS API - DEBUG] Encontrado Jogo: {game_details['name']} (Tentativa: {attempts})", file=sys.stderr, flush=True)
-                return game_details
-            else:
-                # Encontrou um jogo, mas tem a mesma nota. Continua tentando.
-                print(f"[WMS API - DEBUG] Jogo pulado (mesma nota): {game_details['name']} ({game_details['metascore']})", file=sys.stderr, flush=True)
-        # ⬆️ --- FIM DA ALTERAÇÃO --- ⬆️
-        
-    print(f"[WMS API - DEBUG] FALHA! Nenhum jogo qualificado encontrado em {attempts} tentativas.", file=sys.stderr, flush=True)
+        game = get_game_details_and_metascore(appid)
+        if game:
+            if score_to_exclude == 0 or game['metascore'] != score_to_exclude: return game
     return None 
 
-# ⬇️ --- FUNÇÃO ALTERADA --- ⬇️
 def get_two_unique_high_rated_games():
-    """Busca os dois primeiros jogos, garantindo notas diferentes."""
-    
-    # 1. Pega o primeiro jogo (sem restrição de nota)
-    game1 = get_one_unique_high_rated_game(exclude_appids=[], score_to_exclude=0)
-    if not game1:
-        return None, None
-        
-    game2 = None
+    g1 = get_one_unique_high_rated_game([], 0)
+    if not g1: return None, None
+    g2 = None
     attempts = 0
-    MAX_INNER_ATTEMPTS = 15
-    
-    while not game2 and attempts < MAX_INNER_ATTEMPTS:
-        # 2. Pega o segundo jogo, passando a nota do game1 para ser excluída
-        game2_candidate = get_one_unique_high_rated_game(
-            exclude_appids=[game1['appid']], 
-            score_to_exclude=game1['metascore']
-        )
-        
-        # A lógica de "nota diferente" agora é feita dentro da
-        # get_one_unique_high_rated_game.
-        if game2_candidate:
-            game2 = game2_candidate
-        
+    while not g2 and attempts < 15:
+        g2 = get_one_unique_high_rated_game([g1['appid']], g1['metascore'])
         attempts += 1
+    return g1, g2
 
-    return game1, game2 
+def whats_my_score_view(request): return render(request, 'jogos_steam/whats_my_score.html')
 
-
-# View para renderizar a página do jogo
-def whats_my_score_view(request):
-    """Renderiza a página principal do jogo What's My Score."""
-    return render(request, 'jogos_steam/whats_my_score.html')
-
-# ⬇️ --- FUNÇÃO ALTERADA --- ⬇️
-# API que retorna os dados para o "What's My Score"
 def get_metacritic_games_api(request):
-    """Endpoint API que retorna jogos para o What's My Score."""
-    if request.method != 'GET':
-        return JsonResponse({'success': False, 'message': 'Método inválido.'}, status=405)
-        
-    if not WMS_APP_POOL:
-        return JsonResponse({'success': False, 'message': 'Erro de Inicialização: A lista de 100 AppIDs de teste está vazia.'}, status=503)
-    
-    exclude_ids_str = request.GET.get('exclude_appids', '')
-    
-    # 1. Modo de Rotação (carregar 1 novo jogo)
-    if exclude_ids_str:
-        # ⬇️ --- LÓGICA ADICIONADA PARA LER A NOTA ATUAL --- ⬇️
-        current_score_str = request.GET.get('current_score', '0')
-        
+    if request.method != 'GET': return JsonResponse({'success': False}, status=405)
+    if not WMS_APP_POOL: return JsonResponse({'success': False}, status=503)
+    exclude_str = request.GET.get('exclude_appids', '')
+    if exclude_str:
         try:
-            exclude_ids = [int(x.strip()) for x in exclude_ids_str.split(',') if x.strip()]
-            current_score = int(current_score_str)
-        except ValueError:
-            return JsonResponse({'success': False, 'message': 'Parâmetros de AppID ou Score inválidos.'}, status=400)
-        # ⬆️ --- FIM DA ADIÇÃO --- ⬆️
-
-        # Passa a nota atual (score_to_exclude) para a função de busca
-        new_game = get_one_unique_high_rated_game(
-            exclude_appids=exclude_ids, 
-            score_to_exclude=current_score
-        )
-        
+            exclude = [int(x) for x in exclude_str.split(',') if x.strip()]
+            score = int(request.GET.get('current_score', '0'))
+        except ValueError: return JsonResponse({'success': False}, status=400)
+        new_game = get_one_unique_high_rated_game(exclude, score)
         if new_game:
-            response_data = {
-                'success': True,
-                'mode': 'rotation',
-                'game_data': {
-                    'name': new_game['name'],
-                    'image_url': new_game['image_url'],
-                    'appid': new_game['appid'],
-                    'correct_metascore': new_game['metascore'],
-                }
-            }
-            return JsonResponse(response_data)
-        else:
-            # Mensagem de erro caso não encontre um jogo com nota DIFERENTE
-            msg = 'Parabéns, você usou todos os 100 jogos!' if len(exclude_ids) >= len(WMS_APP_POOL) else 'Não foi possível encontrar um novo jogo com nota diferente. Tente de novo.'
-            return JsonResponse({'success': False, 'message': msg})
-
-    # 2. Modo de Inicialização (carregar 2 novos jogos)
+            return JsonResponse({'success': True, 'mode': 'rotation', 'game_data': {'name': new_game['name'], 'image_url': new_game['image_url'], 'appid': new_game['appid'], 'correct_metascore': new_game['metascore']}})
+        else: return JsonResponse({'success': False, 'message': 'Fim dos jogos!'})
     else:
-        game1, game2 = get_two_unique_high_rated_games()
-        
-        if game1 and game2:
-            games_pair = random.sample([game1, game2], 2)
-            
-            response_data = {
-                'success': True,
-                'mode': 'initial',
-                'game1': {
-                    'name': games_pair[0]['name'],
-                    'image_url': games_pair[0]['image_url'],
-                    'metascore': games_pair[0]['metascore'], 
-                    'appid': games_pair[0]['appid'],
-                },
-                'game2': {
-                    'name': games_pair[1]['name'],
-                    'image_url': games_pair[1]['image_url'],
-                    'appid': games_pair[1]['appid'],
-                    'correct_metascore': games_pair[1]['metascore'], 
-                },
-            }
-            return JsonResponse(response_data)
-        else:
-            return JsonResponse({'success': False, 'message': 'O jogo não pôde ser carregado. Não foram encontrados dois jogos qualificados com notas diferentes.'})
+        g1, g2 = get_two_unique_high_rated_games()
+        if g1 and g2:
+            pair = random.sample([g1, g2], 2)
+            return JsonResponse({'success': True, 'mode': 'initial', 'game1': {'name': pair[0]['name'], 'image_url': pair[0]['image_url'], 'metascore': pair[0]['metascore'], 'appid': pair[0]['appid']}, 'game2': {'name': pair[1]['name'], 'image_url': pair[1]['image_url'], 'appid': pair[1]['appid'], 'correct_metascore': pair[1]['metascore']}})
+        return JsonResponse({'success': False, 'message': 'Erro ao carregar.'})
 
-
-# --- INICIALIZAÇÃO DO SERVIDOR ---
-# Carrega a lista completa de jogos da Steam (para o Tac Toe)
-# Isso é executado UMA VEZ quando o Django inicia.
 load_steam_app_list()
