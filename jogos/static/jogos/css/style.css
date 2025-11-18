@@ -4,8 +4,7 @@
     padding: 0;
 }
 
-/* ⬇️ --- ALTERAÇÃO AQUI --- ⬇️ */
-html,Body {
+html, body {
     background-color: #1a1a1a;
     color: #f0f0f0;
     font-family: 'Roboto', sans-serif;
@@ -15,14 +14,10 @@ html,Body {
     margin: 0 !important;
     padding: 0 !important;
     overflow-x: hidden !important; 
-    
-    /* Faz o body ocupar 100% da altura da tela */
     min-height: 100vh;
-    /* Ativa o layout flexbox em coluna */
     display: flex;
     flex-direction: column;
 }
-/* ⬆️ --- FIM DA ALTERAÇÃO --- ⬆️ */
 
 .header {
   display: flex;
@@ -102,17 +97,105 @@ html,Body {
   display: block;
 }
 
-/* ⬇️ --- ALTERAÇÃO AQUI --- ⬇️ */
 .main-content {
     max-width: 1200px;
     margin: 20px auto;
     padding: 20px;
     box-sizing: border-box;
-    
-    /* Diz ao 'main' para crescer e ocupar o espaço vazio */
     flex-grow: 1;
 }
-/* ⬆️ --- FIM DA ALTERAÇÃO --- ⬆️ */
+
+/* =========================================
+   NOVO: ESTILOS DO HERO CAROUSEL (DESTAQUE)
+   ========================================= */
+.hero-container {
+    position: relative;
+    width: 100%;
+    height: 500px; /* Altura do banner de destaque */
+    overflow: hidden;
+    border-radius: 12px;
+    margin-bottom: 50px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none; /* Escondido por padrão */
+    /* A transição será controlada via classes JS */
+}
+
+.hero-slide.active {
+    display: block;
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.5); /* Escurece a imagem para o texto aparecer */
+    transition: transform 6s ease; /* Zoom lento opcional */
+}
+
+.hero-slide.active .hero-image {
+    transform: scale(1.05); /* Leve zoom quando ativo */
+}
+
+.hero-content {
+    position: absolute;
+    bottom: 50px;
+    left: 50px;
+    z-index: 10;
+    max-width: 600px;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #db9731; /* Laranja Destaque */
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideUp 0.8s forwards 0.3s;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    color: #ddd;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: slideUp 0.8s forwards 0.5s;
+}
+
+.hero-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: #db9731;
+    color: #121212;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s;
+    opacity: 0;
+    animation: slideUp 0.8s forwards 0.7s;
+}
+
+.hero-btn:hover {
+    background-color: #ffab40;
+}
+
+@keyframes slideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* FIM HERO */
 
 .content-section {
     margin-bottom: 40px;
@@ -128,6 +211,8 @@ html,Body {
 .section-title {
     font-size: 28px;
     font-weight: 700;
+    border-left: 5px solid #db9731; /* Detalhe laranja no título da seção */
+    padding-left: 15px;
 }
 
 .card-container {
@@ -169,7 +254,7 @@ html,Body {
 .card img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover; /* Mudado de contain para cover para preencher melhor */
 }
 
 .rating-badge {
@@ -189,38 +274,37 @@ html,Body {
     bottom: 0;
     left: 0;
     width: 100%;
-    background: rgba(0, 0, 0, 0.85);
+    background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.6)); /* Gradiente melhorado */
     padding: 10px;
     box-sizing: border-box;
 }
 
+/* ⬇️ --- ALTERAÇÃO AQUI (COR LARANJA) --- ⬇️ */
 .card-title {
     font-size: 16px;
     font-weight: 700;
-    color:#8e24aa;
+    color: #db9731; /* Alterado de Roxo para Laranja */
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+/* ⬆️ ------------------------------------- ⬆️ */
 
 .card-subtitle {
     font-size: 12px;
-    color: #aaa;
+    color: #ccc;
 }
 
-/* ⬇️ --- ALTERAÇÃO AQUI --- ⬇️ */
 footer {
     background-color: #212121;
     padding: 10px;
     text-align: center;
     color: #f0f0f0;
     height: 40px;
-    
-    /* Impede que o footer encolha */
     flex-shrink: 0;
-    
-    /* 'auto' joga o footer para o fim do espaço flexível */
     margin-top: auto; 
 }
-/* ⬆️ --- FIM DA ALTERAÇÃO --- ⬆️ */
-
 
 .right-section {
     display: flex;
@@ -228,7 +312,6 @@ footer {
     gap: 20px;
     margin-left: auto; 
 }
-
 
 .hamburger {
   cursor: pointer;
@@ -249,10 +332,8 @@ footer {
     display: flex;
     align-items: center;
     gap: 15px; 
-    
     margin-left: auto; 
     margin-right: auto; 
-    
     flex-grow: 1; 
     max-width: 600px; 
 }
@@ -281,7 +362,7 @@ footer {
 }
 
 #game-search-input:focus{
-    border-color: purple; 
+    border-color: #db9731; /* Foco laranja */
 }
 
 #autocomplete-results{
@@ -311,7 +392,7 @@ footer {
 
 .autocomplete-item:hover, .autocomplete-item:focus{
     background-color: #4a4a4a;
-    color:#8e24aa;
+    color:#db9731;
 }
 
 .autocomplete-img{
@@ -377,18 +458,7 @@ footer {
     transition: all 0.2s ease-out;
 }
 
-
-/* =================================================== */
-/* CORREÇÃO DO CURSOR DE SELEÇÃO ("I") */
-/* =================================================== */
-
-a,
-button,
-.hamburger,
-.menu ul li,
-.card,
-.filter-toggle-button,
-.autocomplete-item {
+a, button, .hamburger, .menu ul li, .card, .filter-toggle-button, .autocomplete-item {
     -webkit-user-select: none; 
     -moz-user-select: none;    
     -ms-user-select: none;     
@@ -396,11 +466,7 @@ button,
     cursor: pointer; 
 }
 
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="number"],
-textarea {
+input[type="text"], input[type="password"], input[type="email"], input[type="number"], textarea {
     -webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;
@@ -408,17 +474,11 @@ textarea {
     cursor: text; 
 }
 
-/* =================================================== */
-/* ESTILOS DAS MENSAGENS DE FEEDBACK */
-/* =================================================== */
-
 .messages-container {
     list-style: none;
     padding: 0;
     margin-bottom: 20px;
     -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
 }
 
@@ -434,29 +494,10 @@ textarea {
     margin-bottom: 10px;
 }
 
-.message.success {
-    background-color: #1a4a3c; 
-    color: #a3e9d2; 
-    border-color: #278f6c;
-}
-
-.message.error {
-    background-color: #4a1a1a; 
-    color: #e9a3a3; 
-    border-color: #8f2727;
-}
-
-.message.warning {
-    background-color: #4a3c1a; 
-    color: #e9d2a3; 
-    border-color: #8f6c27;
-}
-
-.message.info {
-    background-color: #1a3c4a; 
-    color: #a3d2e9; 
-    border-color: #276c8f;
-}
+.message.success { background-color: #1a4a3c; color: #a3e9d2; border-color: #278f6c; }
+.message.error { background-color: #4a1a1a; color: #e9a3a3; border-color: #8f2727; }
+.message.warning { background-color: #4a3c1a; color: #e9d2a3; border-color: #8f6c27; }
+.message.info { background-color: #1a3c4a; color: #a3d2e9; border-color: #276c8f; }
 
 .close-message-btn {
     font-size: 1.5rem;
@@ -466,34 +507,25 @@ textarea {
     margin-left: 15px;
     transition: color 0.2s ease;
 }
+.close-message-btn:hover { color: #fff; }
 
-.close-message-btn:hover {
-    color: #fff;
-}
-
-
-/* =================================================== */
-/* Avatar no Header (Home) */
-/* =================================================== */
 .header-avatar-link {
     display: block;
     height: 40px;
     width: 40px;
     border-radius: 50%;
-    border: 2px solid #6a1b9a; /* Cor de destaque */
+    border: 2px solid #6a1b9a; 
     overflow: hidden;
     transition: transform 0.2s ease, border-color 0.2s ease;
     -webkit-user-select: none;
     user-select: none;
 }
-
 .header-avatar-link:hover {
     transform: scale(1.1);
-    border-color: #8e24aa; /* Cor de destaque mais clara */
+    border-color: #8e24aa; 
 }
-
 .header-avatar-img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Garante que a imagem preencha o círculo */
+    object-fit: cover; 
 }

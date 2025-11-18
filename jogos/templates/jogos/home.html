@@ -5,15 +5,60 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'jogos/css/biblioteca.css' %}"> 
+    <style>
+        /* Animação de entrada (vem da esquerda) */
+        .slide-in-left {
+            animation: slideInLeft 0.8s forwards;
+        }
+        /* Animação de saída (vai para a direita) */
+        .slide-out-right {
+            animation: slideOutRight 0.8s forwards;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
 <main class="main-content">
 
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">Destaques Populares</h2>
+        </div>
+        
+        <div class="hero-container" id="hero-carousel">
+            {% for jogo in jogos_populares %}
+                <div class="hero-slide {% if forloop.first %}active{% endif %}">
+                    <img src="{{ jogo.background_image }}" alt="{{ jogo.titulo }}" class="hero-image">
+                    <div class="hero-content">
+                        <h1 class="hero-title">{{ jogo.titulo }}</h1>
+                        <p class="hero-subtitle">Lançamento: {{ jogo.ano_lancamento }}</p>
+                        <a href="{% url 'jogos:avaliar' jogo.id %}" class="hero-btn">Ver Detalhes</a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="hero-slide active">
+                    <div class="hero-content">
+                        <h1 class="hero-title">Bem-vindo ao JoyScore</h1>
+                        <p class="hero-subtitle">Explore nossa biblioteca de jogos.</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
     {% if user.is_authenticated and jogos_recomendados %}
         <section class="content-section">
             <div class="section-header">
-                <h2 class="section-title">Jogos Recomendados para Você</h2>
+                <h2 class="section-title">Recomendados para Você</h2>
             </div>
             <div class="card-container">
                 {% for jogo in jogos_recomendados %}
@@ -33,27 +78,6 @@
 
     <section class="content-section">
         <div class="section-header">
-            <h2 class="section-title">Jogos Populares</h2>
-        </div>
-        <div class="card-container">
-            {% for jogo in jogos_populares %}
-                <a href="{% url 'jogos:avaliar' jogo.id %}" class="card-link">
-                    <div class="card">
-                        <img src="{{jogo.background_image}}" alt="{{jogo.titulo}}"> 
-                        <div class="card-info">
-                            <div class="card-title">{{jogo.titulo}}</div>
-                            <div class="card-subtitle">Data de Lançamento: {{jogo.ano_lancamento}}</div>
-                        </div>
-                    </div>
-                </a>
-            {% empty %}
-                <p>Nenhum jogo popular encontrado no momento.</p>
-            {% endfor %}
-        </div>
-    </section>
-
-    <section class="content-section">
-        <div class="section-header">
             <h2 class="section-title">Favoritos dos Desenvolvedores</h2>
         </div>
         <div class="card-container">
@@ -68,7 +92,7 @@
                     </div>
                 </a>
             {% empty %}
-                <p>Nenhum jogo favorito dos desenvolvedores encontrado no momento.</p>
+                <p>Nenhum jogo favorito encontrado.</p>
             {% endfor %}
         </div>
     </section>
@@ -89,7 +113,7 @@
                     </div>
                 </a>
             {% empty %}
-                <p>Nenhum jogo de ação encontrado no momento.</p>
+                <p>Nenhum jogo de ação encontrado.</p>
             {% endfor %}
         </div>
     </section>
@@ -110,7 +134,7 @@
                     </div>
                 </a>
             {% empty %}
-                <p>Nenhum jogo indie encontrado no momento.</p>
+                <p>Nenhum jogo indie encontrado.</p>
             {% endfor %}
         </div>
     </section>
@@ -131,7 +155,7 @@
                     </div>
                 </a>
             {% empty %}
-                <p>Nenhum jogo de RPG encontrado no momento.</p>
+                <p>Nenhum jogo de RPG encontrado.</p>
             {% endfor %}
         </div>
     </section>
@@ -152,7 +176,7 @@
                     </div>
                 </a>
             {% empty %}
-                <p>Nenhum jogo de Tiro (Shooter) encontrado no momento.</p>
+                <p>Nenhum jogo de Tiro encontrado.</p>
             {% endfor %}
         </div>
     </section>
@@ -173,7 +197,7 @@
                     </div>
                 </a>
             {% empty %}
-                <p>Nenhum jogo popular de PlayStation encontrado no momento.</p>
+                <p>Nenhum jogo de PlayStation encontrado.</p>
             {% endfor %}
         </div>
     </section>
@@ -194,7 +218,7 @@
                     </div>
                 </a>
             {% empty %}
-                <p>Nenhum jogo popular da Nintendo encontrado no momento.</p>
+                <p>Nenhum jogo da Nintendo encontrado.</p>
             {% endfor %}
         </div>
     </section>
@@ -204,4 +228,38 @@
 
 {% block extra_scripts %}
     <script src="{% static 'jogos/js/autocomplete.js' %}"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.hero-slide');
+            if (slides.length === 0) return;
+
+            let currentIndex = 0;
+            const intervalTime = 5000; // 5 segundos por slide
+
+            function nextSlide() {
+                // O slide atual sai para a direita
+                const currentSlide = slides[currentIndex];
+                currentSlide.classList.remove('active');
+                currentSlide.classList.remove('slide-in-left'); // Limpa classe anterior
+                currentSlide.classList.add('slide-out-right'); // Sai deslizando p/ direita
+                
+                // Reset depois da animação (limpeza)
+                setTimeout(() => {
+                    currentSlide.classList.remove('slide-out-right');
+                    currentSlide.style.display = 'none';
+                }, 800); // Tempo igual ao CSS animation duration
+
+                // O próximo slide entra da esquerda
+                currentIndex = (currentIndex + 1) % slides.length;
+                const nextSlide = slides[currentIndex];
+                
+                nextSlide.style.display = 'block'; // Garante que está visível para animar
+                nextSlide.classList.add('active');
+                nextSlide.classList.add('slide-in-left'); // Entra deslizando da esquerda
+            }
+
+            setInterval(nextSlide, intervalTime);
+        });
+    </script>
 {% endblock %}
