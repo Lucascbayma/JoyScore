@@ -60,11 +60,11 @@ html, body {
 }
 
 .btn-register {
-    background-color: #6a1b9a; 
+    background-color: #db9731; 
     border: 1px solid #552f6d;
 }
 .btn-register:hover {
-    background-color: #8e24aa;
+    background-color: #db9731;
     border-color: #8e24aa;
     transform: scale(1.05);
 }
@@ -261,7 +261,7 @@ html, body {
     position: absolute;
     top: 10px;
     left: 10px;
-    background-color: #6a1b9a;
+    background-color: #db9731;
     color: #fff;
     padding: 5px 8px;
     border-radius: 5px;
@@ -279,11 +279,10 @@ html, body {
     box-sizing: border-box;
 }
 
-/* ⬇️ --- ALTERAÇÃO AQUI (COR LARANJA) --- ⬇️ */
 .card-title {
     font-size: 16px;
     font-weight: 700;
-    color: #db9731; /* Alterado de Roxo para Laranja */
+    color: #db9731 !important;
     margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
