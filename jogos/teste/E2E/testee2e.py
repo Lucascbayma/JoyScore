@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys 
+from selenium.common.exceptions import TimeoutException
 
 service = Service(ChromeDriverManager().install())
 BASE_URL = "http://lcsbayma.pythonanywhere.com"
@@ -219,7 +220,7 @@ def rodar_teste_voltar_home(driver, wait):
 
 
 def rodar_teste_clicar_jogo(driver, wait):
-    print("\n--- Iniciando Teste de Clicar no Jogo Elden Ring ---")
+    print("\n--- Iniciando Teste de Clicar no Jogo Bloodborne ---")
     try:
         print("Atualmente na Home Page")
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -227,50 +228,41 @@ def rodar_teste_clicar_jogo(driver, wait):
         driver.execute_script("window.scrollTo(0, 0);")
         time.sleep(1)
 
-        print("Tentando clicar na IMAGEM do jogo 'Elden Ring'...")
+        print("Tentando clicar na IMAGEM do jogo 'Bloodborne'...")
         try:
-            jogo_elden = wait.until(EC.element_to_be_clickable((
+            jogo_bloodborne = wait.until(EC.element_to_be_clickable((
                 By.XPATH,
-                "//a[contains(@href, '/avaliar/') and .//img[contains(@alt, 'Elden Ring')]]"
+                "//a[contains(@href, '/avaliar/') and .//img[contains(@alt, 'Bloodborne')]]"
             )))
-            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", jogo_elden)
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", jogo_bloodborne)
             time.sleep(0.8)
-            driver.execute_script("arguments[0].click();", jogo_elden)
-            print("Clicou na imagem do jogo Elden Ring.")
+            driver.execute_script("arguments[0].click();", jogo_bloodborne)
+            print("Clicou na imagem do jogo Bloodborne.")
         except Exception:
             print("Imagem não encontrada, tentando clicar no texto...")
             jogo_elden = wait.until(EC.element_to_be_clickable((
                 By.XPATH,
-                "//a[contains(@href, '/avaliar/') and .//text()[contains(., 'Elden Ring')]]"
+                "//a[contains(@href, '/avaliar/') and .//text()[contains(., 'Bloodborne')]]"
             )))
-            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", jogo_elden)
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", jogo_bloodborne)
             time.sleep(0.8)
-            driver.execute_script("arguments[0].click();", jogo_elden)
-            print("Clicou no texto do jogo Elden Ring.")
+            driver.execute_script("arguments[0].click();", jogo_bloodborne)
+            print("Clicou no texto do jogo Bloodborne.")
 
         wait.until(EC.url_contains("/avaliar/"))
         title_locator = (By.XPATH, "//*[self::h1 or self::h2][contains(text(), 'Elden Ring')]")
         wait.until(EC.visibility_of_element_located(title_locator))
-        print("Página de avaliação do Elden Ring carregada com sucesso.")
+        print("Página de avaliação do Bloodborne carregada com sucesso.")
         time.sleep(DELAY_PARA_VER)
 
         assert "/avaliar/" in driver.current_url
-        print(">>> Teste de Clicar no Jogo (Elden Ring): SUCESSO")
+        print(">>> Teste de Clicar no Jogo (Bloodborne): SUCESSO")
 
     except Exception as e:
-        print(f"XXX Teste de Clicar no Jogo (Elden Ring): FALHOU XXX")
+        print(f"XXX Teste de Clicar no Jogo (Bloodborne): FALHOU XXX")
         print(f"Erro: {e}")
     finally:
-        print("--- Finalizando Teste de Clicar no Jogo (Elden Ring) ---")
-
-
-import time
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
-
-DELAY_PARA_VER = 1.5 
+        print("--- Finalizando Teste de Clicar no Jogo (Bloodborne) ---") 
 
 def rodar_teste_adicionar_e_gerenciar_jornada(driver, wait):
     print("\n--- Iniciando Teste E2E de Adicionar Jogo e Gerenciar Jornada ---")
@@ -285,7 +277,7 @@ def rodar_teste_adicionar_e_gerenciar_jornada(driver, wait):
     btn_salvar_jornada = (By.CSS_SELECTOR, "button.submit-jornada")
     btn_editar_jornada = (By.ID, "jornada-edit-btn") 
     
-    botao_mais_locator = (By.CSS_SELECTOR, "a.add-btn[aria-label*='Elden Ring']")
+    botao_mais_locator = (By.CSS_SELECTOR, "a.add-btn[aria-label*='Bloodborne']")
     
     display_horas = (By.XPATH, "//div[contains(@class, 'jornada-stat')][contains(., 'Horas Jogadas')]")
     display_trofeus = (By.XPATH, "//div[contains(@class, 'jornada-stat')][contains(., 'Progresso de Troféus')]")

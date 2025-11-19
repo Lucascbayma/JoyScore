@@ -87,7 +87,8 @@
                                placeholder="Ex: 35" min="0">
                     </div>
                     
-                    <button type="submit" name="acao" value="salvar_jornada" class="submit-jornada">
+                    <button type="submit" name="acao" value="salvar_jornada" 
+                            class="submit-jornada" id="jornada-save-btn">
                         Salvar Jornada
                     </button>
                 </form>
@@ -181,26 +182,34 @@
 {% endblock content %}
 
 {% block extra_scripts %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const displayBlock = document.querySelector('.jornada-display');
-            const formWrapper = document.querySelector('.jornada-form-wrapper');
-            const editBtn = document.getElementById('jornada-edit-btn');
-            const closeBtn = document.getElementById('jornada-close-btn');
+<script>
+document.addEventListener('DOMContentLoaded', function() {
 
-            if (editBtn) {
-                editBtn.addEventListener('click', function() {
-                    displayBlock.style.display = 'none';
-                    formWrapper.style.display = 'block';
-                });
-            }
+    const displayBlock = document.querySelector('.jornada-display');
+    const formWrapper = document.querySelector('.jornada-form-wrapper');
+    const editBtn = document.getElementById('jornada-edit-btn');
+    const closeBtn = document.getElementById('jornada-close-btn');
+    const saveBtn = document.getElementById('jornada-save-btn');
 
-            if (closeBtn) {
-                closeBtn.addEventListener('click', function() {
-                    displayBlock.style.display = 'block';
-                    formWrapper.style.display = 'none';
-                });
-            }
+    if (editBtn) {
+        editBtn.addEventListener('click', function () {
+            displayBlock.style.display = 'none';
+            formWrapper.style.display = 'block';
         });
-    </script>
+    }
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function () {
+            displayBlock.style.display = 'block';
+            formWrapper.style.display = 'none';
+        });
+    }
+    if (saveBtn) {
+        saveBtn.addEventListener('click', function () {
+            displayBlock.style.display = 'block';
+            formWrapper.style.display = 'none';
+        });
+    }
+
+});
+</script>
 {% endblock %}
