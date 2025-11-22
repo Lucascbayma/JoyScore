@@ -93,11 +93,14 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 <li>Ambiente de versionamento atuante.✅</li>
 <li>Deployment das novas histórias.✅</li>
 <li>Uso do Issue/bug tracker.✅</li>
-<li>Testes de Sistema E2E automatizados.</li>
+<li>Testes de Sistema E2E automatizados.✅</li>
 <li>CI/CD com build e deployment automatizado.✅</li>
 <li>Atualização sobre o uso da programação em pares.✅</li>
 <li>Quadro da Sprint 04 atualizado refletindo a entrega.✅</li>
 <li><a href="https://docs.google.com/document/d/1cLlLR55E9F2QSTH3upHOF6-ahyTImWCMaRnRvmUL4mg/edit?tab=t.0">Relatório de programação em par atualizado </a></li>
+<li><a href="https://youtu.be/ivi1EUmbNxY">Vídeo da implementação de novas funcionalidades</a></li>
+<li><a href="https://youtu.be/T2PwaR753zc">Vídeo de execução da Pipeline (JoyScore)</a></li>
+<li><a href="https://youtu.be/9G63NJQUwjg">Vídeo dos testes E2E (JoyScore)</a></li>
 </ul>
 <p align="center">
 <img src="images/backlog_sprint_04.png" alt="Sprint 4 do JIRA" width="1500"/>
