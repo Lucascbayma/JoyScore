@@ -111,7 +111,7 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 
 ## 👥 Equipe de Desenvolvimento 
 
-Agradecimentos especiais a todas as pessoas que contribuíram com este projeto 💜
+Agradecimentos especiais a todas as pessoas que contribuíram com este projeto 🧡
 
 * **Eros Amâncio Nascimento** - [@erosamancio](https://github.com/erosamancio)
 * **Lucas Coutinho de Almeida Bayma** - [@lucascbaymma](https://github.com/lucascbayma)
