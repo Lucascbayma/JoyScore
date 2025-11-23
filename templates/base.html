@@ -152,25 +152,15 @@
         const menu = document.querySelector('.menu');
 
         if (menuToggle && hamburger && menu) {
-            
-            // Usamos 'mousedown' pois ele ocorre ANTES do 'click'
-            // que ativa o <label>
             document.addEventListener('mousedown', function(event) {
-                
-                // 1. Se o menu está fechado, nosso script não faz nada.
                 if (!menuToggle.checked) {
                     return;
                 }
 
-                // 2. Verifica se o clique foi no hamburguer ou dentro do menu
                 const clickedOnHamburger = hamburger.contains(event.target);
                 const clickedInsideMenu = menu.contains(event.target);
 
-                // 3. Se o clique foi FORA de ambos
                 if (!clickedOnHamburger && !clickedInsideMenu) {
-                    // Nós fechamos o menu.
-                    // Isso acontece antes do 'click' ser registrado,
-                    // então não há conflito.
                     menuToggle.checked = false;
                 }
             });

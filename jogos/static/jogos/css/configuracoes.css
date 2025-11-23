@@ -1,5 +1,3 @@
-/* jogos/static/jogos/css/configuracoes.css */
-
 .config-card {
     background-color: #212121;
     padding: 25px;
@@ -16,7 +14,6 @@
     padding-bottom: 5px;
 }
 
-/* --- SEÇÃO DE PERFIL (AVATAR) --- */
 .profile-body {
     display: flex;
     align-items: center;
@@ -42,7 +39,6 @@
     color: #f0f0f0;
 }
 
-/* --- SEÇÃO JOGO FAVORITO --- */
 .favorite-game-container {
     max-width: 300px; 
 }
@@ -142,11 +138,10 @@
     width: 100%; 
     margin-top: 20px; 
     
-    /* Remove o comportamento de "arrastar"/seleção de texto */
-    -webkit-user-select: none; /* Safari */
-    -moz-user-select: none;    /* Firefox */
-    -ms-user-select: none;     /* Internet Explorer/Edge */
-    user-select: none;         /* Padrão */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .edit-button {
@@ -180,8 +175,6 @@
     padding-bottom: 0;
 }
 
-
-/* --- Configurações de Tema --- */
 .theme-settings-card {
     display: flex;
     flex-direction: column;
@@ -208,8 +201,6 @@
     background-color: #8e24aa;
     transform: scale(1.03);
 }
-
-/* ⬇️ --- ESTILOS DOS MODAIS --- ⬇️ */
 
 .modal-overlay {
     position: fixed;
@@ -259,13 +250,9 @@
 }
 
 .modal-body {
-    /* ⬇️ --- ALTERAÇÃO AQUI --- ⬇️ */
-    /* Remove AMBAS as barras de rolagem */
     overflow: hidden;
-    /* ⬆️ --- FIM DA ALTERAÇÃO --- ⬆️ */
 }
 
-/* Grid de Seleção de Avatar */
 .avatar-selection-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -303,7 +290,6 @@
     border-color: #6a1b9a;
 }
 
-/* Busca de Jogo no Modal */
 .modal-search {
     width: 100%;
     margin-bottom: 15px;
@@ -382,7 +368,6 @@
     justify-content: center;
 }
 
-/* Botão de Remover Jogo */
 .remove-button {
     background-color: #a11b1b;
     color: white;
@@ -400,10 +385,6 @@
     background-color: #c0392b;
 }
 
-/* ⬆️ --- FIM DOS ESTILOS DOS MODAIS --- ⬆️ */
-
-
-/* --- Estilos para o Tema Claro --- */
 body[data-theme="light"] .config-card {
     background-color: #f8f9fa;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -430,7 +411,6 @@ body[data-theme="light"] .genre-tag {
     border: 1px solid #ccc;
 }
 
-/* Tema claro para modais */
 body[data-theme="light"] .modal-content {
     background-color: #f8f9fa;
 }

@@ -12,13 +12,11 @@ const debounce = (func, delay) => {
 };
 
 const fetchGames = async (query) => {
-    if (query.length < 2 || query.trim() === "") { // Reduzi para 2 caracteres para facilitar o teste
+    if (query.length < 2 || query.trim() === "") {
         resultsContainer.innerHTML = '';
         return;
     }
 
-    // ===== CORREÇÃO AQUI =====
-    // A URL foi ajustada para '/api/search/' para corresponder ao seu urls.py
     const url = `/api/search/?q=${encodeURIComponent(query)}`;
 
     try {
@@ -50,9 +48,7 @@ const displayResults = (games) => {
         const item = document.createElement('a');
         item.classList.add('autocomplete-item');
         
-        // ATENÇÃO: Este link '/jogo/${game.id}/' vai precisar de uma página de detalhes do jogo no futuro.
-        // Por enquanto, vamos focar em fazer a busca funcionar.
-        item.href = `/avaliar/${game.id}/`; // Alterado para a página de avaliação que já existe
+        item.href = `/avaliar/${game.id}/`;
 
         item.innerHTML = `
             <img src="${game.background_image || '/static/img/default.jpg'}" alt="${game.name}" class="autocomplete-img">

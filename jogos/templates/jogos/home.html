@@ -235,28 +235,25 @@
             if (slides.length === 0) return;
 
             let currentIndex = 0;
-            const intervalTime = 5000; // 5 segundos por slide
-
+            const intervalTime = 5000; 
             function nextSlide() {
-                // O slide atual sai para a direita
+              
                 const currentSlide = slides[currentIndex];
                 currentSlide.classList.remove('active');
-                currentSlide.classList.remove('slide-in-left'); // Limpa classe anterior
-                currentSlide.classList.add('slide-out-right'); // Sai deslizando p/ direita
+                currentSlide.classList.remove('slide-in-left');
+                currentSlide.classList.add('slide-out-right'); 
                 
-                // Reset depois da animação (limpeza)
                 setTimeout(() => {
                     currentSlide.classList.remove('slide-out-right');
                     currentSlide.style.display = 'none';
-                }, 800); // Tempo igual ao CSS animation duration
-
-                // O próximo slide entra da esquerda
+                }, 800); 
+               
                 currentIndex = (currentIndex + 1) % slides.length;
                 const nextSlide = slides[currentIndex];
                 
-                nextSlide.style.display = 'block'; // Garante que está visível para animar
+                nextSlide.style.display = 'block'; 
                 nextSlide.classList.add('active');
-                nextSlide.classList.add('slide-in-left'); // Entra deslizando da esquerda
+                nextSlide.classList.add('slide-in-left'); 
             }
 
             setInterval(nextSlide, intervalTime);

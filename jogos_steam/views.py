@@ -7,10 +7,7 @@ import time
 import sys 
 import json 
 
-# --- Funções de Utilitário ---
 def normalize_genre(genre_string):
-    # Remove espaços, hifens e deixa minúsculo para facilitar a comparação
-    # Ex: "Single-player" vira "singleplayer"
     return genre_string.lower().replace('-', '').replace(' ', '')
 
 ALL_AVAILABLE_THEMES = [
@@ -19,7 +16,6 @@ ALL_AVAILABLE_THEMES = [
     "Free to Play", "Early Access", "Massively Multiplayer", "Co-op"
 ]
 
-# --- LISTA DE ELITE: JOGOS FAMOSOS ---
 TOP_FAMOUS_GAMES = [
     {'appid': 730, 'name': 'Counter-Strike 2'}, {'appid': 570, 'name': 'Dota 2'},
     {'appid': 271590, 'name': 'Grand Theft Auto V'}, {'appid': 1172470, 'name': 'Apex Legends'},
@@ -35,7 +31,6 @@ TOP_FAMOUS_GAMES = [
     {'appid': 252490, 'name': 'Rust'}, {'appid': 578080, 'name': 'PUBG: BATTLEGROUNDS'}
 ]
 
-# --- FONTE DE DADOS 1: "WHAT'S MY SCORE" ---
 HIGH_RATED_APPIDS = [
     620, 292030, 1245620, 105600, 892970, 379430, 730, 1174180, 230410, 386210, 
     550, 4000, 3830, 20920, 22370, 41000, 48700, 57095, 61767, 200710, 203160, 
@@ -52,11 +47,8 @@ HIGH_RATED_APPIDS = [
 WMS_APP_POOL = [{'appid': appid, 'name': str(appid)} for appid in HIGH_RATED_APPIDS]
 print(f"\n[WMS API] {len(WMS_APP_POOL)} AppIDs de ALTA QUALIDADE carregados para 'What's My Score'.", file=sys.stderr, flush=True)
 
-# --- FONTE DE DADOS 2: "STEAM TAC TOE" ---
 def load_steam_app_list():
     print("\n[STEAM TAC TOE] Pronto. Modo 'Live Search' (Store) ativado.", file=sys.stderr, flush=True)
-
-# --- Views ---
 
 def steam_tac_toe_view(request):
     custom_themes_str = request.GET.get('temas')
@@ -83,22 +75,17 @@ def steam_tac_toe_view(request):
     return render(request, 'jogos_steam/steam_tac_toe.html', context)
 
 def search_steam_games_api(request):
-    """
-    Busca jogos e FABRICA a imagem correta para garantir que ela exista.
-    """
     query = request.GET.get('q', '').strip().lower()
     if not query or len(query) < 2: 
         return JsonResponse({'games': []})
     
     results = []
     
-    # 1. Busca na Lista Local (Top Games)
     for game in TOP_FAMOUS_GAMES:
         if query in game['name'].lower():
             img_url = f"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{game['appid']}/header.jpg"
             results.append({'appid': game['appid'], 'name': game['name'], 'image': img_url})
             
-    # 2. Busca na Loja (Para todo o resto)
     url = f"https://store.steampowered.com/api/storesearch/?term={query}&l=portuguese&cc=BR"
     
     try:
@@ -118,9 +105,6 @@ def search_steam_games_api(request):
     return JsonResponse({'games': results[:10]})
 
 def validate_game_move_api(request):
-    """
-    Valida a jogada pedindo dados em INGLÊS para bater com a lista de temas.
-    """
     if request.method == 'POST':
         appid = request.POST.get('appid', '').strip()
         row_genre = request.POST.get('row_genre', '').strip()
@@ -129,8 +113,6 @@ def validate_game_move_api(request):
         if not all([appid, row_genre, col_genre]):
             return JsonResponse({'success': False, 'message': 'Dados incompletos.'}, status=400)
         
-        # [IMPORTANTE] l=english garante que "Single-player" venha como "Single-player"
-        # e não "Um jogador", para bater com a sua lista ALL_AVAILABLE_THEMES.
         url = f"https://store.steampowered.com/api/appdetails?appids={appid}&l=english"
         
         headers = {
@@ -148,20 +130,15 @@ def validate_game_move_api(request):
             game_name = game_data.get('name', 'Este jogo')
             image_url = game_data.get('header_image')
             
-            # Coleta Gêneros e Categorias da API
-            # Categories é onde fica "Single-player", "Multi-player", "Co-op"
-            # Genres é onde fica "Action", "RPG", "Indie"
             genres_api = [g['description'] for g in game_data.get('genres', [])]
             categories_api = [c['description'] for c in game_data.get('categories', [])]
             
             all_tags = genres_api + categories_api
             
-            # Normaliza tudo para comparação
             norm_row = normalize_genre(row_genre)
             norm_col = normalize_genre(col_genre)
             all_norm_tags = {normalize_genre(tag) for tag in all_tags}
             
-            # DEBUG: Mostra no terminal o que a Steam devolveu (em inglês)
             print(f"\n[VALIDAÇÃO] Jogo: {game_name}", file=sys.stderr)
             print(f"Tags Steam (EN): {all_tags}", file=sys.stderr)
             print(f"Bingo Pede: {row_genre} & {col_genre}", file=sys.stderr)
@@ -169,10 +146,8 @@ def validate_game_move_api(request):
             if norm_row in all_norm_tags and norm_col in all_norm_tags:
                 return JsonResponse({'success': True, 'image_url': image_url})
             else:
-                # Filtra apenas os gêneros que são válidos no Bingo para mostrar na mensagem
                 valid_matches = [t for t in ALL_AVAILABLE_THEMES if normalize_genre(t) in all_norm_tags]
                 
-                # Tradução amigável para a mensagem de erro (Opcional, mas legal)
                 error_msg = f"Jogada inválida! No bingo, '{game_name}' se encaixa em: {', '.join(valid_matches)}."
                 if not valid_matches:
                     error_msg = f"'{game_name}' não possui os gêneros necessários cadastrados na Steam."
@@ -186,7 +161,6 @@ def validate_game_move_api(request):
     return JsonResponse({'success': False, 'message': 'Método inválido.'}, status=405)
 
 
-# --- What's My Score (Intocado) ---
 def get_game_details_and_metascore(appid):
     url = f"https://store.steampowered.com/api/appdetails?appids={appid}&cc=br&l=pt"
     time.sleep(2.0) 

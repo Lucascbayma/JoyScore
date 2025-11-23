@@ -17,11 +17,11 @@ import subprocess
 import logging
 import dateutil.parser 
 from django.core.exceptions import ValidationError 
-from django.urls import reverse # Importamos o reverse para montar a URL
-from django.utils import timezone # Import para o default da data
+from django.urls import reverse
+from django.utils import timezone
 from datetime import timedelta 
-from django.db import IntegrityError # Import para o erro de Jogo Favorito
-import sys # Import adicionado para debug
+from django.db import IntegrityError
+import sys
 
 RAWG_API_KEY = settings.API_KEY
 RAWG_BASE_URL = "https://api.rawg.io/api"
@@ -249,13 +249,11 @@ def home(request):
     
     jogos_recomendados = []
     
-    profile = None # Inicia o profile como None
+    profile = None 
     if request.user.is_authenticated:
         try:
-            # Tenta buscar o profile
             profile = request.user.profile
         except Profile.DoesNotExist:
-            # Se não existir (caso raro), cria um
             profile = Profile.objects.create(user=request.user)
         
         try:
@@ -293,9 +291,7 @@ def home(request):
                     jogos_recomendados.extend(fallback_list[:restantes])
 
         except Profile.DoesNotExist:
-             # Isso agora é pego pelo try/except principal
             pass
-    # ⬆️ --- FIM DA ALTERAÇÃO --- ⬆️
 
     titulos_populares = [ "The Witcher 3: Wild Hunt", "Red Dead Redemption 2", "Grand Theft Auto V", "Hollow Knight", "Portal 2", "Minecraft", "God of War", "Elden Ring", "Fortnite Battle Royale", "The Legend of Zelda: Breath of the Wild", ]
     jogos_populares = Jogo.objects.filter( titulo__in=titulos_populares ).order_by('titulo')
@@ -324,16 +320,15 @@ def home(request):
         'jogos_shooter': jogos_shooter,
         'jogos_playstation': jogos_playstation,
         'jogos_nintendo': jogos_nintendo,
-        'profile': profile, # ⬅️ --- ADICIONADO O PROFILE AO CONTEXTO ---
+        'profile': profile,
     }
     return render(request, 'jogos/home.html', context)
 
 @require_GET
 def autocomplete_search(request):
     """
-    Busca de jogos ATUALIZADA.
-    Busca na API RAWG para o modal de jogo favorito.
-    Busca no BD local para a barra de busca antiga da home.
+    Busca de jogos.
+    Busca na API RAWG para o modal de jogo favorito ou no BD local para a barra de busca.
     """
     query = request.GET.get('q')
     source = request.GET.get('source', 'local') 
@@ -427,22 +422,14 @@ def configuracoes_conta(request):
     
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
-
-        # --- 👇 ALTERAÇÃO AQUI 👇 ---
-        # Define a URL base para o redirecionamento
         redirect_url = reverse('jogos:configuracoes_conta')
-        # --- FIM DA ALTERAÇÃO ---
 
         if form_type == 'genres':
             generos_selecionados = request.POST.getlist('genres')
             profile.generos_favoritos = generos_selecionados
             profile.save()
             messages.success(request, 'Gêneros favoritos atualizados!')
-            
-            # --- 👇 ALTERAÇÃO AQUI 👇 ---
-            # Adiciona a âncora para a seção de gêneros
             redirect_url += '#generos-favoritos'
-            # --- FIM DA ALTERAÇÃO ---
         
         elif form_type == 'avatar':
             avatar_selecionado = request.POST.get('avatar_path')
@@ -452,28 +439,17 @@ def configuracoes_conta(request):
                 messages.success(request, 'Avatar atualizado!')
             else:
                 messages.error(request, 'Avatar inválido.')
-
-            # --- 👇 ALTERAÇÃO AQUI 👇 ---
-            # Adiciona a âncora para a seção de perfil
             redirect_url += '#perfil-info'
-            # --- FIM DA ALTERAÇÃO ---
 
         elif form_type == 'favorite_game':
-            # --- 👇 ALTERAÇÃO AQUI 👇 ---
-            # Adiciona a âncora para a seção de jogo favorito
             redirect_url += '#jogo-favorito'
-            # --- FIM DA ALTERAÇÃO ---
-            
             jogo_rawg_id = request.POST.get('jogo_id')
             
             if jogo_rawg_id == "remove":
                 profile.jogo_favorito = None
                 profile.save()
                 messages.success(request, 'Jogo favorito removido.')
-                
-                # --- 👇 ALTERAÇÃO AQUI 👇 ---
-                return redirect(redirect_url) # Usa a URL com âncora
-                # --- FIM DA ALTERAÇÃO ---
+                return redirect(redirect_url)
 
             try:
                 jogo = Jogo.objects.get(rawg_id=jogo_rawg_id)
@@ -521,19 +497,13 @@ def configuracoes_conta(request):
 
                 except requests.RequestException:
                     messages.error(request, "Não foi possível buscar os detalhes do jogo na API.")
-                    
-                    # --- 👇 ALTERAÇÃO AQUI 👇 ---
-                    return redirect(redirect_url) # Usa a URL com âncora
-                    # --- FIM DA ALTERAÇÃO ---
+                    return redirect(redirect_url)
             
             profile.jogo_favorito = jogo
             profile.save()
             messages.success(request, f'"{jogo.titulo}" foi definido como seu jogo favorito!')
             
-        # --- 👇 ALTERAÇÃO AQUI 👇 ---
-        # Redireciona para a URL final (com âncora)
         return redirect(redirect_url)
-        # --- FIM DA ALTERAÇÃO ---
 
     all_genres = _get_all_genres(request)
     context = {
@@ -547,10 +517,7 @@ def configuracoes_conta(request):
 @login_required
 def avaliacoes_comunidade(request):
     avaliacoes_recentes = Avaliar.objects.select_related('usuario', 'Jogo').order_by('-data_da_avaliacao')[:10]
-    
-    context = {
-        'recentes': avaliacoes_recentes
-    }
+    context = {'recentes': avaliacoes_recentes}
     return render(request, 'jogos/avaliacoes_comunidade.html', context)
 
 
@@ -570,41 +537,30 @@ WSGI_FILE_PATH = f'/var/www/{PA_USERNAME}_pythonanywhere_com_wsgi.py'
 def github_webhook(request):
     if request.method == 'POST':
         try:
-            # 1. ISOLAR O IMPORT AQUI (CRÍTICO PARA O CI PASSAR!)
             from GitPython.repo import Repo 
 
-            # 2. Puxar o código mais recente
             repo = Repo(REPO_PATH)
             origin = repo.remotes.origin
             
-            # Usar fetch e reset --hard para evitar falhas de arquivos não-comitados no servidor
             origin.fetch()
             repo.git.reset('--hard', f'origin/{repo.active_branch.name}')
 
-            # 3. Atualizar dependências (com o pip do VENV)
-            # check=True: Faz o subprocesso levantar um erro se o comando falhar (para que o log do PA pegue)
             subprocess.run([PIP_PATH, 'install', '-r', f'{REPO_PATH}requirements.txt'], check=True, cwd=REPO_PATH)
             
-            # 4. Rodar Migrações (com o Python do VENV)
             subprocess.run([PYTHON_PATH, MANAGE_PY_PATH, 'migrate', '--noinput'], check=True, cwd=REPO_PATH)
 
-            # 5. Coletar Estáticos (com o Python do VENV)
             subprocess.run([PYTHON_PATH, MANAGE_PY_PATH, 'collectstatic', '--noinput'], check=True, cwd=REPO_PATH)
             
-            # 6. Finalmente, recarrega o Web App tocando o arquivo WSGI
             os.utime(WSGI_FILE_PATH, None)
             
-            # Retorna 200 para o GitHub (indicando sucesso do deploy)
             return HttpResponse('Deployment concluído!', status=200)
 
         except subprocess.CalledProcessError as e:
-            # Captura falhas em pip, migrate, collectstatic
             error_message = f"Erro no subprocesso: {e.cmd}. Saída: {e.stdout.decode()} Erro: {e.stderr.decode()}"
             logger.error(error_message, exc_info=True)
             return HttpResponse(f'Erro de subprocesso: {error_message}', status=500)
             
         except Exception as e:
-            # Captura falhas de GitPython ou os.utime
             error_message = f"Erro inesperado no Webhook: {e}"
             logger.error(error_message, exc_info=True)
             return HttpResponse(f'Erro no deploy: {error_message}', status=500)

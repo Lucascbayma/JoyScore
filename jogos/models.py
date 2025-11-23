@@ -3,8 +3,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.core.exceptions import ValidationError # Importado para validação
-from django.utils import timezone # ⬅️ Import já existente
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 class Jogo(models.Model):
     rawg_id = models.IntegerField(
@@ -49,7 +49,6 @@ class Add_Biblioteca(models.Model):
     def __str__(self):
         return f"{self.jogo.titulo} foi adicionado na sua biblioteca!"
 
-# --- NOVO MODELO: JORNADA GAMER ---
 class JornadaGamer(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name="jornadas")
     jogo = models.ForeignKey(Jogo, on_delete=models.CASCADE, related_name="jornadas")
@@ -79,16 +78,12 @@ class JornadaGamer(models.Model):
         self.clean()
         super().save(*args, **kwargs)
 
-# --- FIM DO NOVO MODELO ---
-
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     generos_favoritos = models.JSONField(default=list, blank=True)
 
-    # ⬇️ --- CAMPOS ADICIONADOS --- ⬇️
     avatar = models.CharField(max_length=255, blank=True, null=True, help_text="Caminho para o avatar predefinido")
     jogo_favorito = models.ForeignKey(Jogo, on_delete=models.SET_NULL, null=True, blank=True, related_name="perfis_favoritos")
-    # ⬆️ --- FIM DA ADIÇÃO --- ⬆️
 
     def __str__(self):
         return f'Perfil de {self.user.username}'

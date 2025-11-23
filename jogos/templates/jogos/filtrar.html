@@ -88,14 +88,13 @@
 {% block extra_scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Seleciona todos os checkboxes E o container de erro
     const checkboxes = document.querySelectorAll('input[name="genres"]');
     const errorMessageContainer = document.getElementById('filter-error-message');
     const maxChecked = 2;
 
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', () => {
-            // Limpa a mensagem de erro de JS anterior ao tentar de novo
+          
             if (errorMessageContainer.textContent.includes('Você só pode selecionar até 2 gêneros.')) {
                  errorMessageContainer.innerHTML = '';
             }

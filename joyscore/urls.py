@@ -6,7 +6,7 @@ urlpatterns = [
     # Rota para o painel de administração do Django
     path('admin/', admin.site.urls),
 
-    # Rota para o seu novo app da Steam (Mantenha como está, ou adicione namespace)
+    # Rota para o seu novo app da Steam 
     path('steam/', include('jogos_steam.urls')),
 
     # CORREÇÃO: Adicionando o namespace 'jogos' para resolver o NoReverseMatch

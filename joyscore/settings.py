@@ -15,7 +15,7 @@ import os
 from dotenv import load_dotenv
 from decouple import config
 
-load_dotenv() # Serve pra carregar as variáveis do arquivo .env
+load_dotenv() 
 
 STEAM_API_KEY="C8434A694CAABC87061732D62293CA26"
 API_KEY = "2d6f7a2d7bca4536b96d4277f0152903"

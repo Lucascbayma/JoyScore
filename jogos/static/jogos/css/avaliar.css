@@ -357,7 +357,6 @@ main {
     position: relative; 
 }
 
-/* --- Estado de Exibição --- */
 .jornada-display h3 {
     color: var(--cor-texto-forte);
     font-size: 1.2rem;
@@ -401,25 +400,21 @@ main {
     overflow: hidden;
 }
 
-/* --- [MUDANÇA AQUI] Estilo base da barra de progresso --- */
 .progresso-barra-preenchimento {
     height: 100%;
-    background-color: var(--cor-destaque-dourado); /* Laranja/Dourado (Padrão 26-99%) */
+    background-color: var(--cor-destaque-dourado); 
     border-radius: 6px;
-    transition: width 0.4s ease, background-color 0.4s ease; /* Transição suave de cor */
+    transition: width 0.4s ease, background-color 0.4s ease; 
 }
 
-/* --- [NOVO] Classe para cor vermelha (<= 25%) --- */
 .progresso-barra-preenchimento.cor-vermelha {
     background-color: #d9534f;
 }
 
-/* --- [NOVO] Classe para cor verde (100%) --- */
 .progresso-barra-preenchimento.cor-verde {
     background-color: #5cb85c; 
 }
 
-/* --- [MUDANÇA AQUI] Botão "Editar" agora tem o mesmo estilo do "Salvar" --- */
 .jornada-edit-btn {
     background: var(--cor-destaque-roxo);
     color: white;
@@ -439,10 +434,9 @@ main {
 
 .jornada-edit-btn:hover {
     background: var(--cor-destaque-roxo-hover);
-    color: white; /* Garante que o texto fique branco no hover */
+    color: white; 
 }
 
-/* --- Estado de Formulário --- */
 .jornada-form-wrapper {
     position: relative;
 }
@@ -519,9 +513,6 @@ main {
     color: var(--cor-destaque-dourado);
 }
 
-/* ========================================= */
-/* === ESTILOS MENSAGENS (Django Messages) === */
-/* ========================================= */
 .messages {
     width: 100%;
     margin-bottom: 20px; 
