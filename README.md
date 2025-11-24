@@ -104,7 +104,10 @@ Buscamos ir além do simples gerenciamento, criando uma plataforma onde a avalia
 </ul>
 <p align="center">
 <img src="images/backlog_sprint_04.png" alt="Sprint 4 do JIRA" width="1500"/>
-
+</p>
+<p align="center">
+<img src="images/bugs_sprint4.jpeg" alt="Bug tracker atualizado" width="1500"/>
+</p>
 </details>
 
 ---
