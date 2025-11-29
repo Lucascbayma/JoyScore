@@ -23,12 +23,24 @@ class JoyScoreE2ETest(TestCase):
     """
 
     def setUp(self):
-        """Configura o Driver antes de iniciar o teste."""
+        """Configura o Driver antes de iniciar o teste (Modo Headless para CI)."""
         print("\n=== Iniciando Configuração do WebDriver ===")
         try:
+            # --- CONFIGURAÇÕES PARA RODAR NO GITHUB ACTIONS ---
+            chrome_options = Options()
+            chrome_options.add_argument("--headless")  # Roda sem interface gráfica
+            chrome_options.add_argument("--no-sandbox") # Necessário para rodar como root/docker
+            chrome_options.add_argument("--disable-dev-shm-usage") # Evita erro de memória
+            chrome_options.add_argument("--window-size=1920,1080") # Define tamanho fixo (já que maximize falha)
+
             service = Service(ChromeDriverManager().install())
-            self.driver = webdriver.Chrome(service=service)
-            self.driver.maximize_window()
+            
+            # Passamos as options aqui
+            self.driver = webdriver.Chrome(service=service, options=chrome_options)
+            
+            # Não usamos maximize_window() no modo headless, usamos o window-size acima
+            # self.driver.maximize_window() 
+            
             self.wait = WebDriverWait(self.driver, 10)
         except Exception as e:
             print(f"ERRO CRÍTICO: Não foi possível iniciar o WebDriver: {e}")
