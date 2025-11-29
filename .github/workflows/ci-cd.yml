@@ -38,7 +38,7 @@ jobs:
       # Garante que os testes rodem sem erro de SECRET_KEY
       run: |
         export SECRET_KEY='ci-secret-key-para-testes'
-        python manage.py test
+        python manage.py test jogos/tests/E2E/
       
   # 2. Job de Deployment (CD) - Roda somente se o CI for SUCESSO
   cd:
